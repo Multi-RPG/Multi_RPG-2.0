@@ -1,10 +1,15 @@
 
-# Discord-Bot
+# Multi_RPG-2.0
 ## About
-A discord bot, written in python, with several utility/meme generators/RPG elements and a feature-rich hangman game.
+Multi_RPG-2.0 is a new version of [Discord-Bot](https://github.com/jdkennedy45/Discord-Bot), written in python3.8, using discord.py v1.0.
+
+## Features
+ - Utility
+ - Meme Makers
+ - RPG elements
+ - Games: Hangman, Slots, Lotto, many more.
 
 ## Run requirements:
-Multi_RPG-2.0 is using discord.py v1.0+. That is, Python 3.5.3 or higher is required.
 1. Needs python 3.5.3+ with sqlite3, pillow, requests, discord (1.3.4), numpy, dblpy (info on discordbots.org), and profanityfilter packages installed (use python3 -m pip install X)
 2. Optional: (Recommended) Create virtual environment, run `pip install -r requirements.txt`;
 3. In `scripts/setup/` folder, run `python setup.py`
