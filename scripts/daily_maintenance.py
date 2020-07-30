@@ -10,21 +10,20 @@ PS2: MAKE SURE TO CHANGE PATHS TO FULL FILE PATHS IF THIS IS AUTOMATED
 """
 
 import configparser
-import sys
-import random
 import discord
-import numpy
+import random
+import sys
 import os
+import Users
+import numpy
+import Database
 # add parent folder to module path. can comment this out if using virtual environment
-sys.path.append('..')
 
-from numpy import random
-from Users import Users
-from Database import Database
 from discord.ext import commands
 from pathlib import Path
 from datetime import date
 
+sys.path.append('..')
 
 # change working directory to parent to simplify file paths
 os.chdir("..")
@@ -34,22 +33,20 @@ client = commands.Bot(command_prefix=["=", "%"])
 
 # set up parser to config through our .ini file with our bot's token
 config = configparser.ConfigParser()
-bot_token_path = Path("tokens/tokenbot.ini") # use forward slash "/" for path directories
+bot_token_path = Path("tokens/tokenbot.ini")  # use forward slash "/" for path directories
 # confirm the token is located in the above path
 if bot_token_path.is_file():
     config.read(bot_token_path)
     # we now have the bot's token
     TOKEN = config.get('BOT1', 'token')
 else:
-    print("\n","Discord bot token not found at: ",bot_token_path,"... Please correct file path in daily_maintenance.py file.")
+    print("\n", "Discord bot token not found at: ", bot_token_path, "... Please correct file path in daily_maintenance.py file.")
     sys.exit()
+
 
 @client.event
 async def on_ready():
-    print('Logged in as\n'
-          + client.user.name + '\n'
-          + client.user.id + '\n'
-          + '---------')
+    print(f'Logged in as {client.user.name}\n{client.user.id}\n---------')
 
     # open database
     db = Database(0)
@@ -80,7 +77,7 @@ async def on_ready():
 
     """ PERFORM DAILY LOTTERY MAINTENANCE NOW """
     # generate a random winning number 1-5
-    win_number = random.randint(1,5)
+    win_number = random.randint(1, 5)
     # get python list of winner ticket id's who match today's winning number
     std_winners, prem_winners = db.get_lottery_winners(win_number)
     # we have today's winners now, so reset lottery
@@ -127,9 +124,8 @@ async def on_ready():
     em3 = discord.Embed(description=global_announcement3, colour=0x607d4a)
     em3.set_thumbnail(url="http://i66.tinypic.com/25g7akg.jpg")
 
-
     # for each server the bot is in, post the lottery results in the lottery channel
-    for server in client.servers:
+    for server in client.guilds:
         # try to get the server's announcement status
         # if they turned off announcements, skip to next loop iteration
         try:
@@ -143,9 +139,9 @@ async def on_ready():
             try:
                 if channel.name == 'lottery':
                     channel_found = 1
-                    await client.send_message(channel, embed=em)
-                    await client.send_message(channel, embed=em2)
-                    await client.send_message(channel, embed=em3)
+                    await channel.send(embed=em)
+                    await channel.send(embed=em2)
+                    await channel.send(embed=em3)
             except:
                 pass
 
@@ -153,16 +149,15 @@ async def on_ready():
         # make the channel, then send the results
         if channel_found == 0:
             try:
-                channel = await client.create_channel(server, 'lottery', type=discord.ChannelType.text)
-                await client.send_message(channel, embed=em)
-                await client.send_message(channel, embed=em2)
+                channel = await server.create_text_channel('lottery')
+                await channel.send(embed=em)
+                await channel.send(embed=em2)
             except:
                 # if the bot failed to make the channel, simply move on
                 pass
 
-
     """ PERFORM DAILY TOURNAMENT MAINTENANCE NOW! """
-    for server in client.servers:
+    for server in client.guilds:
         server_fighters_ids = db.get_server_tourney_members(server.id)
         # only do anything else if the server has more than 1 entry
         # need more than 1 fighter entry to have a tournament
@@ -246,7 +241,7 @@ async def on_ready():
                         em = discord.Embed(description=local_server_announcement, colour=0x607d4a)
                         em.set_thumbnail(url="https://cdn.discordapp.com/emojis/493220414206509056.gif?size=64")
                         try:
-                            await client.send_message(channel, embed=em)
+                            await channel.send(embed=em)
                         except:
                             pass
 
@@ -256,7 +251,7 @@ async def on_ready():
                         em = discord.Embed(description=local_server_announcement, colour=0x607d4a)
                         em.set_thumbnail(url="https://cdn.discordapp.com/emojis/493220414206509056.gif?size=64")
                         try:
-                            await client.send_message(channel, embed=em)
+                            await channel.send(embed=em)
                         except:
                             pass
 
