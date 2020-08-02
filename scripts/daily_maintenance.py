@@ -14,13 +14,13 @@ import discord
 import random
 import sys
 import os
-import Users
 import numpy
-import Database
 
 from discord.ext import commands
 from pathlib import Path
 from datetime import date
+from Users import Users
+from Database import Database
 
 # add parent folder to module path. can comment this out if using virtual environment
 sys.path.append('..')
@@ -141,7 +141,7 @@ async def on_ready():
                     channel_found = 1
                     await channel.send(embed=em)
                     await channel.send(embed=em2)
-                    await channel.send(embed=em3)
+                    #await channel.send(embed=em3)
             except:
                 pass
 
