@@ -270,9 +270,9 @@ if enable_error:
             commands_logger.info(
                 str(error)
                 + " in command: "
-                + str(context.command)
+                + str(context)
                 + "\nUser tried: "
-                + str(context.message.clean_content)
+                + str(context.clean_content)
                 + "\nInitiated by: {}, ID: {}".format(
                     context.message.author.name, context.message.author.id
                 )
@@ -295,15 +295,17 @@ if enable_error:
             await context.send(str(error))
 
 '''
-if __name__ == "__main__":
-    for extension in [
         "Games",
         "Utilities",
         "Memes",
-        "Account",
         "Lottery",
         "Shop",
         "Pets",
+'''
+
+if __name__ == "__main__":
+    for extension in [
+        "Account",
         "DiscordBotsOrgApi",
     ]:
         try:
@@ -311,7 +313,6 @@ if __name__ == "__main__":
         except Exception as e:
             exc = "{}: {}".format(type(e).__name__, e)
             print("Failed to load extension {}\n{}".format(extension, exc))
-'''
 
 # set up parser to config through our .ini file with our bot's token
 config = configparser.ConfigParser()
