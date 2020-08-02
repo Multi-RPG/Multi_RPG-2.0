@@ -27,7 +27,7 @@ def has_voted():
         checker = DiscordBotsOrgAPI()
         # check if the user attempting to use this command has voted for the bot within 24 hours
         # if they have not voted recently, let the error handler in Main.py give the proper error message
-        if checker.check_upvote(ctx.message.author.id) == 0:
+        if checker.check_upvote(ctx.author.id) == 0:
             return False
         else:
             return True

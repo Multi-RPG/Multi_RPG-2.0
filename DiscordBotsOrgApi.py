@@ -59,7 +59,7 @@ class DiscordBotsOrgAPI(commands.Cog):
         headers = {"Authorization": self.token}
         api_url = (
             "https://discordbots.org/api/bots/486349031224639488/check?userId="
-            + voter_id
+            + str(voter_id)
         )
         r = requests.get(api_url, headers=headers)
         return r.json()["voted"]

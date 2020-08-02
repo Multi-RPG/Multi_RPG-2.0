@@ -211,12 +211,13 @@ async def announcements_toggle(context):
 # Commands error handling
 if enable_error:
     @client.event
-    async def on_command_error(error, context):
+    async def on_command_error(context, error):
         if isinstance(error, commands.CommandOnCooldown):
             # error.retry_after returns float, need to cast to integer without decimals
             # now convert to proper HH:MM:SS format and print the cooldown
             time = str(datetime.timedelta(seconds=int(error.retry_after)))
-            await context.send(content=" You are on cooldown: " + time)
+            msg = f"You are on cooldown: {time}"
+            await context.send(msg)
 
         elif isinstance(error, commands.CommandNotFound):
             error_msg = await context.send("Command not found...")
@@ -265,16 +266,8 @@ if enable_error:
 
         # if the error fell in none of the above, log the error in our commands_errors.txt file
         else:
-            commands_logger.info(
-                str(error)
-                + " in command: "
-                + str(context)
-                + "\nUser tried: "
-                + str(context.clean_content)
-                + "\nInitiated by: {}, ID: {}".format(
-                    context.message.author.name, context.message.author.id
-                )
-            )
+            error_message = f"{str(error)} in command: {str(context.command)}, \nUser tried: {str(context.clean_content)}\nInitiated by: {context.author.name} ID: {context.author.id}."
+            commands_logger.info(error_message)
 
         # special cases
         # if permissions/access error is indicated from discord's response string, private message the user
