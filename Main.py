@@ -146,7 +146,11 @@ async def helper(context):
         await author.dm_channel.send(msg4)
     except discord.Forbidden as error:
         print(f"{type(error).__name__} {error.text}")
-        error_msg = "I was unable to DM you the help message. It is possible that you do not allow DM from server members. Please check your privacy settings."
+        error_msg = (
+            f"I was unable to DM you the help message. "
+            f"It is possible that you do not allow DM from server members. "
+            f"Please check your privacy settings."
+        )
         await context.send(error_msg)
 
 
@@ -214,9 +218,7 @@ if enable_error:
             await asyncio.sleep(10)
             await context.message.delete()
             await error_msg.delete()
-            commands_logger.info(
-                str(error) + "\nInitiated by: {}, ID: {}".format(context.author.name, context.author.id)
-            )
+            commands_logger.info(f"{str(error)}\nInitiated by: {context.author.name}, ID: {context.author.id}")
 
         # we use command checks when checking if user voted within 12 hours,
         # or if a user has a pet/account in the database
