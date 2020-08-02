@@ -17,12 +17,12 @@ import os
 import Users
 import numpy
 import Database
-# add parent folder to module path. can comment this out if using virtual environment
 
 from discord.ext import commands
 from pathlib import Path
 from datetime import date
 
+# add parent folder to module path. can comment this out if using virtual environment
 sys.path.append('..')
 
 # change working directory to parent to simplify file paths

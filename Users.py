@@ -136,9 +136,15 @@ class Users:
         # if we want the full formatted string sequence of battle records
         elif string == 1:
             # assign each variable from the sql query
-            weapon_level, helmet_level, chest_level, boots_level, battles_lost, battles_won, total_winnings = (
-                hm_db.get_battle_stats()
-            )
+            (
+                weapon_level,
+                helmet_level,
+                chest_level,
+                boots_level,
+                battles_lost,
+                battles_won,
+                total_winnings,
+            ) = hm_db.get_battle_stats()
             total_winnings = "{:,}".format(total_winnings)
             user_level = hm_db.get_level()
             # format money with commas

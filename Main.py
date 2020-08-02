@@ -56,11 +56,7 @@ async def on_message(message):
 
 
 @client.command(
-    name="help",
-    description="command information",
-    brief="commands",
-    aliases=["h", "HELP"],
-    pass_context=True,
+    name="help", description="command information", brief="commands", aliases=["h", "HELP"],
 )
 async def helper(context):
     # using discord's "ml" language coloring scheme for the encoded help message
@@ -137,11 +133,7 @@ async def helper(context):
         "                          NOTE: this toggle disables =rob @user for yourself and people targetting you\n"
         "                          NOTE: peace mode has a cooldown that only resets once every week on Monday```"
     )
-    msg4 = (
-        "```ml\n"
-        "https://discord.gg/BGAwXft"
-        "```"
-    )
+    msg4 = "```ml\n" "https://discord.gg/BGAwXft" "```"
 
     # Person that invoked this command.
     author = context.author
@@ -153,7 +145,7 @@ async def helper(context):
         await author.dm_channel.send(msg3)
         await author.dm_channel.send(msg4)
     except discord.Forbidden as error:
-        print(f'{type(error).__name__} {error.text}')
+        print(f"{type(error).__name__} {error.text}")
         error_msg = "I was unable to DM you the help message. It is possible that you do not allow DM from server members. Please check your privacy settings."
         await context.send(error_msg)
 
@@ -163,7 +155,6 @@ async def helper(context):
     description="use to toggle daily announcements",
     brief="toggle server announcements",
     aliases=["announcements", "ANNOUNCEMENTS", "TOGGLE", "TOGGLEANNOUNCEMENTS"],
-    pass_context=True,
 )
 async def announcements_toggle(context):
     # connect to database through our custom Database module
@@ -171,13 +162,13 @@ async def announcements_toggle(context):
     db.connect()
 
     # if the server id does not exist in our database, insert it
-    if db.find_server(context.message.server.id) == 0:
-        db.insert_server(context.message.server.id)
+    if db.find_server(context.guild.id) == 0:
+        db.insert_server(context.guild.id)
 
     # if the user has admin privileges, permit them to toggle the daily server announcements
-    if context.message.author.server_permissions.administrator:
+    if context.author.guild_permissions.administrator:
         # flip the status and retrieve the new announcements status
-        new_status = db.toggle_server_announcements(context.message.server.id)
+        new_status = db.toggle_server_announcements(context.guild.id)
 
         # if the new status is off, they just toggled off the announcements
         if new_status == 0:
@@ -187,9 +178,7 @@ async def announcements_toggle(context):
             )
             # embed the confirmation into a message and send
             em = discord.Embed(description=result_str, colour=0x607D4A)
-            thumb_url = "https://cdn.discordapp.com/icons/{0.id}/{0.icon}.webp?size=40".format(
-                context.message.server
-            )
+            thumb_url = "https://cdn.discordapp.com/icons/{0.id}/{0.icon}.webp?size=40".format(context.guild)
             em.set_thumbnail(url=thumb_url)
             await context.send(embed=em)
         # if the new status is on, they just toggled on announcements
@@ -200,9 +189,7 @@ async def announcements_toggle(context):
             )
             # embed the confirmation into a message and send
             em = discord.Embed(description=result_str, colour=0x607D4A)
-            thumb_url = "https://cdn.discordapp.com/icons/{0.id}/{0.icon}.webp?size=32".format(
-                context.message.server
-            )
+            thumb_url = "https://cdn.discordapp.com/icons/{0.id}/{0.icon}.webp?size=32".format(context.guild)
             em.set_thumbnail(url=thumb_url)
             await context.send(embed=em)
     # else inform the user they lack sufficient privileges
@@ -212,24 +199,23 @@ async def announcements_toggle(context):
 
 # Commands error handling
 if enable_error:
+
     @client.event
-    async def on_command_error(error, context):
+    async def on_command_error(context, error):
         if isinstance(error, commands.CommandOnCooldown):
             # error.retry_after returns float, need to cast to integer without decimals
             # now convert to proper HH:MM:SS format and print the cooldown
             time = str(datetime.timedelta(seconds=int(error.retry_after)))
-            await context.send(content=" You are on cooldown: " + time)
+            msg = f"You are on cooldown: {time}"
+            await context.send(msg)
 
         elif isinstance(error, commands.CommandNotFound):
             error_msg = await context.send("Command not found...")
             await asyncio.sleep(10)
-            await context.delete_message(context.message)
-            await context.delete_message(error_msg)
+            await context.message.delete()
+            await error_msg.delete()
             commands_logger.info(
-                str(error)
-                + "\nInitiated by: {}, ID: {}".format(
-                    context.message.author.name, context.message.author.id
-                )
+                str(error) + "\nInitiated by: {}, ID: {}".format(context.author.name, context.author.id)
             )
 
         # we use command checks when checking if user voted within 12 hours,
@@ -241,42 +227,26 @@ if enable_error:
                     "Failed! You have not voted within the last 12 hours."
                     "\nhttps://discordbots.org/bot/486349031224639488/vote"
                 )
-                em = discord.Embed(
-                    title=context.message.author.display_name,
-                    description=error_msg,
-                    colour=0x607D4A,
-                )
-                em.set_thumbnail(
-                    url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=64"
-                )
+                em = discord.Embed(title=context.author.display_name, description=error_msg, colour=0x607D4A,)
+                em.set_thumbnail(url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=64")
                 await context.send(embed=em)
             # if the check failed for one of the 3 pet interaction functions in Pets.py
             elif any(x in str(error) for x in ["feed", "hunt", "pet"]):
                 error_msg = "Failed! You have no pet! Use **=adopt** to adopt a pet."
-                em = discord.Embed(
-                    title=context.message.author.display_name,
-                    description=error_msg,
-                    colour=0x607D4A,
-                )
-                em.set_thumbnail(
-                    url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=64"
-                )
+                em = discord.Embed(title=context.author.display_name, description=error_msg, colour=0x607D4A,)
+                em.set_thumbnail(url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=64")
                 await context.send(embed=em)
             else:
                 await context.send(" No account found.\nUse **=create** to make one.")
 
         # if the error fell in none of the above, log the error in our commands_errors.txt file
         else:
-            commands_logger.info(
-                str(error)
-                + " in command: "
-                + str(context.command)
-                + "\nUser tried: "
-                + str(context.message.clean_content)
-                + "\nInitiated by: {}, ID: {}".format(
-                    context.message.author.name, context.message.author.id
-                )
+            error_message = (
+                f"{str(error)} in command: {str(context.command)}, \n"
+                f"User tried: {str(context.clean_content)}\n"
+                f"Initiated by: {context.author.name} ID: {context.author.id}."
             )
+            commands_logger.info(error_message)
 
         # special cases
         # if permissions/access error is indicated from discord's response string, private message the user
@@ -288,22 +258,22 @@ if enable_error:
             )
             await context.send(str(error))
         elif "Access" in str(error):
-            await context.send(
-                "I couldn't talk to you in there!\n"
-                "I am likely missing **access** to that channel.",
-            )
+            await context.send("I couldn't talk to you in there!\n" "I am likely missing **access** to that channel.",)
             await context.send(str(error))
 
-'''
-if __name__ == "__main__":
-    for extension in [
+
+"""
         "Games",
         "Utilities",
         "Memes",
-        "Account",
         "Lottery",
         "Shop",
         "Pets",
+"""
+
+if __name__ == "__main__":
+    for extension in [
+        "Account",
         "DiscordBotsOrgApi",
     ]:
         try:
@@ -311,13 +281,10 @@ if __name__ == "__main__":
         except Exception as e:
             exc = "{}: {}".format(type(e).__name__, e)
             print("Failed to load extension {}\n{}".format(extension, exc))
-'''
 
 # set up parser to config through our .ini file with our bot's token
 config = configparser.ConfigParser()
-bot_token_path = Path(
-    "tokens/tokenbot.ini"
-)  # use forward slash "/" for path directories
+bot_token_path = Path("tokens/tokenbot.ini")  # use forward slash "/" for path directories
 # confirm the token is located in the above path
 if bot_token_path.is_file():
     config.read(bot_token_path)
@@ -325,10 +292,7 @@ if bot_token_path.is_file():
     TOKEN = config.get("BOT1", "token")
 else:
     print(
-        "\n",
-        "Discord bot token not found at: ",
-        bot_token_path,
-        "... Please correct file path in Main.py file.",
+        "\n", "Discord bot token not found at: ", bot_token_path, "... Please correct file path in Main.py file.",
     )
     sys.exit()
 
