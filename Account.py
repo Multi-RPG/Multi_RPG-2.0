@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import re
-import asyncio
 import discord
+import asyncio
 
 from discord.ext import commands
 from DiscordBotsOrgApi import DiscordBotsOrgAPI
@@ -33,7 +33,6 @@ def has_voted():
             return True
 
     return commands.check(predicate)
-
 
 
 class Account(commands.Cog):
@@ -124,8 +123,7 @@ class Account(commands.Cog):
             print(msg)
         finally:
             # delete original message to reduce spam
-            # await context.delete(context.message)
-            print()  # remove this once we figure out how to use delete.
+            await context.message.delete()
 
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -182,8 +180,7 @@ class Account(commands.Cog):
             print(msg)
         finally:
             # delete original message to reduce spam
-            # await context.delete(context.message)
-            print()  # remove this once we figure out how to use delete.
+            await context.message.delete()
 
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -236,7 +233,7 @@ class Account(commands.Cog):
                 url="https://cdn.discordapp.com/emojis/526815183553822721.webp?size=64"
             )
             await context.send(embed=em)
-            # await context.delete_message(context.message)
+            await context.message.delete()
         except Exception as e:
             msg = f"Not ok! {e.__class__} occurred"
             print(msg)
@@ -335,9 +332,9 @@ class Account(commands.Cog):
                 + str("{:,}".format((level_up_cost)) + "**")
             )
             # wait 15 seconds then delete error message and original message to reduce spam
-            # await asyncio.sleep(15)
-            # await context.delete(error_msg)
-            # await context.delete(context.message)
+            await asyncio.sleep(15)
+            await error_msg.delete()
+            await context.message.delete()
             return
 
         # passed conditional, so they have enough money to level up

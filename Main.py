@@ -223,8 +223,8 @@ if enable_error:
         elif isinstance(error, commands.CommandNotFound):
             error_msg = await context.send("Command not found...")
             await asyncio.sleep(10)
-            await context.delete_message(context.message)
-            await context.delete_message(error_msg)
+            await context.message.delete()
+            await error_msg.delete()
             commands_logger.info(
                 str(error)
                 + "\nInitiated by: {}, ID: {}".format(
