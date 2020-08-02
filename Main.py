@@ -60,7 +60,6 @@ async def on_message(message):
     description="command information",
     brief="commands",
     aliases=["h", "HELP"],
-    pass_context=True,
 )
 async def helper(context):
     # using discord's "ml" language coloring scheme for the encoded help message
@@ -163,7 +162,6 @@ async def helper(context):
     description="use to toggle daily announcements",
     brief="toggle server announcements",
     aliases=["announcements", "ANNOUNCEMENTS", "TOGGLE", "TOGGLEANNOUNCEMENTS"],
-    pass_context=True,
 )
 async def announcements_toggle(context):
     # connect to database through our custom Database module
@@ -171,13 +169,13 @@ async def announcements_toggle(context):
     db.connect()
 
     # if the server id does not exist in our database, insert it
-    if db.find_server(context.message.server.id) == 0:
-        db.insert_server(context.message.server.id)
+    if db.find_server(context.guild.id) == 0:
+        db.insert_server(context.guild.id)
 
     # if the user has admin privileges, permit them to toggle the daily server announcements
-    if context.message.author.server_permissions.administrator:
+    if context.author.guild_permissions.administrator:
         # flip the status and retrieve the new announcements status
-        new_status = db.toggle_server_announcements(context.message.server.id)
+        new_status = db.toggle_server_announcements(context.guild.id)
 
         # if the new status is off, they just toggled off the announcements
         if new_status == 0:
@@ -188,7 +186,7 @@ async def announcements_toggle(context):
             # embed the confirmation into a message and send
             em = discord.Embed(description=result_str, colour=0x607D4A)
             thumb_url = "https://cdn.discordapp.com/icons/{0.id}/{0.icon}.webp?size=40".format(
-                context.message.server
+                context.guild
             )
             em.set_thumbnail(url=thumb_url)
             await context.send(embed=em)
@@ -201,7 +199,7 @@ async def announcements_toggle(context):
             # embed the confirmation into a message and send
             em = discord.Embed(description=result_str, colour=0x607D4A)
             thumb_url = "https://cdn.discordapp.com/icons/{0.id}/{0.icon}.webp?size=32".format(
-                context.message.server
+                context.guild
             )
             em.set_thumbnail(url=thumb_url)
             await context.send(embed=em)
@@ -228,7 +226,7 @@ if enable_error:
             commands_logger.info(
                 str(error)
                 + "\nInitiated by: {}, ID: {}".format(
-                    context.message.author.name, context.message.author.id
+                    context.author.name, context.author.id
                 )
             )
 
@@ -242,7 +240,7 @@ if enable_error:
                     "\nhttps://discordbots.org/bot/486349031224639488/vote"
                 )
                 em = discord.Embed(
-                    title=context.message.author.display_name,
+                    title=context.author.display_name,
                     description=error_msg,
                     colour=0x607D4A,
                 )
@@ -254,7 +252,7 @@ if enable_error:
             elif any(x in str(error) for x in ["feed", "hunt", "pet"]):
                 error_msg = "Failed! You have no pet! Use **=adopt** to adopt a pet."
                 em = discord.Embed(
-                    title=context.message.author.display_name,
+                    title=context.author.display_name,
                     description=error_msg,
                     colour=0x607D4A,
                 )
