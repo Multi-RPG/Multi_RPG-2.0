@@ -22,18 +22,21 @@ class Utilities(commands.Cog):
             # try-catch block, because of *args array.
             # if no argument given in discord after "=clear", it will go to the exception
             try:
-                if int(args[0]) > 100:
-                    await context.send("100 messages maximum!")
-                    return
-                deleted = await context.channel.purge(limit=int(args[0]))
-                await context.send("Deleted %s message(s)" % str(len(deleted)))
-
-            except:
-                await context.channel.purge(context.message.channel, limit=1)
-                await context.send(
-                    "Cleared 1 message... "
-                    "Use **=clear X** to clear a higher, specified amount."
-                )
+                if args:
+                    if int(args[0]) > 100:
+                        await context.send("100 messages maximum!")
+                        return
+                    deleted = await context.channel.purge(limit=int(args[0]))
+                    await context.send("Deleted %s message(s)" % str(len(deleted)))
+                else:
+                    await context.channel.purge(limit=1)
+                    await context.send(
+                        "Cleared 1 message... "
+                        "Use **=clear X** to clear a higher, specified amount."
+                    )
+            except Exception as e:
+                msg = f"Not ok! {e.__class__} occurred"
+                print(msg)
         # else inform the user they lack sufficient privileges
         else:
             await context.send("You need to be a local server administrator to do that!")
@@ -76,6 +79,7 @@ class Utilities(commands.Cog):
                 error_msg = await context.send(context.author.mention + " No links permitted!")
                 await asyncio.sleep(6)
                 await error_msg.delete()
+                await context.message.delete()
                 return
 
             # if a negative sign in the user's time parameter...
@@ -83,6 +87,7 @@ class Utilities(commands.Cog):
                 error_msg = await context.send("Timer can not be negative...")
                 await asyncio.sleep(10)
                 await error_msg.delete()
+                await context.message.delete()
                 return
             # if "s" in their time parameter, simply set seconds to "s" after retrieving the integer
             if "s" in time:
@@ -104,12 +109,14 @@ class Utilities(commands.Cog):
                 error_msg = await context.send("Use a **valid** unit of time (Ex: _20s_, _50m_, _3hr_)")
                 await asyncio.sleep(15)
                 await error_msg.delete()
+                await context.message.delete()
                 return
         # if arguments weren't passed in correctly
         except:
             error_msg = await context.send(error_str)
             await asyncio.sleep(15)
             await error_msg.delete()
+            await context.message.delete()
             return
 
         # embed the link, set thumbnail, send reminder confirmation, then wait X seconds
