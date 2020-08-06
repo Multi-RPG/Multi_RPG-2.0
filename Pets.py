@@ -32,7 +32,7 @@ def has_pet():
     return commands.check(predicate)
 
 
-class Pets:
+class Pets(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -41,36 +41,30 @@ class Pets:
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="adopt",
-        description="adopt a pet and raise it for rewards",
-        brief="can use =adopt",
-        aliases=["ADOPT"],
-        pass_context=True,
+        name="adopt", description="adopt a pet and raise it for rewards", brief="can use =adopt", aliases=["ADOPT"],
     )
     async def adopt_pet(self, context):
         # create instance of the user who wishes to feed their pet
-        pet_owner = Users(context.message.author.id)
+        pet_owner = Users(context.author.id)
 
         if pet_owner.find_pet() == 1:
-            msg = await self.client.say("Failed! You already have a pet!")
+            msg = await context.send("Failed! You already have a pet!")
             await asyncio.sleep(5)
-            await self.client.delete_message(msg)
+            await msg.delete()
             return
 
-        intro_msg = (
-            "Welcome to the **Pet Shelter**!\n\nPlease enter your desired pet name now:"
-        )
+        intro_msg = "Welcome to the **Pet Shelter**!\n\nPlease enter your desired pet name now:"
         # embed intro message, then overwrite the variable with the actual message object
         em = discord.Embed(description=intro_msg, colour=0x607D4A)
-        em.set_thumbnail(
-            url="https://cdn.discordapp.com/emojis/560065150489722880.png?size=128"
-        )
-        await self.client.say(embed=em)
+        em.set_thumbnail(url="https://cdn.discordapp.com/emojis/560065150489722880.png?size=128")
+        await context.send(embed=em)
 
         # wait for user's pet name entry
-        pet_name = await self.client.wait_for_message(
-            author=context.message.author, timeout=60
-        )
+        # helper to check if it's the author that it's responding.
+        def is_author(m):
+            return m.author == context.author and m.channel == context.channel
+
+        pet_name = await self.client.wait_for("message", check=is_author, timeout=60)
         # remove everything except alphanumerics from the user's pet name entry
         pet_name = re.sub(r"\W+", "", pet_name.clean_content)
 
@@ -78,21 +72,17 @@ class Pets:
         pf = ProfanityFilter()
         # while the pet name entry has profanity, prompt user to re-enter a name
         while not pf.is_clean(pet_name):
-            await self.client.say("Pet name has profanity! Please enter a new one now:")
+            await context.send("Pet name has profanity! Please enter a new one now:")
             # wait for user's new pet name entry
-            pet_name = await self.client.wait_for_message(
-                author=context.message.author, timeout=60
-            )
+            pet_name = await self.client.wait_for("message", check=is_author, timeout=60)
             # remove everything except alphanumerics from the user's pet name entry
             pet_name = re.sub(r"\W+", "", pet_name.clean_content)
 
         adoption_msg = pet_owner.add_pet(pet_name[:15])
         # embed confirmation message
         em = discord.Embed(description=adoption_msg, colour=0x607D4A)
-        em.set_thumbnail(
-            url="https://cdn.discordapp.com/emojis/563872560308289536.png?v=1"
-        )
-        await self.client.say(embed=em)
+        em.set_thumbnail(url="https://cdn.discordapp.com/emojis/563872560308289536.png?v=1")
+        await context.send(embed=em)
 
     """FEED PET FUNCTION"""
 
@@ -100,11 +90,7 @@ class Pets:
     @has_pet()
     @commands.cooldown(1, 86400, commands.BucketType.user)
     @commands.command(
-        name="feed",
-        description="feed your pet for XP",
-        brief="can use =feed",
-        aliases=["FEED"],
-        pass_context=True,
+        name="feed", description="feed your pet for XP", brief="can use =feed", aliases=["FEED"],
     )
     async def feed(self, context):
         # create instance of the user who wishes to feed their pet
@@ -127,54 +113,34 @@ class Pets:
             )
 
             if new_pet_level == 2:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/491930617823494147.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/491930617823494147.png?v=1"
             elif new_pet_level == 3:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/435032643772350464.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/435032643772350464.png?v=1"
             elif new_pet_level == 4:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/400690504104148992.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/400690504104148992.png?v=1"
             else:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/422845006232027147.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/422845006232027147.png?v=1"
 
         else:
             if pet_level == 1:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/563872560308289536.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/563872560308289536.png?v=1"
             elif pet_level == 2:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/491930617823494147.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/491930617823494147.png?v=1"
             elif pet_level == 3:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/435032643772350464.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/435032643772350464.png?v=1"
             elif pet_level == 4:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/400690504104148992.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/400690504104148992.png?v=1"
             else:
-                pet_avatar = (
-                    "https://cdn.discordapp.com/emojis/422845006232027147.png?v=1"
-                )
+                pet_avatar = "https://cdn.discordapp.com/emojis/422845006232027147.png?v=1"
 
             confirmation_msg = "Fed **" + pet_name + "**! They feel stuffed for today." "\n\n\n**XP:** " + str(
                 new_pet_xp
-            ) + "/" + str(
-                level_up_cost
-            )
+            ) + "/" + str(level_up_cost)
 
         # embed confirmation message
         em = discord.Embed(description=confirmation_msg, colour=0x607D4A)
         em.set_thumbnail(url=pet_avatar)
-        await self.client.say(embed=em)
+        await context.send(embed=em)
 
     """PET HUNT LOOT FUNCTION"""
 
@@ -182,15 +148,11 @@ class Pets:
     @has_pet()
     @commands.cooldown(1, 86400, commands.BucketType.user)
     @commands.command(
-        name="hunt",
-        description="command your pet to hunt for loot",
-        brief="can use =hunt",
-        aliases=["HUNT", "Hunt"],
-        pass_context=True,
+        name="hunt", description="command your pet to hunt for loot", brief="can use =hunt", aliases=["HUNT", "Hunt"],
     )
     async def hunt(self, context):
         # create instance of the user who wishes for their pet to hunt rewards
-        pet_owner = Users(context.message.author.id)
+        pet_owner = Users(context.author.id)
         # retrieve pet name
         pet_name = pet_owner.get_user_pet_name()
         # retrieve integer of pet's current level
@@ -216,14 +178,12 @@ class Pets:
             loot = choices([1, 2], [0.80, 0.20])
 
         # remove brackets from returned value of choices() function
-        loot = int(re.findall("\d+", str(loot))[0])
+        loot = int(re.findall(r"\d+", str(loot))[0])
 
         # if it was decided that the loot would be a money reward, reward the pet owner with money
         if loot == 1:
             reward_msg = (
-                "**"
-                + pet_name
-                + "** was unable to hunt any gear upgrades in the woods..."
+                "**" + pet_name + "** was unable to hunt any gear upgrades in the woods..."
                 "\nBut, they located a :moneybag: on their journey!"
             )
             # get int version of level and multiply it by 35 for the money reward
@@ -247,9 +207,15 @@ class Pets:
             # 2. then offer the pet owner a corresponding item 1 gear point above the item
 
             # assign each variable from the sql query to retrieve the pet owner's gear levels
-            weapon_level, helmet_level, chest_level, boots_level, battles_lost, battles_won, total_winnings = pet_owner.get_user_stats(
-                0
-            )
+            (
+                weapon_level,
+                helmet_level,
+                chest_level,
+                boots_level,
+                battles_lost,
+                battles_won,
+                total_winnings,
+            ) = pet_owner.get_user_stats(0)
 
             # put the point levels of each gear piece they possess in a list
             list = (weapon_level, helmet_level, chest_level, boots_level)
@@ -259,9 +225,7 @@ class Pets:
             # if the user has at least level 10 gear pieces of all types, give them money reward and return
             if list[index_smallest] == 10:
                 reward_msg = (
-                    "**"
-                    + pet_name
-                    + "** failed to hunt gear. Level 10 gear is the limit for hunt upgrades."
+                    "**" + pet_name + "** failed to hunt gear. Level 10 gear is the limit for hunt upgrades."
                     "\nCheck =shop for level 11 and level 12 items."
                     "\nBut, they located a :moneybag: on their journey!"
                 )
@@ -277,38 +241,22 @@ class Pets:
                 # embed confirmation message
                 em = discord.Embed(description=reward_msg, colour=0x607D4A)
                 em.set_thumbnail(url=pet_avatar)
-                await self.client.say(embed=em)
+                await context.send(embed=em)
                 return
 
             # 1. use the index of lowest gear item acquired above
             # 2. upgrade that minimum stat by 1
             if index_smallest == 0:
-                reward_msg += (
-                    "Upgraded to level **"
-                    + str((weapon_level + 1))
-                    + "** <:weapon1:532252764097740861>"
-                )
+                reward_msg += "Upgraded to level **" + str((weapon_level + 1)) + "** <:weapon1:532252764097740861>"
                 pet_owner.update_user_battle_gear("weapon", weapon_level + 1)
             elif index_smallest == 1:
-                reward_msg += (
-                    " Upgraded to level **"
-                    + str((helmet_level + 1))
-                    + "** <:helmet2:532252796255469588>"
-                )
+                reward_msg += " Upgraded to level **" + str((helmet_level + 1)) + "** <:helmet2:532252796255469588>"
                 pet_owner.update_user_battle_gear("helmet", helmet_level + 1)
             elif index_smallest == 2:
-                reward_msg += (
-                    "Upgraded to level **"
-                    + str((chest_level + 1))
-                    + "** <:chest5:532255708679503873>"
-                )
+                reward_msg += "Upgraded to level **" + str((chest_level + 1)) + "** <:chest5:532255708679503873>"
                 pet_owner.update_user_battle_gear("chest", chest_level + 1)
             else:
-                reward_msg += (
-                    "Upgraded to level **"
-                    + str((boots_level + 1))
-                    + "** <:boots1:532252814953676807>"
-                )
+                reward_msg += "Upgraded to level **" + str((boots_level + 1)) + "** <:boots1:532252814953676807>"
                 pet_owner.update_user_battle_gear("boots", boots_level + 1)
 
             reward_msg += " <a:worryHype:487059927731273739>"
@@ -316,7 +264,7 @@ class Pets:
         # embed confirmation message
         em = discord.Embed(description=reward_msg, colour=0x607D4A)
         em.set_thumbnail(url=pet_avatar)
-        await self.client.say(embed=em)
+        await context.send(embed=em)
 
     """PET PROFILE PAGE FUNCTION"""
 
@@ -324,15 +272,11 @@ class Pets:
     @has_pet()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="pet",
-        description="check your pet status",
-        brief="can use =pet",
-        aliases=["PET", "Pet"],
-        pass_context=True,
+        name="pet", description="check your pet status", brief="can use =pet", aliases=["PET", "Pet"],
     )
     async def pet_profile(self, context):
         # create instance of the user who wishes to view their pet stats
-        pet_owner = Users(context.message.author.id)
+        pet_owner = Users(context.author.id)
         # retrieve pet name
         pet_name = pet_owner.get_user_pet_name()
         # retrieve integer of pet's current xp
@@ -375,7 +319,7 @@ class Pets:
         # embed pet's details into a message
         em = discord.Embed(description=pet_details, colour=0x607D4A)
         em.set_thumbnail(url=pet_avatar)
-        await self.client.say(embed=em)
+        await context.send(embed=em)
 
 
 def setup(client):
