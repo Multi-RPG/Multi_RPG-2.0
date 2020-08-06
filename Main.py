@@ -269,7 +269,6 @@ if enable_error:
         "Memes",
         "Lottery",
         "Shop",
-        "Pets",
 """
 
 if __name__ == "__main__":
@@ -277,6 +276,7 @@ if __name__ == "__main__":
         "Account",
         "DiscordBotsOrgApi",
         "Utilities",
+        "Pets",
     ]:
         try:
             client.load_extension(extension)
