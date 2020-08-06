@@ -5,7 +5,7 @@ import re
 from discord.ext import commands
 
 
-class Utilities:
+class Utilities(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -15,34 +15,28 @@ class Utilities:
         description="Deletes messages in the channel.",
         brief='can use "=clear" or "=clear X", with X being #  messages to delete',
         aliases=["c", "clr", "CLEAR", "C", "CLR", "clean", "CLEAN"],
-        pass_context=True,
     )
     async def clear(self, context, *args):
         # if the user has admin privileges, permit them to use this command
-        if context.message.author.server_permissions.administrator:
+        if context.author.guild_permissions.administrator:
             # try-catch block, because of *args array.
             # if no argument given in discord after "=clear", it will go to the exception
             try:
                 if int(args[0]) > 100:
-                    await self.client.say("100 messages maximum!")
+                    await context.send("100 messages maximum!")
                     return
-                deleted = await self.client.purge_from(
-                    context.message.channel, limit=int(args[0])
-                )
-                await self.client.say("Deleted %s message(s)" % str(len(deleted)))
+                deleted = await context.channel.purge(limit=int(args[0]))
+                await context.send("Deleted %s message(s)" % str(len(deleted)))
 
             except:
-                await self.client.purge_from(context.message.channel, limit=1)
-                await self.client.say(
+                await context.channel.purge(context.message.channel, limit=1)
+                await context.send(
                     "Cleared 1 message... "
                     "Use **=clear X** to clear a higher, specified amount."
                 )
         # else inform the user they lack sufficient privileges
         else:
-            await self.client.send_message(
-                context.message.channel,
-                "You need to be a local server administrator to do that!",
-            )
+            await context.send("You need to be a local server administrator to do that!")
 
     @commands.cooldown(1, 6, commands.BucketType.user)
     @commands.command(
@@ -50,7 +44,6 @@ class Utilities:
         description="Reminds you by timer.",
         brief='=remindme "message" X',
         aliases=["remindme", "ALARM", "timer", "alarm,", "REMIND", "REMINDME"],
-        pass_context=True,
     )
     async def remindme(self, context, *args):
         error_str = '```ml\nUse =remindme "message" X     -- X being timer (Ex: 20s, 50m, 3hr)```'
@@ -80,47 +73,43 @@ class Utilities:
                 msg = str(msg.replace("@here", "Here!"))
             # prevent users from using links in remindme's message
             if "http" in msg:
-                error_msg = await self.client.say(
-                    context.message.author.mention + " No links permitted!"
-                )
+                error_msg = await context.send(context.author.mention + " No links permitted!")
                 await asyncio.sleep(6)
-                await self.client.delete_message(error_msg)
+                await error_msg.delete()
                 return
 
             # if a negative sign in the user's time parameter...
             if "-" in time:
-                error_msg = await self.client.say("Timer can not be negative...")
+                error_msg = await context.send("Timer can not be negative...")
                 await asyncio.sleep(10)
-                await self.client.delete_message(error_msg)
+                await error_msg.delete()
                 return
             # if "s" in their time parameter, simply set seconds to "s" after retrieving the integer
             if "s" in time:
                 unit = "second(s)"
-                time = int(re.findall("\d+", time)[0])
+                time = int(re.findall(r"\d+", time)[0])
                 seconds = 1 * time
             # if "m" in their time parameter, set seconds to 60 * parameter after retrieving the integer
             elif "m" in time:
                 unit = "minute(s)"
-                time = int(re.findall("\d+", time)[0])
+                time = int(re.findall(r"\d+", time)[0])
                 seconds = 60 * time
             # if "h" in their time parameter, set seconds to 3600 * parameter after retrieving the integer
             elif "h" in time:
                 unit = "hour(s)"
-                time = int(re.findall("\d+", time)[0])
+                time = int(re.findall(r"\d+", time)[0])
                 seconds = 3600 * time
             # if none of the above units of time were found, send an error message
             else:
-                error_msg = await self.client.say(
-                    "Use a **valid** unit of time (Ex: _20s_, _50m_, _3hr_)"
-                )
+                error_msg = await context.send("Use a **valid** unit of time (Ex: _20s_, _50m_, _3hr_)")
                 await asyncio.sleep(15)
-                await self.client.delete_message(error_msg)
+                await error_msg.delete()
                 return
         # if arguments weren't passed in correctly
         except:
-            error_msg = await self.client.say(error_str)
+            error_msg = await context.send(error_str)
             await asyncio.sleep(15)
-            await self.client.delete_message(error_msg)
+            await error_msg.delete()
             return
 
         # embed the link, set thumbnail, send reminder confirmation, then wait X seconds
@@ -130,20 +119,15 @@ class Utilities:
             colour=0x607D4A,
         )
         em.set_thumbnail(url="https://i.imgur.com/1HdQNaz.gif")
-        await self.client.say(embed=em)
+        await context.send(embed=em)
 
         await asyncio.sleep(seconds)
-        await self.client.say(context.message.author.mention + " **Reminder:** " + msg)
+        await context.send(context.author.mention + " **Reminder:** " + msg)
 
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(name="id", aliases=["myid", "ID"], pass_context=True)
+    @commands.command(name="id", aliases=["myid", "ID"])
     async def discordID(self, context):
-        await self.client.say(
-            context.message.author.mention
-            + " Your discord ID: **"
-            + context.message.author.id
-            + "**"
-        )
+        await context.send(f'{context.author.mention} Your discord ID: **{context.author.id}**')
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
@@ -151,17 +135,16 @@ class Utilities:
         description="Give link to code",
         brief='can use "=code',
         aliases=["CODE"],
-        pass_context=True,
     )
     async def source_code_link(self, context):
         # embed the link, set thumbnail and send
         em = discord.Embed(
             title="Source code link",
-            description="https://github.com/jdkennedy45/Discord-Bot",
+            description="https://github.com/Multi-RPG/Multi_RPG-2.0",
             colour=0x607D4A,
         )
         em.set_thumbnail(url="https://i.imgur.com/nbTu5lX.png")
-        await self.client.say(embed=em)
+        await context.send(embed=em)
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
@@ -169,7 +152,6 @@ class Utilities:
         description="Give link to code",
         brief='can use "=code',
         aliases=["link", "botlink", "invitelink", "INVITE"],
-        pass_context=True,
     )
     async def invite_link(self, context):
         # embed the link, set thumbnail and send
@@ -181,7 +163,7 @@ class Utilities:
         em.set_thumbnail(
             url="https://cdn.discordapp.com/emojis/440598342767083521.png?size=64"
         )
-        await self.client.say(embed=em)
+        await context.send(embed=em)
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
@@ -189,7 +171,6 @@ class Utilities:
         description="Give link to vote for bot",
         brief='can use "=code',
         aliases=["VOTE", "votelink", "VOTELINK"],
-        pass_context=True,
     )
     async def vote_link(self, context):
         # embed the link, set thumbnail and send
@@ -201,7 +182,7 @@ class Utilities:
         em.set_thumbnail(
             url="https://cdn.discordapp.com/emojis/440598342767083521.png?size=40"
         )
-        await self.client.say(embed=em)
+        await context.send(embed=em)
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
@@ -209,7 +190,6 @@ class Utilities:
         description="Get server infoe",
         brief="server information",
         aliases=["si", "info", "i", "server"],
-        pass_context=True,
     )
     async def server_info(self, context):
         # server_name =
@@ -239,7 +219,7 @@ class Utilities:
         embed.add_field(name="Nitro Booster", value="2", inline=True)
         embed.add_field(name="Server Created at", value="2020-04-12", inline=True)
 
-        await self.client.say(embed=embed)
+        await context.send(embed=embed)
 
 
 def setup(client):

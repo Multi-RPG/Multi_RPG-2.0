@@ -266,7 +266,6 @@ if enable_error:
 
 """
         "Games",
-        "Utilities",
         "Memes",
         "Lottery",
         "Shop",
@@ -277,6 +276,7 @@ if __name__ == "__main__":
     for extension in [
         "Account",
         "DiscordBotsOrgApi",
+        "Utilities",
     ]:
         try:
             client.load_extension(extension)
