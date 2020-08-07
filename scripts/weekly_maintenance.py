@@ -16,7 +16,7 @@ from discord.ext import commands
 from pathlib import Path
 
 # add parent folder to module path. can comment this out if using virtual environment
-sys.path.append('..')
+sys.path.append("..")
 
 # change working directory to parent to simplify file paths
 os.chdir("..")
@@ -31,16 +31,20 @@ bot_token_path = Path("tokens/tokenbot.ini")  # use forward slash "/" for path d
 if bot_token_path.is_file():
     config.read(bot_token_path)
     # we now have the bot's token
-    TOKEN = config.get('BOT1', 'token')
+    TOKEN = config.get("BOT1", "token")
 else:
-    print("\n", "Discord bot token not found at: ", bot_token_path,
-          "... Please correct file path in weekly_maintenance.py file.")
+    print(
+        "\n",
+        "Discord bot token not found at: ",
+        bot_token_path,
+        "... Please correct file path in weekly_maintenance.py file.",
+    )
     sys.exit()
 
 
 @client.event
 async def on_ready():
-    print(f'Logged in as\n{client.user.name}\n{client.user.id}\n---------')
+    print(f"Logged in as\n{client.user.name}\n{client.user.id}\n---------")
 
     # open database
     db = Database(0)
@@ -51,5 +55,6 @@ async def on_ready():
 
     # end this weekly maintenance program
     sys.exit(0)
+
 
 client.run(TOKEN)

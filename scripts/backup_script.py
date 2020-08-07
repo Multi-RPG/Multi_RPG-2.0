@@ -18,7 +18,7 @@ from google.cloud import storage
 
 
 def sqlite3_backup(db_file, directory):
-    '''Copy the database file and timestamp it'''
+    """Copy the database file and timestamp it"""
 
     if not os.path.isdir(directory):
         raise Exception("Backup directory not found: {}".format(directory))
@@ -37,7 +37,7 @@ def sqlite3_backup(db_file, directory):
     while not locked:
         # attempt to lock database
         try:
-            cursor.execute('begin immediate')
+            cursor.execute("begin immediate")
             locked = 1
         # if failed to lock database, wait 3 seconds and try again
         except:
@@ -60,14 +60,15 @@ def sqlite3_backup(db_file, directory):
         google_cloud_upload(backup_file)
         print("Successfully uploaded to google cloud bucket!")
     except:
-        print("Failed to upload to google cloud. Please view "
-              "https://cloud.google.com/storage/docs/reference/libraries#client-libraries-install-"
-              " to set it up yourself if you wish to have this feature.")
-
+        print(
+            "Failed to upload to google cloud. Please view "
+            "https://cloud.google.com/storage/docs/reference/libraries#client-libraries-install-"
+            " to set it up yourself if you wish to have this feature."
+        )
 
 
 def clear_old_backups(backup_dir):
-    ''' Delete old database backups that are older than num_days '''
+    """ Delete old database backups that are older than num_days """
     num_days = 5
     elapse_time = time.time() - num_days * 86400
 
@@ -82,10 +83,11 @@ def clear_old_backups(backup_dir):
                 os.remove(backup_file)
                 print("Deleting {} now!".format(backup_file))
 
+
 def google_cloud_upload(file_path):
     """Uploads a file to the bucket."""
     # Edit this line with your private key json file path
-    #os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\\Users\jake\Documents\Python discord bot\\tokens\creds.json"
+    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\\Users\jake\Documents\Python discord bot\\tokens\creds.json"
     storage_client = storage.Client()
     bucket = storage_client.get_bucket("multirpg")
     blob = bucket.blob(os.path.basename(file_path))
@@ -95,7 +97,7 @@ def google_cloud_upload(file_path):
 if __name__ == "__main__":
     # change working directory to parent to simplify file paths
     os.chdir("..")
-    
+
     # pass in parameters: database file to backup, and directory to place backup in
     sqlite3_backup("db_and_words\hangman.db", "db_and_words\db_backups")
     # pass in parameters: directory to clear old backups from
