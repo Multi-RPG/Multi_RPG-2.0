@@ -234,8 +234,8 @@ class Shop(commands.Cog):
             await context.send(context.author.mention, embed=em)
             return
 
-        # if user's item level is already greater than or equal to the item the user is trying to buy, inform user + return
-        # because the user should not be able to downgrade
+        # if user's item level is already greater than or equal to the item the user is trying to buy,
+        # inform user + return because the user should not be able to downgrade
         error_msg = (
             "<:worrymag1:531214786646507540> Your current equipped item is already **better or equal** to that! "
             "<:worrymag1:531214786646507540>"
