@@ -119,7 +119,7 @@ class Shop(commands.Cog):
                 if res.reaction.emoji == "➡":
                     current_page_number += 1
                     # set the new indexes to next 5 items indexes, store the new range into a string
-                    for item in formatted_items[counter: counter + 5]:
+                    for item in formatted_items[counter : counter + 5]:
                         page_str += item
                     # clear the embed fields for the new page of items, add the new one, and send it
                     em.clear_fields()
@@ -140,7 +140,7 @@ class Shop(commands.Cog):
                 elif res.reaction.emoji == "⬅":
                     current_page_number -= 1
                     # set the new indexes to previous 5 items indexes, store the new range into a string
-                    for item in formatted_items[counter - 10: counter - 5]:
+                    for item in formatted_items[counter - 10 : counter - 5]:
                         page_str += item
                     # clear the embed fields for the new page of items, add the new one, and send it
                     em.clear_fields()
@@ -279,7 +279,7 @@ class Shop(commands.Cog):
         def is_author(m):
             return m.author == context.author and m.channel == context.channel
 
-        response = await self.client.wait_for('message', check=is_author, timeout=20)
+        response = await self.client.wait_for("message", check=is_author, timeout=20)
         if response.clean_content.upper() == "CONFIRM":
             # check if they tried to exploit the code by spending all their money before confirming
             if user.get_user_money(0) < item_price:

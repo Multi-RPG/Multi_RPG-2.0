@@ -12,20 +12,14 @@ class Users:
     def add_user(self):
         hm_db = Database(self.id)
         hm_db.connect()
-        return (
-            " Made account!\nYour starting :moneybag: balance: **$"
-            + str(hm_db.insert_acct())
-            + "**"
-        )
+        return " Made account!\nYour starting :moneybag: balance: **$" + str(hm_db.insert_acct()) + "**"
 
     def add_pet(self, pet_name):
         hm_db = Database(self.id)
         hm_db.connect()
         hm_db.insert_pet(pet_name)
         return (
-            " Adopted **"
-            + pet_name
-            + "**!\n\nYou can: \n1. Use **=feed** to level them up\n"
+            " Adopted **" + pet_name + "**!\n\nYou can: \n1. Use **=feed** to level them up\n"
             "2. Use **=hunt** for rewards\n"
             "3. Use **=pet** to check their status"
         )
@@ -151,11 +145,7 @@ class Users:
             user_money = "{:,}".format(hm_db.get_money())
 
             # add full bold discord-format to each variable
-            item_score = (
-                "**"
-                + str(weapon_level + helmet_level + chest_level + boots_level)
-                + "**"
-            )
+            item_score = "**" + str(weapon_level + helmet_level + chest_level + boots_level) + "**"
 
             weapon_level = "**" + str(weapon_level) + "**"
             helmet_level = "**" + str(helmet_level) + "**"
@@ -210,11 +200,7 @@ class Users:
     def update_user_money(self, amount):
         hm_db = Database(self.id)
         hm_db.connect()
-        return (
-            "Your new account balance: **$"
-            + str("{:,}".format(hm_db.update_money(amount)))
-            + "**"
-        )
+        return "Your new account balance: **$" + str("{:,}".format(hm_db.update_money(amount))) + "**"
 
     def update_user_level(self):
         hm_db = Database(self.id)
@@ -256,29 +242,13 @@ class Users:
         hm_db.connect()
 
         if gear_type == "weapon":
-            return (
-                " Your new total item score: **"
-                + str(hm_db.update_battle_weapon(level))
-                + "**"
-            )
+            return " Your new total item score: **" + str(hm_db.update_battle_weapon(level)) + "**"
         elif gear_type == "helmet":
-            return (
-                " Your new total item score: **"
-                + str(hm_db.update_battle_helmet(level))
-                + "**"
-            )
+            return " Your new total item score: **" + str(hm_db.update_battle_helmet(level)) + "**"
         elif gear_type == "chest":
-            return (
-                " Your new total item score: **"
-                + str(hm_db.update_battle_chest(level))
-                + "**"
-            )
+            return " Your new total item score: **" + str(hm_db.update_battle_chest(level)) + "**"
         elif gear_type == "boots":
-            return (
-                " Your new total item score: **"
-                + str(hm_db.update_battle_boots(level))
-                + "**"
-            )
+            return " Your new total item score: **" + str(hm_db.update_battle_boots(level)) + "**"
 
     def update_user_tourney_server_id(self, server_name, server_id):
         hm_db = Database(self.id)
@@ -298,9 +268,7 @@ class Users:
 
         return (
             " Your new battle records: **"
-            + str(
-                hm_db.update_battle_records(battles_lost, battles_won, total_winnings)
-            )
+            + str(hm_db.update_battle_records(battles_lost, battles_won, total_winnings))
             + "**"
         )
 
