@@ -46,7 +46,7 @@ class Shop(commands.Cog):
         formatted_items = []
 
         # Emojis used for reaction
-        Emoji_Reaction = collections.namedtuple('Emoji_Reaction', ['Left', 'Right'])
+        Emoji_Reaction = collections.namedtuple("Emoji_Reaction", ["Left", "Right"])
         emoji = Emoji_Reaction("⬅️", "➡️")
 
         # for each item retreived from database, get the details of each one from the returned tuple
@@ -127,7 +127,7 @@ class Shop(commands.Cog):
                     if str(reaction) == emoji.Right:
                         current_page_number += 1
                         # set the new indexes to next 5 items indexes, store the new range into a string
-                        for item in formatted_items[counter: counter + 5]:
+                        for item in formatted_items[counter : counter + 5]:
                             page_str += item
                         # clear the embed fields for the new page of items, add the new one, and send it
                         em.clear_fields()
@@ -148,7 +148,7 @@ class Shop(commands.Cog):
                     elif str(reaction) == emoji.Left:
                         current_page_number -= 1
                         # set the new indexes to previous 5 items indexes, store the new range into a string
-                        for item in formatted_items[counter - 10: counter - 5]:
+                        for item in formatted_items[counter - 10 : counter - 5]:
                             page_str += item
                         # clear the embed fields for the new page of items, add the new one, and send it
                         em.clear_fields()
