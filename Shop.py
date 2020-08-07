@@ -2,6 +2,8 @@
 import asyncio
 import discord
 import math
+import collections
+
 from discord.ext import commands
 from Users import Users
 from Database import Database
@@ -42,6 +44,10 @@ class Shop(commands.Cog):
         # get list of current shop items from database
         daily_items = db.get_shop_list()
         formatted_items = []
+
+        # Emojis used for reaction
+        Emoji_Reaction = collections.namedtuple('Emoji_Reaction', ['Left', 'Right'])
+        emoji = Emoji_Reaction("⬅️", "➡️")
 
         # for each item retreived from database, get the details of each one from the returned tuple
         for item in daily_items:
@@ -96,77 +102,84 @@ class Shop(commands.Cog):
         # if there is more than 5 items, we need more than 1 page.
         if len(formatted_items) > 5:
             # add a right arrow emoji to the first page's message, and wait for the author to click it
-            await msg.add_reaction(emoji="➡")
+            await msg.add_reaction(emoji=emoji.Right)
 
             # Checks if the user adding the reaction is the message author.
             def is_author(reaction, user):
-                return user == context.author and str(reaction.emoji) in ["⬅", "➡"]
+                return user == context.author and str(reaction.emoji) in emoji
 
-            res = await self.client.wait_for("reaction_add", check=is_author, timeout=30)
+            try:
+                # In the new API, waif_for returns a tuple. The first element is the emoji (reaction).
+                reaction, user = await self.client.wait_for("reaction_add", check=is_author, timeout=30)
 
-            # counter will represent the last item number on current page
-            # it will be used as indexes of formatted_items[] for changing pages
-            counter = 5
-            current_page_number = 1
-            # while a reaction is provided and not timed out
-            while res:
-                # delete the previous page message
+                # counter will represent the last item number on current page
+                # it will be used as indexes of formatted_items[] for changing pages
+                counter = 5
+                current_page_number = 1
+                # while a reaction is provided and not timed out
+                while reaction:
+                    # delete the previous page message
+                    await msg.delete()
+                    # reset the items string
+                    page_str = ""
+
+                    # if user reacted to go to next page
+                    if str(reaction) == emoji.Right:
+                        current_page_number += 1
+                        # set the new indexes to next 5 items indexes, store the new range into a string
+                        for item in formatted_items[counter: counter + 5]:
+                            page_str += item
+                        # clear the embed fields for the new page of items, add the new one, and send it
+                        em.clear_fields()
+                        # get the current page/total_page and add it to the embedded page's title
+                        field_name = "Shop (Page {}/{})".format(str(current_page_number), str(total_pages))
+                        em.add_field(name=field_name, value=page_str, inline=True)
+                        msg = await context.send(embed=em)
+
+                        # add 5 to the counter to indicate new index
+                        counter += 5
+                        # add emoji to go to previous page if desired
+                        await msg.add_reaction(emoji=emoji.Left)
+                        # if the current page number isn't the page count, there is a next page
+                        if not current_page_number == total_pages:
+                            await msg.add_reaction(emoji=emoji.Right)
+
+                    # if user reacted to go to previous page
+                    elif str(reaction) == emoji.Left:
+                        current_page_number -= 1
+                        # set the new indexes to previous 5 items indexes, store the new range into a string
+                        for item in formatted_items[counter - 10: counter - 5]:
+                            page_str += item
+                        # clear the embed fields for the new page of items, add the new one, and send it
+                        em.clear_fields()
+                        # get the current page/total_page and add it to the embedded page's title
+                        field_name = "Shop (Page {}/{})".format(str(current_page_number), str(total_pages))
+                        em.add_field(name=field_name, value=page_str, inline=True)
+                        msg = await context.send(embed=em)
+
+                        # subtract 5 from the counter to indicate new index
+                        counter -= 5
+                        # if current page number is not page 1, there is a previous page
+                        if not current_page_number == 1:
+                            await msg.add_reaction(emoji=emoji.Left)
+                        # add emoji to go to next page if desired
+                        await msg.add_reaction(emoji=emoji.Right)
+
+                    # wait for next reaction then restart loop if no timeout
+                    # Checks if the user adding the reaction is the message author.
+                    def is_author(reaction, user):
+                        return user == context.author and str(reaction.emoji) in emoji
+
+                    reaction, user = await self.client.wait_for("reaction_add", check=is_author, timeout=30)
+
+            except asyncio.TimeoutError:
+                print("Timeout")
+
+            # This is called regardless.
+            finally:
+                await asyncio.sleep(30)
+                await intro_msg.delete()
                 await msg.delete()
-                # reset the items string
-                page_str = ""
-
-                # if user reacted to go to next page
-                if res.reaction.emoji == "➡":
-                    current_page_number += 1
-                    # set the new indexes to next 5 items indexes, store the new range into a string
-                    for item in formatted_items[counter : counter + 5]:
-                        page_str += item
-                    # clear the embed fields for the new page of items, add the new one, and send it
-                    em.clear_fields()
-                    # get the current page/total_page and add it to the embedded page's title
-                    field_name = "Shop (Page {}/{})".format(str(current_page_number), str(total_pages))
-                    em.add_field(name=field_name, value=page_str, inline=True)
-                    msg = await context.send(embed=em)
-
-                    # add 5 to the counter to indicate new index
-                    counter += 5
-                    # add emoji to go to previous page if desired
-                    await msg.add_reaction(emoji="⬅")
-                    # if the current page number isn't the page count, there is a next page
-                    if not current_page_number == total_pages:
-                        await msg.add_reaction(emoji="➡")
-
-                # if user reacted to go to previous page
-                elif res.reaction.emoji == "⬅":
-                    current_page_number -= 1
-                    # set the new indexes to previous 5 items indexes, store the new range into a string
-                    for item in formatted_items[counter - 10 : counter - 5]:
-                        page_str += item
-                    # clear the embed fields for the new page of items, add the new one, and send it
-                    em.clear_fields()
-                    # get the current page/total_page and add it to the embedded page's title
-                    field_name = "Shop (Page {}/{})".format(str(current_page_number), str(total_pages))
-                    em.add_field(name=field_name, value=page_str, inline=True)
-                    msg = await context.send(embed=em)
-
-                    # subtract 5 from the counter to indicate new index
-                    counter -= 5
-                    # if current page number is not page 1, there is a previous page
-                    if not current_page_number == 1:
-                        await msg.add_reaction(emoji="⬅")
-                    # add emoji to go to next page if desired
-                    await msg.add_reaction(emoji="➡")
-
-                # wait for next reaction then restart loop if no timeout
-                # Checks if the user adding the reaction is the message author.
-                def is_author(reaction, user):
-                    return user == context.author and str(reaction.emoji) in ["⬅", "➡"]
-
-                res = await self.client.wait_for("reaction_add", check=is_author, timeout=30)
-
-        await asyncio.sleep(30)
-        await intro_msg.delete()
-        await msg.delete()
 
     @has_account()
     @commands.cooldown(1, 15, commands.BucketType.user)
