@@ -11,7 +11,7 @@ PS2: MAKE SURE TO CHANGE PATHS TO FULL FILE PATHS IF THIS IS AUTOMATED
 
 import sys
 
-from Bot.Database import Database
+from Database import Database
 
 
 def main():
