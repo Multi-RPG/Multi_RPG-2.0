@@ -53,9 +53,9 @@ class Account(commands.Cog):
 
         em = discord.Embed(title="", colour=0x607D4A)
         em.add_field(
-            name=context.message.author.display_name, value=new_user.add_user(), inline=True,
+            name=context.author.display_name, value=new_user.add_user(), inline=True,
         )
-        em.set_thumbnail(url=context.message.author.avatar_url)
+        em.set_thumbnail(url=context.author.avatar_url)
         await context.send(embed=em)
 
     @has_account()
@@ -382,7 +382,7 @@ class Account(commands.Cog):
     @commands.command(name="daily2", aliases=["DAILY2", "bonus", "votebonus"])
     async def daily2(self, context):
         # create instance of user who earned their vote bonus
-        user = Users(context.message.author.id)
+        user = Users(context.author.id)
         # get the user's current level
         user_level = user.get_user_level(0)  # get int version of level, SEE USERS.PY
         dailyreward = user_level * 50

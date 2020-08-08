@@ -94,7 +94,7 @@ class Pets(commands.Cog):
     )
     async def feed(self, context):
         # create instance of the user who wishes to feed their pet
-        pet_owner = Users(context.message.author.id)
+        pet_owner = Users(context.author.id)
         # retrieve pet name
         pet_name = pet_owner.get_user_pet_name()
         # "feed" the pet by updating the pet's xp, then place updated xp in a variable
