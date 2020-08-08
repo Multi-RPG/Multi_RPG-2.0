@@ -277,9 +277,5 @@ class Users:
         hm_db.connect()
 
         hm_db.update_lottery_guess(ticket_guess, ticket_active)
-        return (
-            "Thanks! Processed ticket ID: **"
-            + self.id
-            + "**\n "
-            + "Results will be live by :alarm_clock: **7 AM PST!**"
-        )
+        return (f"Thanks! Processed ticket ID: **{self.id}**\n"
+                f"Results will be live by :alarm_clock: **7 AM PST!**")
