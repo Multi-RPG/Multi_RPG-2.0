@@ -9,25 +9,31 @@ import logging
 from discord.ext import commands
 from pathlib import Path
 from Database import Database
+from parse_args import parse_args
+
+# Bot's prefix is defaulted to '=' and '%'
+bot_prefix = "="
 
 # Command error handling
 enable_error = True
 
-# Command line arguments for custom settings
-if len(sys.argv) > 1:
-    # set custom prefix
-    if sys.argv[1] == "dev":
-        prefix = "."
-        print(f"Running [{sys.argv[1]}] mode, prefix set to [{prefix}]")
-        client = commands.Bot(command_prefix=[prefix])
-        enable_error = False
-    else:
-        client = commands.Bot(command_prefix=["=", "%"])
-else:
-    # set our bot's prefix
-    client = commands.Bot(command_prefix=["=", "%"])
+# Parse command-line for custom settings, such as changing the default prefix and enabling the dev mode to enable
+# error messages.
+args = parse_args()
+if args.dev:
+    bot_prefix = "."
+    enable_error = False
+    print(f"Running dev mode. enable_error = {enable_error}")
 
-client.remove_command("help")  # remove the default help command
+# Check if a prefix was passed, so we override the prefix set by args.dev
+if args.prefix:
+    bot_prefix = args.prefix
+
+client = commands.Bot(command_prefix=[bot_prefix])
+print(f"Prefix set to [{bot_prefix}]")
+
+# remove the default help command
+client.remove_command("help")
 
 # set up logging for command errors
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
