@@ -273,7 +273,6 @@ if enable_error:
 """
         "Games",
         "Memes",
-        "Lottery",
 """
 
 if __name__ == "__main__":
@@ -283,6 +282,7 @@ if __name__ == "__main__":
         "Utilities",
         "Pets",
         "Shop",
+        "Lottery",
     ]:
         try:
             client.load_extension(extension)
