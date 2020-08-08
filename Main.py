@@ -11,7 +11,7 @@ from pathlib import Path
 from Database import Database
 from parse_args import parse_args
 
-# Bot's prefix is defaulted to '=' and '%'
+# Bot's prefix is defaulted to '='.
 bot_prefix = "="
 
 # Command error handling
