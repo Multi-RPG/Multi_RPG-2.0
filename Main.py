@@ -251,7 +251,7 @@ if enable_error:
         else:
             error_message = (
                 f"{str(error)} in command: {str(context.command)}, \n"
-                f"User tried: {str(context.clean_content)}\n"
+                f"User tried: {str(context.message.clean_content)}\n"
                 f"Initiated by: {context.author.name} ID: {context.author.id}."
             )
             commands_logger.info(error_message)
