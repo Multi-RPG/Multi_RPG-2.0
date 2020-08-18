@@ -41,28 +41,21 @@ class Account(commands.Cog):
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="create",
-        description="make a user",
-        brief="start a user account",
-        aliases=["register"],
+        name="create", description="make a user", brief="start a user account", aliases=["register"],
     )
     async def register(self, context):
         # create new user instance with their discord ID to store in database
         new_user = Users(context.author.id)
 
         if new_user.find_user() == 1:
-            await context.send(
-                "<:worrymag1:531214786646507540> You **already** have an account registered!"
-            )
+            await context.send("<:worrymag1:531214786646507540> You **already** have an account registered!")
             return
 
         em = discord.Embed(title="", colour=0x607D4A)
         em.add_field(
-            name=context.message.author.display_name,
-            value=new_user.add_user(),
-            inline=True,
+            name=context.author.display_name, value=new_user.add_user(), inline=True,
         )
-        em.set_thumbnail(url=context.message.author.avatar_url)
+        em.set_thumbnail(url=context.author.avatar_url)
         await context.send(embed=em)
 
     @has_account()
@@ -106,13 +99,9 @@ class Account(commands.Cog):
                 # embed the money retrieved from get_user_money(), set thumbnail to 64x64 version of user's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name,
-                    value="**:moneybag: ** " + user.get_user_money(),
-                    inline=True,
+                    name=context.author.display_name, value="**:moneybag: ** " + user.get_user_money(), inline=True,
                 )
-                thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(
-                    context.author
-                )
+                thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(context.author)
                 em.set_thumbnail(url=thumb_url)
 
                 await context.send(context.author.mention, embed=em)
@@ -146,9 +135,7 @@ class Account(commands.Cog):
                 # embed the level retrieved from get_user_level(), set thumbnail to 64x64 version of target's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=discord_member_target.display_name,
-                    value="**Level** " + target.get_user_level(),
-                    inline=True,
+                    name=discord_member_target.display_name, value="**Level** " + target.get_user_level(), inline=True,
                 )
                 thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(
                     discord_member_target
@@ -165,9 +152,7 @@ class Account(commands.Cog):
                 # embed the level retrieved from get_user_level(), set thumbnail to 64x64 version of user's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name,
-                    value="**Level** " + user.get_user_level(),
-                    inline=True,
+                    name=context.author.display_name, value="**Level** " + user.get_user_level(), inline=True,
                 )
                 thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(context.author)
                 em.set_thumbnail(url=thumb_url)
@@ -184,10 +169,7 @@ class Account(commands.Cog):
 
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(
-        name="give",
-        aliases=["DONATE", "GIVE", "pay", "donate", "PAY", "gift", "GIFT"]
-    )
+    @commands.command(name="give", aliases=["DONATE", "GIVE", "pay", "donate", "PAY", "gift", "GIFT"])
     async def give(self, context, *args):
         # will automatically go to exception if all arguments weren't supplied correctly
         try:
@@ -205,33 +187,24 @@ class Account(commands.Cog):
             # check if receiver has account
             if receiver.find_user() == 0:
                 await context.send(
-                    context.author.mention
-                    + " The target doesn't have an account."
-                    "\nUse **=create** to make one."
+                    context.author.mention + " The target doesn't have an account." "\nUse **=create** to make one."
                 )
                 return
             # check if donator has enough money for the donation
             # pass 0 to return integer version of money, see USERS.PY function
             if int(amnt) > donator.get_user_money(0):
                 await context.send(
-                    context.author.mention
-                    + " You don't have enough money for that donation..."
+                    context.author.mention + " You don't have enough money for that donation..."
                     " <a:pepehands:485869482602922021> "
                 )
                 return
 
             # pass the donation amount, pass the receiver user object, and pass the receiver's string name
-            msg = (
-                context.author.mention
-                + " "
-                + donator.donate_money(int(amnt), receiver, receiver_string)
-            )
+            msg = context.author.mention + " " + donator.donate_money(int(amnt), receiver, receiver_string)
             # embed the donation message, put a heartwarming emoji size 64x64 as the thumbnail
             em = discord.Embed(title="", colour=0x607D4A)
             em.add_field(name="DONATION ALERT", value=msg, inline=True)
-            em.set_thumbnail(
-                url="https://cdn.discordapp.com/emojis/526815183553822721.webp?size=64"
-            )
+            em.set_thumbnail(url="https://cdn.discordapp.com/emojis/526815183553822721.webp?size=64")
             await context.send(embed=em)
             await context.message.delete()
         except Exception as e:
@@ -245,8 +218,7 @@ class Account(commands.Cog):
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="stats",
-        aliases=["battles", "BRECORDS", "STATS", "profile", "PROFILE", "gear", "GEAR"],
+        name="stats", aliases=["battles", "BRECORDS", "STATS", "profile", "PROFILE", "gear", "GEAR"],
     )
     async def profile_stats(self, context, *args):
         try:
@@ -268,9 +240,7 @@ class Account(commands.Cog):
                 # embed the statistics retrieved from get_user_stats(), set thumbnail to target's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=discord_member_target.display_name,
-                    value=target.get_user_stats(),
-                    inline=True,
+                    name=discord_member_target.display_name, value=target.get_user_stats(), inline=True,
                 )
                 em.set_thumbnail(url=target_avatar_url)
 
@@ -284,9 +254,7 @@ class Account(commands.Cog):
                 # embed the statistics retrieved from get_user_stats(), set thumbnail to user's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name,
-                    value=user.get_user_stats(),
-                    inline=True,
+                    name=context.author.display_name, value=user.get_user_stats(), inline=True,
                 )
                 em.set_thumbnail(url=context.author.avatar_url)
 
@@ -364,14 +332,11 @@ class Account(commands.Cog):
         def is_author(m):
             return m.author == context.author and m.channel == context.channel
 
-        confirm = await self.client.wait_for('message', check=is_author, timeout=60)
+        confirm = await self.client.wait_for("message", check=is_author, timeout=60)
         if confirm.clean_content.upper() == "CONFIRM":
             # check if they tried to exploit the code by spending all their money before confirming
             if user.get_user_money(0) < level_up_cost:
-                await context.send(
-                    context.author.mention
-                    + " You spent money before confirming..."
-                )
+                await context.send(context.author.mention + " You spent money before confirming...")
                 return
             # deduct the level-up cost from their account
             user.update_user_money(level_up_cost * -1)
@@ -379,17 +344,13 @@ class Account(commands.Cog):
             # increase level by 1 and print new level
             em = discord.Embed(title="", colour=0x607D4A)
             em.add_field(
-                name=context.author.display_name,
-                value=user.update_user_level(),
-                inline=True,
+                name=context.author.display_name, value=user.update_user_level(), inline=True,
             )
             thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(context.author)
             em.set_thumbnail(url=thumb_url)
             await context.send(embed=em)
         else:
-            await context.send(
-                context.author.mention + " Cancelled level-up."
-            )
+            await context.send(context.author.mention + " Cancelled level-up.")
 
     @has_account()
     @commands.cooldown(1, 86400, commands.BucketType.user)
@@ -418,11 +379,10 @@ class Account(commands.Cog):
     @has_voted()
     @has_account()
     @commands.cooldown(1, 43200, commands.BucketType.user)
-    @commands.command(
-        name="daily2", aliases=["DAILY2", "bonus", "votebonus"])
+    @commands.command(name="daily2", aliases=["DAILY2", "bonus", "votebonus"])
     async def daily2(self, context):
         # create instance of user who earned their vote bonus
-        user = Users(context.message.author.id)
+        user = Users(context.author.id)
         # get the user's current level
         user_level = user.get_user_level(0)  # get int version of level, SEE USERS.PY
         dailyreward = user_level * 50
@@ -437,9 +397,7 @@ class Account(commands.Cog):
         # embed the confirmation message, set thumbnail to user's id
         em = discord.Embed(title="", colour=0x607D4A)
         em.add_field(
-            name="Thanks for voting, {}!".format(context.author.display_name),
-            value=msg,
-            inline=True,
+            name="Thanks for voting, {}!".format(context.author.display_name), value=msg, inline=True,
         )
         em.set_thumbnail(url=context.author.avatar_url)
         await context.send(embed=em)
@@ -447,8 +405,7 @@ class Account(commands.Cog):
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="toggle",
-        aliases=["togglepeace", "TOGGLEPEACE", "peace", "PEACE"],
+        name="toggle", aliases=["togglepeace", "TOGGLEPEACE", "peace", "PEACE"],
     )
     async def toggle_peace(self, context):
         # create instance of user who wants to get their daily money
@@ -466,9 +423,7 @@ class Account(commands.Cog):
             )
             # embed the confirmation message, set thumbnail to user's id
             em = discord.Embed(title="", colour=0x607D4A)
-            em.add_field(
-                name=context.author.display_name, value=msg, inline=True
-            )
+            em.add_field(name=context.author.display_name, value=msg, inline=True)
             em.set_thumbnail(url=context.author.avatar_url)
             await context.send(embed=em)
 
@@ -479,7 +434,7 @@ class Account(commands.Cog):
             def is_author(m):
                 return m.author == context.author and m.channel == context.channel
 
-            response = await self.client.wait_for('message', check=is_author, timeout=20)
+            response = await self.client.wait_for("message", check=is_author, timeout=20)
             if response.clean_content.upper() == "CONFIRM":
                 user.toggle_user_peace_status()
                 user.update_user_peace_cooldown()
@@ -491,9 +446,7 @@ class Account(commands.Cog):
                 # embed the confirmation string, add the user's avatar to it, and send it
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name,
-                    value=confirmation,
-                    inline=True,
+                    name=context.author.display_name, value=confirmation, inline=True,
                 )
                 em.set_thumbnail(url=context.author.avatar_url)
                 await context.send(embed=em)
@@ -520,17 +473,17 @@ class Account(commands.Cog):
             def is_author(m):
                 return m.author == context.author and m.channel == context.channel
 
-            response = await self.client.wait_for('message', check=is_author, timeout=20)
+            response = await self.client.wait_for("message", check=is_author, timeout=20)
             if response.clean_content.upper() == "CONFIRM":
                 user.toggle_user_peace_status()
-                confirmation = ":dove: You are now **out of peace** status :dove:\n\n_Note: =rob @user is now available_"
+                confirmation = (
+                    ":dove: You are now **out of peace** status :dove:\n\n_Note: =rob @user is now available_"
+                )
 
                 # embed the confirmation string, add the user's avatar to it, and send it
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name,
-                    value=confirmation,
-                    inline=True,
+                    name=context.author.display_name, value=confirmation, inline=True,
                 )
                 em.set_thumbnail(url=context.author.avatar_url)
                 await context.send(embed=em)
@@ -546,17 +499,13 @@ class Account(commands.Cog):
             )
             # embed the confirmation message, set thumbnail to user's id
             em = discord.Embed(description=msg, colour=0x607D4A)
-            em.set_thumbnail(
-                url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=40"
-            )
+            em.set_thumbnail(url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=40")
             await context.send(embed=em)
             return
 
     @has_account()
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(
-        name="rankings", aliases=["ranks", "leaderboards", "lb"]
-    )
+    @commands.command(name="rankings", aliases=["ranks", "leaderboards", "lb"])
     async def ranks(self, context):
         # create instance of user who wants to view rankings
         user = Users(context.author.id)
@@ -574,9 +523,15 @@ class Account(commands.Cog):
             user = Users(str(rank[0]))
 
             # store their stats in temporary variables
-            weapon_level, helmet_level, chest_level, boots_level, battles_lost, battles_won, total_winnings = user.get_user_stats(
-                0
-            )
+            (
+                weapon_level,
+                helmet_level,
+                chest_level,
+                boots_level,
+                battles_lost,
+                battles_won,
+                total_winnings,
+            ) = user.get_user_stats(0)
             # format money for commas
             total_winnings = "{:,}".format(total_winnings)
             # try to retrieve user's level, if failed, skip to next iteration
@@ -600,15 +555,7 @@ class Account(commands.Cog):
                 + str(user_level)
                 + "_ ) \u200B \u200B \n"
             )
-            win_loss_column += (
-                "$"
-                + str(total_winnings)
-                + "/"
-                + str(battles_won)
-                + "/"
-                + str(battles_lost)
-                + "\n"
-            )
+            win_loss_column += "$" + str(total_winnings) + "/" + str(battles_won) + "/" + str(battles_lost) + "\n"
             counter += 1
 
         # embed the ranking columns
@@ -616,9 +563,7 @@ class Account(commands.Cog):
         em.add_field(name="Top 15 Fighters", value=name_field_column, inline=True)
         em.add_field(name="Winnings/W/L", value=win_loss_column, inline=True)
         # set embedded thumbnail to an upwards trend chart
-        em.set_thumbnail(
-            url="https://cdn.shopify.com/s/files/1/0185/5092/products/objects-0104_800x.png?v=1369543363"
-        )
+        em.set_thumbnail(url="https://cdn.shopify.com/s/files/1/0185/5092/products/objects-0104_800x.png?v=1369543363")
         await context.send(embed=em)
 
 

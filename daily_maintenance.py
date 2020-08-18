@@ -13,7 +13,6 @@ import configparser
 import discord
 import random
 import sys
-import os
 import numpy
 
 from discord.ext import commands
@@ -21,12 +20,6 @@ from pathlib import Path
 from datetime import date
 from Users import Users
 from Database import Database
-
-# add parent folder to module path. can comment this out if using virtual environment
-sys.path.append('..')
-
-# change working directory to parent to simplify file paths
-os.chdir("..")
 
 # startup discord client
 client = commands.Bot(command_prefix=["=", "%"])
@@ -38,15 +31,20 @@ bot_token_path = Path("tokens/tokenbot.ini")  # use forward slash "/" for path d
 if bot_token_path.is_file():
     config.read(bot_token_path)
     # we now have the bot's token
-    TOKEN = config.get('BOT1', 'token')
+    TOKEN = config.get("BOT1", "token")
 else:
-    print("\n", "Discord bot token not found at: ", bot_token_path, "... Please correct file path in daily_maintenance.py file.")
+    print(
+        "\n",
+        "Discord bot token not found at: ",
+        bot_token_path,
+        "... Please correct file path in daily_maintenance.py file.",
+    )
     sys.exit()
 
 
 @client.event
 async def on_ready():
-    print(f'Logged in as {client.user.name}\n{client.user.id}\n---------')
+    print(f"Logged in as {client.user.name}\n{client.user.id}\n---------")
 
     # open database
     db = Database(0)
@@ -61,17 +59,22 @@ async def on_ready():
     if items_path.is_file():
         config.read(items_path)
     else:
-        print("\n", "Shop items file not found at: ", items_path, "... Please correct file path in daily_maintenance.py file.")
+        print(
+            "\n",
+            "Shop items file not found at: ",
+            items_path,
+            "... Please correct file path in daily_maintenance.py file.",
+        )
         sys.exit()
 
     # parse through each section in the items in the .ini file
     # each item has a 17% chance to be inserted into the daily shop
     for item in config.sections():
         if 17 >= random.randint(1, 100) >= 1:
-            item_name = config.get(item, 'name')
-            item_type = config.get(item, 'type')
-            item_level = config.get(item, 'level')
-            item_price = config.get(item, 'price')
+            item_name = config.get(item, "name")
+            item_type = config.get(item, "type")
+            item_level = config.get(item, "level")
+            item_price = config.get(item, "price")
 
             db.insert_shop_item(item_name, item_type, item_level, item_price)
 
@@ -82,46 +85,56 @@ async def on_ready():
     std_winners, prem_winners = db.get_lottery_winners(win_number)
     # we have today's winners now, so reset lottery
     db.reset_lottery()
-    std_winners_string = ''
+    std_winners_string = ""
     for winner in std_winners:
         # create instance of each basic ticket user who won, and update their money
         user = Users(winner)
         user.update_user_money(user.get_user_level(0) * 100)
         # alter each item on list to discord @ format and concatenate into 1 string to ping winners below
-        std_winners_string += ('\n**TICKET ID:** ' + winner + ' <@' + winner + '>')
-        
-    prem_winners_string = ''
+        std_winners_string += "\n**TICKET ID:** " + winner + " <@" + winner + ">"
+
+    prem_winners_string = ""
     for winner in prem_winners:
         # create instance of each premium ticket user who won, and update their
         user = Users(winner)
         user.update_user_money(user.get_user_level(0) * 170)
         # alter each item on list to discord @ format and concatenate into 1 string to ping winners below
-        prem_winners_string += ('\n**TICKET ID:** ' + winner + ' <@' + winner + '>')
+        prem_winners_string += "\n**TICKET ID:** " + winner + " <@" + winner + ">"
 
     # prepare string of shop reset notifcation & lottery results to send to every discord server
     if not std_winners:
-        std_winners_string = '\n<a:worrycry:525209793405648896> no basic winners...  <a:worrycry:525209793405648896>'
+        std_winners_string = "\n<a:worrycry:525209793405648896> no basic winners...  <a:worrycry:525209793405648896>"
     if not prem_winners:
-        prem_winners_string = '\n<a:worrycry:525209793405648896> no premium winners...  <a:worrycry:525209793405648896>'
+        prem_winners_string = "\n<a:worrycry:525209793405648896> no premium winners...  <a:worrycry:525209793405648896>"
 
     # split shop & lottery announcements into 2 strings
     # have to insert encode \u200B for spaces when using discord encoding
-    global_announcement1 = "__**SHOP ANNOUNCEMENT**__ \u200B \u200B" \
-                           + "_" + str(date.today()) + "_" \
-                           + "\n:shopping_cart: \u200B Daily shop just reset... Check out **=shop**!\n"
-    global_announcement2 = "__**LOTTERY ANNOUNCEMENT**__ \u200B \u200B_" + str(date.today()) + "_" \
-                           + "\nToday's winning number is... **" \
-                           + str(win_number) + "**\n\n__The lucky **basic** winners:__  " \
-                           + std_winners_string + "\n__The lucky **premium** winners:__  " \
-                           + prem_winners_string
+    global_announcement1 = (
+        "__**SHOP ANNOUNCEMENT**__ \u200B \u200B"
+        + "_"
+        + str(date.today())
+        + "_"
+        + "\n:shopping_cart: \u200B Daily shop just reset... Check out **=shop**!\n"
+    )
+    global_announcement2 = (
+        "__**LOTTERY ANNOUNCEMENT**__ \u200B \u200B_"
+        + str(date.today())
+        + "_"
+        + "\nToday's winning number is... **"
+        + str(win_number)
+        + "**\n\n__The lucky **basic** winners:__  "
+        + std_winners_string
+        + "\n__The lucky **premium** winners:__  "
+        + prem_winners_string
+    )
     global_announcement3 = "__**PATCH ANNOUNCEMENT**__\nPatch **2.7** is here! Use **=adopt** command for your own pet!"
 
     # embed shop announcement and lottery announcement, and set thumbnails of a shopping cart and "money rain frog" gif
-    em = discord.Embed(description=global_announcement1, colour=0x607d4a)
+    em = discord.Embed(description=global_announcement1, colour=0x607D4A)
     em.set_thumbnail(url="https://i.imgur.com/rS6tXmD.gif")
-    em2 = discord.Embed(description=global_announcement2, colour=0x607d4a)
+    em2 = discord.Embed(description=global_announcement2, colour=0x607D4A)
     em2.set_thumbnail(url="https://cdn.discordapp.com/emojis/525200274340577290.gif?size=64")
-    em3 = discord.Embed(description=global_announcement3, colour=0x607d4a)
+    em3 = discord.Embed(description=global_announcement3, colour=0x607D4A)
     em3.set_thumbnail(url="http://i66.tinypic.com/25g7akg.jpg")
 
     # for each server the bot is in, post the lottery results in the lottery channel
@@ -137,11 +150,11 @@ async def on_ready():
         channel_found = 0
         for channel in server.channels:
             try:
-                if channel.name == 'lottery':
+                if channel.name == "lottery":
                     channel_found = 1
                     await channel.send(embed=em)
                     await channel.send(embed=em2)
-                    #await channel.send(embed=em3)
+                    # await channel.send(embed=em3)
             except:
                 pass
 
@@ -149,7 +162,7 @@ async def on_ready():
         # make the channel, then send the results
         if channel_found == 0:
             try:
-                channel = await server.create_text_channel('lottery')
+                channel = await server.create_text_channel("lottery")
                 await channel.send(embed=em)
                 await channel.send(embed=em2)
             except:
@@ -187,8 +200,9 @@ async def on_ready():
             # random's choices package did not offer a "weighted shuffle"
             # decided to use numpy here for the weighted choice, because it can do a a "weighted shuffle"
             # a weighted shuffle was required to randomly generate an ordered list of winners influenced by weights
-            server_winners = numpy.random.choice(server_fighters_ids, size=len(server_fighters_ids),
-                                                 replace=False, p=server_fighters_weights)
+            server_winners = numpy.random.choice(
+                server_fighters_ids, size=len(server_fighters_ids), replace=False, p=server_fighters_weights
+            )
 
             # make object of first and second place users
             first_place = Users(server_winners[0])
@@ -206,11 +220,22 @@ async def on_ready():
 
             # prepare string for local server tourney announcement
             # have to insert encode \u200B for spaces when using discord encoding
-            local_server_announcement = '__**TOURNEY ANNOUNCEMENT**__ \u200B \u200B_' + str(date.today())\
-                                        + '_\n\n**:trophy: 1st place: ** ' + '<@' \
-                                        + server_winners[0] + '> :trophy:  __Prize__: **$' + str(prize1) \
-                                        + '**\n' + '**:trophy: 2nd place:** ' + '<@' + server_winners[1] \
-                                        + '> :trophy:  __Prize__: **$' + str(prize2) + '**\n'
+            local_server_announcement = (
+                "__**TOURNEY ANNOUNCEMENT**__ \u200B \u200B_"
+                + str(date.today())
+                + "_\n\n**:trophy: 1st place: ** "
+                + "<@"
+                + server_winners[0]
+                + "> :trophy:  __Prize__: **$"
+                + str(prize1)
+                + "**\n"
+                + "**:trophy: 2nd place:** "
+                + "<@"
+                + server_winners[1]
+                + "> :trophy:  __Prize__: **$"
+                + str(prize2)
+                + "**\n"
+            )
 
             # find the channel in the server and state the results
             for channel in server.channels:
@@ -221,24 +246,24 @@ async def on_ready():
                         continue
                 except:
                     pass
-                if channel.name == 'lottery':
+                if channel.name == "lottery":
                     # if there were more than 2 fighters, make an "honorable mentions" string to append to announcement
                     if len(server_fighters_ids) > 2:
                         # counter to represent placings- losers list will start at 3rd place
                         counter = 3
-                        loser_string = '\n__Honorable mentions__\n'
+                        loser_string = "\n__Honorable mentions__\n"
                         for loser in server_winners[2:]:
-                            user = Users(server_winners[counter-1])
+                            user = Users(server_winners[counter - 1])
                             user.update_user_records(1, 0, 0)
                             if counter == 3:
-                                loser_string += ('**' + str(counter) + 'rd place: <@' + loser + '>**\n')
+                                loser_string += "**" + str(counter) + "rd place: <@" + loser + ">**\n"
                             else:
-                                loser_string += ('**' + str(counter) + 'th place: <@' + loser + '>**\n')
+                                loser_string += "**" + str(counter) + "th place: <@" + loser + ">**\n"
                             counter += 1
                         local_server_announcement += loser_string
 
                         # embed combined announcement, with emoji of 64x64 "nunchuck frog", then send it
-                        em = discord.Embed(description=local_server_announcement, colour=0x607d4a)
+                        em = discord.Embed(description=local_server_announcement, colour=0x607D4A)
                         em.set_thumbnail(url="https://cdn.discordapp.com/emojis/493220414206509056.gif?size=64")
                         try:
                             await channel.send(embed=em)
@@ -248,7 +273,7 @@ async def on_ready():
                     # else if only 2 entries in the server's tournament, just send first and second place results
                     elif len(server_fighters_ids) == 2:
                         # embed announcement, with emoji of 64x64 "nunchuck frog", then send it
-                        em = discord.Embed(description=local_server_announcement, colour=0x607d4a)
+                        em = discord.Embed(description=local_server_announcement, colour=0x607D4A)
                         em.set_thumbnail(url="https://cdn.discordapp.com/emojis/493220414206509056.gif?size=64")
                         try:
                             await channel.send(embed=em)
@@ -260,5 +285,6 @@ async def on_ready():
 
     # end this daily maintenance program
     sys.exit(0)
+
 
 client.run(TOKEN)

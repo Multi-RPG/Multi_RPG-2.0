@@ -248,9 +248,7 @@ class Database:
     def get_lottery_winners(self, winning_number):
         cur = self.connection.cursor()
         # find ticket id's with the winning number as their ticket guess, and their active_ticket is 1, which defines a basic ticket
-        sql = (
-            "SELECT ticket_id FROM Lottery WHERE ticket_guess = ? AND ticket_active = ?"
-        )
+        sql = "SELECT ticket_id FROM Lottery WHERE ticket_guess = ? AND ticket_active = ?"
         cur.execute(sql, (winning_number, 1))
         rows = cur.fetchall()
         std_winners = []
@@ -258,9 +256,7 @@ class Database:
             std_winners.append(row[0])
 
         # find ticket id's with the winning number as their ticket guess, and their active_ticket is 2, which defined a premium ticket
-        sql = (
-            "SELECT ticket_id FROM Lottery WHERE ticket_guess = ? AND ticket_active = ?"
-        )
+        sql = "SELECT ticket_id FROM Lottery WHERE ticket_guess = ? AND ticket_active = ?"
         cur.execute(sql, (winning_number, 2))
         rows = cur.fetchall()
         prem_winners = []
@@ -489,9 +485,7 @@ class Database:
 
         # update specific user's ticket guess
         # change their ticket to active in order to be considered during next drawing
-        sql = (
-            "UPDATE Lottery SET ticket_guess = ?, ticket_active = ? WHERE ticket_id = ?"
-        )
+        sql = "UPDATE Lottery SET ticket_guess = ?, ticket_active = ? WHERE ticket_id = ?"
         cur.execute(sql, (ticket_guess, ticket_active, self.id))
         cur.execute("SELECT * from Lottery")
 

@@ -14,9 +14,7 @@ class DiscordBotsOrgAPI(commands.Cog):
     def __init__(self, client=None):
         # set up parser to config through our .ini file with our discordbots.org api token
         config = configparser.ConfigParser()
-        api_token_path = Path(
-            "tokens/token_dbo_api.ini"
-        )  # use forward slash "/" for path directories
+        api_token_path = Path("tokens/token_dbo_api.ini")  # use forward slash "/" for path directories
         # confirm the token is located in the above path, then setup DBL client and execute update_stats
         if api_token_path.is_file():
             config.read(api_token_path)
@@ -43,24 +41,15 @@ class DiscordBotsOrgAPI(commands.Cog):
                 await self.dblpy.post_server_count()
                 logger.info("Posted server count ({})".format(self.dblpy.guild_count()))
             except Exception as e:
-                print(
-                    "\nWarning: couldn't update server count for discordbots.org. Potential invalid DBO API token."
-                )
-                print(
-                    "client will continue to run without DiscordBots.org API support."
-                )
-                logger.exception(
-                    "Failed to post server count\n{}: {}".format(type(e).__name__, e)
-                )
+                print("\nWarning: couldn't update server count for discordbots.org. Potential invalid DBO API token.")
+                print("client will continue to run without DiscordBots.org API support.")
+                logger.exception("Failed to post server count\n{}: {}".format(type(e).__name__, e))
             # wait 5 hours before updating server count again
             await asyncio.sleep(18000)
 
     def check_upvote(self, voter_id):
         headers = {"Authorization": self.token}
-        api_url = (
-            "https://discordbots.org/api/bots/486349031224639488/check?userId="
-            + str(voter_id)
-        )
+        api_url = "https://discordbots.org/api/bots/486349031224639488/check?userId=" + str(voter_id)
         r = requests.get(api_url, headers=headers)
         return r.json()["voted"]
 
