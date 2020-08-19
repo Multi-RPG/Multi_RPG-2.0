@@ -270,10 +270,6 @@ if enable_error:
             await context.send(str(error))
 
 
-"""
-        "Games",
-"""
-
 if __name__ == "__main__":
     for extension in [
         "Account",
@@ -283,6 +279,7 @@ if __name__ == "__main__":
         "Shop",
         "Lottery",
         "Memes",
+        "Games",
     ]:
         try:
             client.load_extension(extension)
