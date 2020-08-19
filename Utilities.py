@@ -175,42 +175,52 @@ class Utilities(commands.Cog):
         em.set_thumbnail(url="https://cdn.discordapp.com/emojis/440598342767083521.png?size=40")
         await context.send(embed=em)
 
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(
         name="serverinfo",
-        description="Get server infoe",
-        brief="server information",
-        aliases=["si", "info", "i", "server"],
+        description="Get server information.",
+        brief="server info",
+        aliases=["si", "info", "i", "server", "guild", "guildinfo", "gi"],
     )
     async def server_info(self, context):
-        # server_name =
-        # number_of_emojis =
-        # number_of_members =
-        # number_of_channels =
-        # server_owner =
-        # print(server_name)
-        # print(number_of_emojis)
-        # print(number_of_members)
-        # print(number_of_channels)
-        # print(server_owner)
-        # print(type(server_owner))
+        server_name = context.guild.name
+        title = f"Server Information for {server_name}"
+        number_of_emojis = len(context.guild.emojis)
+
+        # Using Guild.members here instead of Guild.member_count,
+        # because we need to filter the bots out of the counting.
+        number_of_members = 0
+        for member in context.guild.members:
+            # If it's a bot we skip it.
+            if member.bot:
+                continue
+            number_of_members += 1
+
+        number_of_voicechannels = len(context.guild.voice_channels)
+        number_of_textchannels = len(context.guild.text_channels)
+        number_of_roles = len(context.guild.roles)
+        guild_owner = context.guild.owner
+        guild_booster_level = context.guild.premium_tier
+        number_of_boosters = context.guild.premium_subscription_count
+        guild_region = str(context.guild.region)
+        guild_create_at = context.guild.created_at.strftime("%b %d %Y %H:%M:%S")
 
         embed = discord.Embed(colour=discord.Colour(0x28D1F7))
-
-        embed.set_thumbnail(url="https://cdn.discordapp.com/embed/avatars/0.png")
-        embed.set_author(name="Server Information for 'Testing'")
-        embed.add_field(name="Member count", value="100", inline=True)
-        embed.add_field(name="User count", value="100", inline=True)
-        embed.add_field(name="Bot", value="100", inline=True)
-        embed.add_field(name="Role count", value="100", inline=True)
-        embed.add_field(name="Text Channels", value="100", inline=True)
-        embed.add_field(name="Voice Channels", value="100", inline=True)
-        embed.add_field(name="Emoji Count", value="100", inline=True)
-        embed.add_field(name="Owner", value="tony#1020", inline=True)
-        embed.add_field(name="Nitro Booster", value="2", inline=True)
-        embed.add_field(name="Server Created at", value="2020-04-12", inline=True)
+        embed.set_thumbnail(url=context.guild.icon_url)
+        embed.set_author(name=title)
+        embed.add_field(name="Member Count", value=number_of_members, inline=True)
+        embed.add_field(name="Role Count", value=number_of_roles, inline=True)
+        embed.add_field(name="Emoji Count", value=number_of_emojis, inline=True)
+        embed.add_field(name="VoiceChannel Count", value=number_of_voicechannels, inline=True)
+        embed.add_field(name="TextChannel Count", value=number_of_textchannels, inline=True)
+        embed.add_field(name="Server Owner", value=guild_owner, inline=True)
+        embed.add_field(name="Server Booster Level", value=guild_booster_level, inline=True)
+        embed.add_field(name="Server Booster Count", value=number_of_boosters, inline=True)
+        embed.add_field(name="Region", value=guild_region, inline=True)
+        embed.add_field(name="Server Created at", value=guild_create_at, inline=True)
 
         await context.send(embed=embed)
+        await context.message.delete()
 
 
 def setup(client):
