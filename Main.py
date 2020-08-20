@@ -74,6 +74,7 @@ async def helper(context):
         '  =invite         use "=invite" to view the bot\'s invitation link\n'
         '  =id             use "=id" to view your personal discord ID\n'
         '  =remindme       use "=remindme "message" X"  -- X being the timer\n'
+        '  =serverinfo     use "=serverinfo to get information about your discord server\n'
         "Account:\n"
         '  =create         use "=create" to make a account\n'
         '  =daily          use "=daily" for free money equal to 60x your level\n'
