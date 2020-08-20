@@ -1,6 +1,5 @@
 import dbl
 import configparser
-import asyncio
 import logging
 import requests
 
@@ -25,27 +24,14 @@ class DiscordBotsOrgAPI(commands.Cog):
             # only setup a loop to update server count to API when client is passed in constructor
             if client:
                 self.client = client
-                self.dblpy = dbl.DBLClient(self.client, self.token, loop=client.loop)
-                self.updating = client.loop.create_task(self.update_stats())
+                self.dblpy = dbl.DBLClient(self.client, self.token, autopost=True)
         # if the file doesn't exist with the api token, do not attempt to use discordbots.org API
         else:
             print("\nWarning: discordbots.org token not found at: ", api_token_path)
             print("client will continue to run without DiscordBotsOrgApi support.")
 
-    async def update_stats(self):
-        """This function runs every 30 minutes to automatically update your server count"""
-        await self.client.wait_until_ready()
-        while True:
-            logger.info("Attempting to post server count")
-            try:
-                await self.dblpy.post_server_count()
-                logger.info("Posted server count ({})".format(self.dblpy.guild_count()))
-            except Exception as e:
-                print("\nWarning: couldn't update server count for discordbots.org. Potential invalid DBO API token.")
-                print("client will continue to run without DiscordBots.org API support.")
-                logger.exception("Failed to post server count\n{}: {}".format(type(e).__name__, e))
-            # wait 5 hours before updating server count again
-            await asyncio.sleep(18000)
+    async def on_guild_post():
+        print("Server count posted successfully")
 
     def check_upvote(self, voter_id):
         headers = {"Authorization": self.token}
