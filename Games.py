@@ -638,7 +638,7 @@ class Games(commands.Cog):
         # check if they want to list the categories
         if args:
             if args[0] in ("help", "HELP", "categories", "cats", "h"):
-                await self.client.say(
+                await context.send(
                     context.author.mention + " Categories:\n" + "```fix\n1. Country name\n"
                     "2. Farm\n3. Camping\n"
                     "4. Household items/devices\n"
