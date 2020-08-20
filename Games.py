@@ -712,7 +712,7 @@ class Games(commands.Cog):
                 )
                 # add WINNINGS to user's bank account now
                 user = Users(context.author.id)
-                prize = user.get_user_level(0) * 8
+                prize = user.get_user_level(0) * 10
                 win_msg += "Won **$" + str(prize) + "**... " + user.update_user_money(prize)
                 em = discord.Embed(description=win_msg, colour=0x607D4A)
                 await context.send(context.author.mention, embed=em)
@@ -762,7 +762,7 @@ class Games(commands.Cog):
                 )
                 # add WINNINGS to user's bank account now
                 user = Users(context.author.id)
-                prize = user.get_user_level(0) * 8
+                prize = user.get_user_level(0) * 10
                 win_msg += "Won **$" + str(prize) + "**... " + user.update_user_money(prize)
                 em = discord.Embed(description=win_msg, colour=0x607D4A)
                 await context.send(context.author.mention, embed=em)
