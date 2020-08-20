@@ -69,6 +69,7 @@ async def helper(context):
     msg = (
         "```ml\n"
         "Utilities:\n"
+        '  =serverinfo     use "=serverinfo" to get information about your discord server\n'
         '  =clear          use "=clear" or "=clear X", -- X being #  messages \n'
         '  =code           use "=code" to view this bot\'s source code\n'
         '  =invite         use "=invite" to view the bot\'s invitation link\n'
