@@ -700,7 +700,7 @@ class Games(commands.Cog):
                 if counter > 0:
                     await pick_result_msg.delete()
                     await underscore_seq_msg.delete()
-                    await guessed_lisg_msg.delete()
+                    await guessed_list_msg.delete()
                 await context.send(hangmen[wrong_guesses])
                 # prepare win message string & embed it
                 win_msg = (
@@ -727,7 +727,7 @@ class Games(commands.Cog):
                 if counter > 0:
                     await pick_result_msg.delete()
                     await underscore_seq_msg.delete()
-                    await guessed_lisg_msg.delete()
+                    await guessed_list_msg.delete()
                 await context.send(
                     "**Cancelled** the game!! <a:pepehands:485869482602922021> Correct word was: "
                     "**" + correct_word.upper() + "** " + context.author.mention
@@ -750,7 +750,7 @@ class Games(commands.Cog):
                 if counter > 0:
                     await pick_result_msg.delete()
                     await underscore_seq_msg.delete()
-                    await guessed_lisg_msg.delete()
+                    await guessed_list_msg.delete()
                 await context.send(hangmen[wrong_guesses])
                 # prepare win message string & embed it
                 win_msg = (
@@ -776,7 +776,7 @@ class Games(commands.Cog):
             if counter > 0:
                 await pick_result_msg.delete()
                 await underscore_seq_msg.delete()
-                await guessed_lisg_msg.delete()
+                await guessed_list_msg.delete()
 
             # if user's guess has zero matches in the correct word
             if num_matches == 0:
