@@ -107,9 +107,9 @@ class Pets(commands.Cog):
         if new_pet_xp >= level_up_cost:
             new_pet_level = pet_owner.update_user_pet_level()
             confirmation_msg = (
-                "Fed **" + pet_name + "**. They leveled up and transformed!\n"
-                " They now have a higher chance to hunt for gear upgrades!"
-                "\n\n\nNew level: **" + str(new_pet_level) + "**"
+                f"Fed **{pet_name}**. They leveled up and transformed!\n"
+                f" They now have a higher chance to hunt for gear upgrades!"
+                f"\n\n\nNew level: **{new_pet_level}**"
             )
 
             if new_pet_level == 2:
@@ -133,9 +133,10 @@ class Pets(commands.Cog):
             else:
                 pet_avatar = "https://cdn.discordapp.com/emojis/422845006232027147.png?v=1"
 
-            confirmation_msg = "Fed **" + pet_name + "**! They feel stuffed for today." "\n\n\n**XP:** " + str(
-                new_pet_xp
-            ) + "/" + str(level_up_cost)
+            confirmation_msg = (
+                f"Fed **{pet_name}**! They feel stuffed for today.\n\n\n**XP:** {new_pet_xp}"
+                f"/{level_up_cost}"
+            )
 
         # embed confirmation message
         em = discord.Embed(description=confirmation_msg, colour=0x607D4A)
@@ -183,23 +184,23 @@ class Pets(commands.Cog):
         # if it was decided that the loot would be a money reward, reward the pet owner with money
         if loot == 1:
             reward_msg = (
-                "**" + pet_name + "** was unable to hunt any gear upgrades in the woods..."
-                "\nBut, they located a :moneybag: on their journey!"
+                f"**{pet_name}** was unable to hunt any gear upgrades in the woods..."
+                f"\nBut, they located a :moneybag: on their journey!"
             )
             # get int version of level and multiply it by 35 for the money reward
             reward = pet_owner.get_user_level(0) * 35
             pet_owner.update_user_money(reward)
 
             reward_msg += (
-                "\n\n<a:worryswipe:525755450218643496> "
-                "You received **$" + str(reward) + "** from your pet's efforts."
-                " <a:worryswipe:525755450218643496>"
+                f"\n\n<a:worryswipe:525755450218643496> "
+                f"You received **${reward}** from your pet's efforts."
+                f" <a:worryswipe:525755450218643496>"
             )
         # if it was decided that the loot would be a gear upgrade reward, upgrade the pet owner's lowest gear item
         else:
             reward_msg = (
-                "**" + pet_name + "** located a gear upgrade in the woods for you!"
-                "\n\n\n<a:worryHype:487059927731273739> "
+                f"**{pet_name}** located a gear upgrade in the woods for you!"
+                f"\n\n\n<a:worryHype:487059927731273739> "
             )
 
             # if they are awarded a gear upgrade (which happens in this conditional), we need to do a few things:
@@ -225,18 +226,18 @@ class Pets(commands.Cog):
             # if the user has at least level 10 gear pieces of all types, give them money reward and return
             if list[index_smallest] == 10:
                 reward_msg = (
-                    "**" + pet_name + "** failed to hunt gear. Level 10 gear is the limit for hunt upgrades."
-                    "\nCheck =shop for level 11 and level 12 items."
-                    "\nBut, they located a :moneybag: on their journey!"
+                    f"**{pet_name}** failed to hunt gear. Level 10 gear is the limit for hunt upgrades."
+                    f"\nCheck =shop for level 11 and level 12 items."
+                    f"\nBut, they located a :moneybag: on their journey!"
                 )
                 # get int version of level and multiply it by 35 for the money reward
                 reward = pet_owner.get_user_level(0) * 35
                 pet_owner.update_user_money(reward)
 
                 reward_msg += (
-                    "\n\n<a:worryswipe:525755450218643496> "
-                    "You received **$" + str(reward) + "** from your pet's efforts."
-                    " <a:worryswipe:525755450218643496>"
+                    f"\n\n<a:worryswipe:525755450218643496> "
+                    f"You received **${reward}** from your pet's efforts."
+                    f" <a:worryswipe:525755450218643496>"
                 )
                 # embed confirmation message
                 em = discord.Embed(description=reward_msg, colour=0x607D4A)
@@ -247,16 +248,16 @@ class Pets(commands.Cog):
             # 1. use the index of lowest gear item acquired above
             # 2. upgrade that minimum stat by 1
             if index_smallest == 0:
-                reward_msg += "Upgraded to level **" + str((weapon_level + 1)) + "** <:weapon1:532252764097740861>"
+                reward_msg += f"Upgraded to level **{weapon_level + 1}** <:weapon1:532252764097740861>"
                 pet_owner.update_user_battle_gear("weapon", weapon_level + 1)
             elif index_smallest == 1:
-                reward_msg += " Upgraded to level **" + str((helmet_level + 1)) + "** <:helmet2:532252796255469588>"
+                reward_msg += f" Upgraded to level **{helmet_level + 1}** <:helmet2:532252796255469588>"
                 pet_owner.update_user_battle_gear("helmet", helmet_level + 1)
             elif index_smallest == 2:
-                reward_msg += "Upgraded to level **" + str((chest_level + 1)) + "** <:chest5:532255708679503873>"
+                reward_msg += f"Upgraded to level **{chest_level + 1}** <:chest5:532255708679503873>"
                 pet_owner.update_user_battle_gear("chest", chest_level + 1)
             else:
-                reward_msg += "Upgraded to level **" + str((boots_level + 1)) + "** <:boots1:532252814953676807>"
+                reward_msg += f"Upgraded to level **{boots_level + 1}** <:boots1:532252814953676807>"
                 pet_owner.update_user_battle_gear("boots", boots_level + 1)
 
             reward_msg += " <a:worryHype:487059927731273739>"
@@ -304,16 +305,8 @@ class Pets(commands.Cog):
             hunt_gear_chance = "20%"
 
         pet_details = (
-            "**" + pet_name + "** (Pet Profile) "
-            "\n\n**XP:** "
-            + str(pet_xp)
-            + "/"
-            + str(level_up_cost)
-            + "\n**Level:** "
-            + str(pet_level)
-            + "\n\n_Chance for gear upgrade while hunting: "
-            + hunt_gear_chance
-            + "_"
+            f"**{pet_name}** (Pet Profile) \n\n**XP:** {pet_xp}/{level_up_cost}\n**Level:** {pet_level}"
+            f"\n\n_Chance for gear upgrade while hunting: {hunt_gear_chance}_"
         )
 
         # embed pet's details into a message
