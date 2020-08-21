@@ -16,9 +16,7 @@ import sys
 URL = "https://api.imgflip.com/caption_image"
 # set up parser to config through our .ini file with our imgflip account details
 config = configparser.ConfigParser()
-imgflip_token_path = Path(
-    "tokens/tokenimgflip.ini"
-)  # use forward slash "/" for path directories
+imgflip_token_path = Path("tokens/tokenimgflip.ini")  # use forward slash "/" for path directories
 # confirm the token is located in the above path
 if imgflip_token_path.is_file():
     config.read(imgflip_token_path)
@@ -45,24 +43,20 @@ class Memes(commands.Cog):
         # made this check function with the help of discord API documentation
         # it will be called below when purging, to only purge messages from itself and user who called this command
         def purge_check(msg):
-            return (
-                msg.author == context.author or context.author == self.client.user
-            )
+            return msg.author == context.author or context.author == self.client.user
 
         # first, get the inputs from user. this command needs the meme text and the meme image
         await context.send(
-            "<:wthumbs:493806177894006786> First, type the text for your"
-            " custom twitter-styled meme..."
+            "<:wthumbs:493806177894006786> First, type the text for your" " custom twitter-styled meme..."
         )
 
         # helper to check if it's the author that it's responding.
         def is_author(m):
             return m.author == context.author and m.channel == context.channel
-        
+
         user_text = await self.client.wait_for("message", check=is_author, timeout=60)
         await context.send(
-            "<:wthumbs:493806177894006786> Now, send an image URL for your"
-            " custom twitter-styled meme..."
+            "<:wthumbs:493806177894006786> Now, send an image URL for your" " custom twitter-styled meme..."
         )
 
         user_image = await self.client.wait_for("message", check=is_author, timeout=60)
@@ -83,9 +77,7 @@ class Memes(commands.Cog):
         # try to start the request to get the image specified by user
         try:
             # download the image as "UserImage.png"
-            urllib.request.urlretrieve(
-                user_image.clean_content, "custom_memes\\UserImage.png"
-            )
+            urllib.request.urlretrieve(user_image.clean_content, "custom_memes\\UserImage.png")
         except:
             # the bot failed to retrieve image at that URL
             await context.send(
@@ -113,9 +105,7 @@ class Memes(commands.Cog):
         # paste the image onto background at the top
         background.paste(img, (10, 5))
         # draw the user's username next to their profile picture
-        draw.text(
-            (63, 1), ("@" + str(context.author)), (65, 65, 65), font=smallfont
-        )
+        draw.text((63, 1), ("@" + str(context.author)), (65, 65, 65), font=smallfont)
 
         # PASTE THE MEME TEXT IN MIDDLE OF BACKGROUND CANVAS
         # draw their specified text on the white background, with word wrapping
@@ -130,9 +120,7 @@ class Memes(commands.Cog):
             img = Image.open("custom_memes\\UserImage.png", "r").convert("RGB")
         except:
             # if we can't read the image downloaded, it's in the wrong format...
-            await context.send(
-                "PNG/JPG/WebP links only please! <a:pepehands:485869482602922021>"
-            )
+            await context.send("PNG/JPG/WebP links only please! <a:pepehands:485869482602922021>")
             return
         # resize image to fit background
         # using ANTIALIAS as good practice for using PIL library
@@ -151,14 +139,7 @@ class Memes(commands.Cog):
         name="trumporder",
         description="executive order from trump",
         brief='can use =trumporder "order"',
-        aliases=[
-            "trump",
-            "order",
-            "executiveorder" "TRUMP",
-            "EXECUTIVE",
-            "executive",
-            "ORDER",
-        ],
+        aliases=["trump", "order", "executiveorder" "TRUMP", "EXECUTIVE", "executive", "ORDER",],
     )
     async def trump_order(self, context, *args):
         # using IMGFLIP public API: https://api.imgflip.com/
@@ -220,8 +201,7 @@ class Memes(commands.Cog):
 
         except:
             await context.send(
-                f'{context.author.mention}```ml\n'
-                f'use =twobuttons like so: =twobuttons "option1" "option2"```'
+                f"{context.author.mention}```ml\n" f'use =twobuttons like so: =twobuttons "option1" "option2"```'
             )
             return
 
@@ -298,16 +278,7 @@ class Memes(commands.Cog):
         name="bookfacts",
         description="book of facts meme",
         brief='can use =bookfacts "facts"',
-        aliases=[
-            "book",
-            "facts",
-            "BOOK",
-            "FACTS",
-            "bookoffacts",
-            "BOOKOFFACTS",
-            "factsbook",
-            "FACTSBOOK",
-        ],
+        aliases=["book", "facts", "BOOK", "FACTS", "bookoffacts", "BOOKOFFACTS", "factsbook", "FACTSBOOK",],
     )
     async def book_of_facts(self, context, *args):
         # using IMGFLIP public API: https://api.imgflip.com/
@@ -636,7 +607,7 @@ class Memes(commands.Cog):
 
         except:
             await context.send(
-                f'{context.author.mention}```ml\nuse =boyfriend like so: '
+                f"{context.author.mention}```ml\nuse =boyfriend like so: "
                 f'"new girl" "distracted boyfriend" "girlfriend"```'
             )
             return

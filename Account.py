@@ -104,8 +104,7 @@ class Account(commands.Cog):
                     name=context.author.display_name, value=f"**:moneybag: ** {user.get_user_money()}", inline=True,
                 )
                 thumb_url = (
-                    f"https://cdn.discordapp.com/avatars/{context.author.id}"
-                    f"/{context.author.avatar}.webp?size=64"
+                    f"https://cdn.discordapp.com/avatars/{context.author.id}" f"/{context.author.avatar}.webp?size=64"
                 )
                 em.set_thumbnail(url=thumb_url)
 
@@ -195,8 +194,7 @@ class Account(commands.Cog):
             # check if receiver has account
             if receiver.find_user() == 0:
                 await context.send(
-                    f"{context.author.mention} The target doesn't have an account."
-                    f"\nUse **=create** to make one."
+                    f"{context.author.mention} The target doesn't have an account." f"\nUse **=create** to make one."
                 )
                 return
             # check if donator has enough money for the donation
@@ -390,7 +388,9 @@ class Account(commands.Cog):
 
         # embed the confirmation message, set thumbnail to user's id
         em = discord.Embed(title="", colour=0x607D4A)
-        em.add_field(name=f"Thanks for voting, {context.author.display_name}", value=msg, inline=True,)
+        em.add_field(
+            name=f"Thanks for voting, {context.author.display_name}", value=msg, inline=True,
+        )
         em.set_thumbnail(url=context.author.avatar_url)
         await context.send(embed=em)
 
@@ -539,9 +539,7 @@ class Account(commands.Cog):
             ranker_name = re.sub(r"\W+", "", ranker_name)
 
             # format the 2 columns for the leaderboards
-            name_field_column += (
-                f"{counter}. {ranker_name[:15]} \u200B \u200B (_lvl: {user_level}_ ) \u200B \u200B \n"
-            )
+            name_field_column += f"{counter}. {ranker_name[:15]} \u200B \u200B (_lvl: {user_level}_ ) \u200B \u200B \n"
             win_loss_column += f"${total_winnings}/{battles_won}/{battles_lost}\n"
             counter += 1
 

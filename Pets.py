@@ -134,8 +134,7 @@ class Pets(commands.Cog):
                 pet_avatar = "https://cdn.discordapp.com/emojis/422845006232027147.png?v=1"
 
             confirmation_msg = (
-                f"Fed **{pet_name}**! They feel stuffed for today.\n\n\n**XP:** {new_pet_xp}"
-                f"/{level_up_cost}"
+                f"Fed **{pet_name}**! They feel stuffed for today.\n\n\n**XP:** {new_pet_xp}" f"/{level_up_cost}"
             )
 
         # embed confirmation message
