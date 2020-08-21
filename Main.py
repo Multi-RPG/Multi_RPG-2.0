@@ -189,7 +189,7 @@ async def announcements_toggle(context):
             )
             # embed the confirmation into a message and send
             em = discord.Embed(description=result_str, colour=0x607D4A)
-            thumb_url = "https://cdn.discordapp.com/icons/{0.id}/{0.icon}.webp?size=40".format(context.guild)
+            thumb_url = f"https://cdn.discordapp.com/icons/{context.guild.id}/{context.guild.icon}.webp?size=40"
             em.set_thumbnail(url=thumb_url)
             await context.send(embed=em)
         # if the new status is on, they just toggled on announcements
@@ -200,7 +200,7 @@ async def announcements_toggle(context):
             )
             # embed the confirmation into a message and send
             em = discord.Embed(description=result_str, colour=0x607D4A)
-            thumb_url = "https://cdn.discordapp.com/icons/{0.id}/{0.icon}.webp?size=32".format(context.guild)
+            thumb_url = f"https://cdn.discordapp.com/icons/{context.guild.id}/{context.guild.icon}.webp?size=32"
             em.set_thumbnail(url=thumb_url)
             await context.send(embed=em)
     # else inform the user they lack sufficient privileges
@@ -267,7 +267,7 @@ if enable_error:
             )
             await context.send(str(error))
         elif "Access" in str(error):
-            await context.send("I couldn't talk to you in there!\n" "I am likely missing **access** to that channel.",)
+            await context.send("I couldn't talk to you in there!\nI am likely missing **access** to that channel.",)
             await context.send(str(error))
 
 
@@ -285,8 +285,8 @@ if __name__ == "__main__":
         try:
             client.load_extension(extension)
         except Exception as e:
-            exc = "{}: {}".format(type(e).__name__, e)
-            print("Failed to load extension {}\n{}".format(extension, exc))
+            exc = f"{type(e).__name__}: {e}"
+            print(f"Failed to load extension {extension}\n{exc}")
 
 # set up parser to config through our .ini file with our bot's token
 config = configparser.ConfigParser()
@@ -297,9 +297,7 @@ if bot_token_path.is_file():
     # we now have the bot's token
     TOKEN = config.get("BOT1", "token")
 else:
-    print(
-        "\n", "Discord bot token not found at: ", bot_token_path, "... Please correct file path in Main.py file.",
-    )
+    print(f"\nDiscord bot token not found at: {bot_token_path}... Please correct file path in Main.py file.")
     sys.exit()
 
 client.run(TOKEN)
