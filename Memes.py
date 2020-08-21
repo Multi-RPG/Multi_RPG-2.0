@@ -25,12 +25,7 @@ if imgflip_token_path.is_file():
     username = config.get("USER1", "username")
     password = config.get("USER1", "password")
 else:
-    print(
-        "\n",
-        "IMGFLIP account token not found at: ",
-        imgflip_token_path,
-        "... Please correct file path in Memes.py file.",
-    )
+    print(f"\nIMGFLIP account token not found at: {imgflip_token_path}... Please correct file path in Memes.py file.")
     sys.exit()
 
 
@@ -94,9 +89,8 @@ class Memes(commands.Cog):
         except:
             # the bot failed to retrieve image at that URL
             await context.send(
-                context.author.mention
-                + " The link you provided seems to be faulty..."
-                " <a:pepehands:485869482602922021>"
+                f"{context.author.mention} The link you provided seems to be faulty..."
+                f" <a:pepehands:485869482602922021>"
             )
             return
 
@@ -110,9 +104,7 @@ class Memes(commands.Cog):
         # PASTE USER'S PROFILE PICTURE AND USERNAME ON TOP OF BACKGROUND CANVAS
         # retrieve the URL for this user's avatar to embed above the text
         print(context.author.avatar_url)
-        urllib.request.urlretrieve(
-            "{}".format(context.author.avatar_url), "custom_memes\\UserAvatar.webp"
-        )
+        urllib.request.urlretrieve(f"{context.author.avatar_url}", "custom_memes\\UserAvatar.webp")
         # read the avatar image that we downloaded, convert to RGB so we can process it
         img = Image.open("custom_memes\\UserAvatar.webp", "r").convert("RGB")
         # resize avatar to to be thumbnail size
@@ -184,12 +176,9 @@ class Memes(commands.Cog):
                 order = order.replace("“", "").replace("”", "")
             else:
                 order = str(args[0])
-            print("trump order meme arguments: " + order)
+            print(f"trump order meme arguments: {order}")
         except:
-            await context.send(
-                context.author.mention
-                + '```ml\nuse =trumporder like so: =trumporder "order"```'
-            )
+            await context.send(f'{context.author.mention}```ml\nuse =trumporder like so: =trumporder "order"```')
             return
 
         DATA = {
@@ -227,12 +216,12 @@ class Memes(commands.Cog):
         try:
             button1 = str(args[0])
             button2 = str(args[1])
-            print("2 buttons meme arguments: " + button1 + " " + button2)
+            print(f"2 buttons meme arguments: {button1} {button2}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =twobuttons like so: =twobuttons "option1" "option2"```'
+                f'{context.author.mention}```ml\n'
+                f'use =twobuttons like so: =twobuttons "option1" "option2"```'
             )
             return
 
@@ -278,12 +267,11 @@ class Memes(commands.Cog):
                 reasons = reasons.replace("“", "").replace("”", "")
             else:
                 reasons = str(args[0])
-            print("reasons to live meme arguments: " + reasons)
+            print(f"reasons to live meme arguments: {reasons}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =reasonstolive like so: =reasonstolive "reasons"```'
+                f'{context.author.mention}```ml\nuse =reasonstolive like so: =reasonstolive "reasons"```'
             )
             return
 
@@ -339,13 +327,10 @@ class Memes(commands.Cog):
                 facts = facts.replace("“", "").replace("”", "")
             else:
                 facts = str(args[0])
-            print("book of facts meme arguments: " + facts)
+            print(f"book of facts meme arguments: {facts}")
 
         except:
-            await context.send(
-                context.author.mention
-                + '```ml\nuse =bookfacts like so: =bookfacts "facts"```'
-            )
+            await context.send(f'{context.author.mention}```ml\nuse =bookfacts like so: =bookfacts "facts"```')
             return
 
         DATA = {
@@ -394,12 +379,11 @@ class Memes(commands.Cog):
                 facts = facts.replace("“", "").replace("”", "")
             else:
                 facts = str(args[0])
-            print("change my mind meme arguments: " + facts)
+            print(f"change my mind meme arguments: {facts}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =changemymind like so: =changemymind "statement"```'
+                f'{context.author.mention}```ml\nuse =changemymind like so: =changemymind "statement"```'
             )
             return
 
@@ -440,12 +424,11 @@ class Memes(commands.Cog):
         try:
             cause = str(args[0])
             reaction = str(args[1])
-            print("slap button meme arguments: " + cause + " " + reaction)
+            print(f"slap button meme arguments: {cause} {reaction}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =slapbutton like so: =slapbutton "cause" "reaction"```'
+                f'{context.author.mention}```ml\nuse =slapbutton like so: =slapbutton "cause" "reaction"```'
             )
             return
 
@@ -481,21 +464,11 @@ class Memes(commands.Cog):
             stage2 = str(args[1])
             stage3 = str(args[2])
             stage4 = str(args[3])
-            print(
-                "expanding brain meme arguments: "
-                + stage1
-                + " "
-                + stage2
-                + " "
-                + stage3
-                + " "
-                + stage4
-            )
+            print(f"expanding brain meme arguments: {stage1} {stage2} {stage3} {stage4}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =brain like so: =brain "stage1" "stage2" "stage3" "stage4"```'
+                f'{context.author.mention}```ml\nuse =brain like so: =brain "stage1" "stage2" "stage3" "stage4"```'
             )
             return
 
@@ -553,12 +526,11 @@ class Memes(commands.Cog):
             # combine into 1 string with spaces between each word
             is_this_a = " ".join(args[2 : len(args)])
 
-            print("Pigeon meme arguments: " + whom + " " + butterfly + " " + is_this_a)
+            print(f"Pigeon meme arguments: {whom} {butterfly} {is_this_a}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =pigeon like so: =pigeon "boy" "butterfly" "is this a pidgeon?"```'
+                f'{context.author.mention}```ml\nuse =pigeon like so: =pigeon "boy" "butterfly" "is this a pidgeon?"```'
             )
             return
 
@@ -608,12 +580,11 @@ class Memes(commands.Cog):
             right = str(args[1])
             car = " ".join(args[2 : len(args)])
 
-            print("Left exit meme arguments " + left + " " + right + " " + car)
+            print(f"Left exit meme arguments {left} {right} {car}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =leftexit like so: =leftexit "left" "right" "car"```'
+                f'{context.author.mention}```ml\nuse =leftexit like so: =leftexit "left" "right" "car"```'
             )
             return
 
@@ -661,19 +632,12 @@ class Memes(commands.Cog):
             distracted_boyfriend = str(args[1])
             girlfriend = " ".join(args[2 : len(args)])
 
-            print(
-                "Distracted boyfriend meme arguments "
-                + new_girl
-                + " "
-                + distracted_boyfriend
-                + " "
-                + girlfriend
-            )
+            print(f"Distracted boyfriend meme arguments {new_girl} {distracted_boyfriend} {girlfriend}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =boyfriend like so: "new girl" "distracted boyfriend" "girlfriend"```'
+                f'{context.author.mention}```ml\nuse =boyfriend like so: '
+                f'"new girl" "distracted boyfriend" "girlfriend"```'
             )
             return
 
