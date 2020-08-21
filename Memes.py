@@ -103,7 +103,7 @@ class Memes(commands.Cog):
 
         # PASTE USER'S PROFILE PICTURE AND USERNAME ON TOP OF BACKGROUND CANVAS
         # retrieve the URL for this user's avatar to embed above the text
-        print(context.author.avatar_url)
+        print(f"User's avatar: {context.author.avatar_url}")
         urllib.request.urlretrieve(f"{context.author.avatar_url}", "custom_memes\\UserAvatar.webp")
         # read the avatar image that we downloaded, convert to RGB so we can process it
         img = Image.open("custom_memes\\UserAvatar.webp", "r").convert("RGB")
