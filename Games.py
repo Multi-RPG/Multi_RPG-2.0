@@ -185,15 +185,7 @@ class Games(commands.Cog):
         # declare 30% fail chance, used to calculate chance of failing rob
         fail_chance = 30
 
-        # pick a random user in the server to rob
-        # target variable will function as the victim user's "english" name
-        target = random.choice(list(context.guild.members))
-        # make an instance of the target
-        victim = Users(target.id)
-        victim_id = target.id
-        counter = 1
-
-        # if they specified a rob target, change the random target to their specified target
+        # if they specified a rob target, attempt to rob that target
         if args:
             try:
                 # use regex to extract only the user-id from the user targeted
@@ -201,105 +193,117 @@ class Games(commands.Cog):
                 victim = Users(victim_id)
 
                 # get_member() returns the "member" object that matches an id provided
-                target = context.guild.get_member(victim_id)
-                # higher fail chance, 35%, if they want to specify a rob target
-                fail_chance = 35
+                target = await context.guild.fetch_member(victim_id)
+
                 # if the target doesn't have an account, change fail chance back to 30%
                 # and the target will reroll next loop
-                if victim.find_user() == 0:
-                    fail_chance = 30
+                if victim.find_user() == 0 or victim_id == context.author.id:
                     await context.send(
-                        f"{context.author.mention} Your rob target doesn't have an account."
-                        f"\n**Rerolling** rob target now!"
+                        f"{context.author.mention} Your target has no account or you attempted to rob yourself."
+                        f"\n**Exiting now!**"
                     )
+                    context.command.reset_cooldown(context)
+                    return
+                # if robber is in peace mode
                 if robber.get_user_peace_status() == 1:
-                    fail_chance = 30
                     await context.send(
-                        f"{context.author.mention} You are in :dove: **peace mode** :dove: and cannot use =rob @user."
-                        f"\n**Rerolling** rob target now!"
+                        f"{context.author.mention} You are in :dove: **peace mode** :dove: and cannot specify a target!"
                     )
-
-                    # pick a random user in the server to rob
-                    # target variable will function as the victim user's "english" name
-                    target = random.choice(list(context.guild.members))
-                    # make an instance of the target
-                    victim = Users(target.id)
-                    victim_id = target.id
+                    return
+                # if target is in peace mode
                 elif victim.get_user_peace_status() == 1:
-                    fail_chance = 30
                     await context.send(
-                        f"{context.author.mention} That target is in :dove: **peace mode** :dove: "
-                        f"and exempt to =rob @user.\n**Rerolling** rob target now!"
+                        f"{context.author.mention} That target is in :dove: **peace mode** :dove:. Try another target."
                     )
-
-                    # pick a random user in the server to rob
-                    # target variable will function as the victim user's "english" name
-                    target = random.choice(list(context.guild.members))
-                    # make an instance of the target
-                    victim = Users(target.id)
-                    victim_id = target.id
-
+                    return
             except:
                 pass
 
-        # while the user to rob is the robber, re-roll the target
-        # while the user to rob does not have an account in the database, re-roll the target
-        while victim_id == context.author.id or victim.find_user() == 0:
-            # only try 120 members in the user's server
-            # otherwise if the user was the sole player with an account in the discord server, infinite while loop
-            # this part is inefficient, but only way I can think of right now with discord's functionality
-            if counter == 120:
-                # no users were found to rob if we hit 120 in the counter
-                # calculate random integer 1-100
-                # if the result is within 1 through fail chance, they failed the rob, so take bail money and return
-                if fail_chance >= random.randint(1, 100) >= 1:
-                    robber_level = robber.get_user_level(0)
-
-                    bail = int(robber_level * 8.4)
-                    robber.update_user_money(bail * -1)
-
-                    msg = (
-                        f"<a:policesiren2:490326123549556746> :oncoming_police_car: "
-                        f"<a:policesiren2:490326123549556746>\n<a:monkacop:490323719063863306>"
-                        f"\u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B"
-                        f"<a:monkacop:490323719063863306>\nPolice shot you in the process.\n"
-                        f"You spent **${bail}** to bail out of jail."
-                    )
-
-                    # embed the rob failure message, set thumbnail to 80x80 of a "police siren" gif
-                    em = discord.Embed(description=msg, colour=0x607D4A)
-                    em.set_thumbnail(url="https://cdn.discordapp.com/emojis/490326123549556746.gif?size=80")
-                    await context.send(embed=em)
-                    return
-                else:
-                    # if they passed the fail test, give the user a small prize and return
-                    bonus_prize = int(robber.get_user_level(0) * 29.3)
-                    robber.update_user_money(bonus_prize)
-                    msg = (
-                        f"**No users found to rob...** \nOn the way back to your basement, you found **$"
-                        f"{bonus_prize}** <:poggers:490322361891946496>"
-                    )
-                    # embed the rob confirmation message, set thumbnail to 40x40 of a "ninja" gif
-                    em = discord.Embed(description=msg, colour=0x607D4A)
-                    em.set_thumbnail(url="https://cdn.discordapp.com/emojis/419506568728543263.gif?size=40")
-                    await context.send(embed=em)
-                    return
+        # if robber did not specify a target
+        else:
+            # pick a random user in the server to rob
+            # target variable will function as the victim user's "english" name
             target = random.choice(list(context.guild.members))
-            # create a new instance of victim each loop
-            # in order to check if the reroll has an account in database
+            # make an instance of the target
             victim = Users(target.id)
             victim_id = target.id
-            counter += 1
+            counter = 1
 
+            # while the selected user to rob is the robber, re-roll the target
+            # while the selected user to rob does not have an account in the database, re-roll the target
+            while victim_id == context.author.id or victim.find_user() == 0:
+                # only try 70 members in the user's server
+                # otherwise if the user was the sole player with an account in the discord server, infinite while loop
+                # this part is inefficient, but only way I can think of right now with discord's functionality
+                if counter == 70:
+                    no_targets_found_msg = (
+                        f"**No users with Multi-RPG accounts found to rob...** \nExiting now..."
+                    )
+                    # embed the rob confirmation message, set thumbnail to 40x40 of a "ninja" gif
+                    em = discord.Embed(description=no_targets_found_msg, colour=0x607D4A)
+                    em.set_thumbnail(url="https://cdn.discordapp.com/emojis/618911376613834752.gif?size=40")
+                    await context.send(embed=em)
+                    context.command.reset_cooldown(context)
+                    return
+                target = random.choice(list(context.guild.members))
+                # create a new instance of victim each loop
+                # in order to check if the reroll has an account in database
+                victim = Users(target.id)
+                victim_id = target.id
+                counter += 1
+
+        # now that a target has been decided, roll dice to rob
         # calculate random integer 1-100
         # if the result is within 1 through fail chance, they failed the rob
         if fail_chance >= random.randint(1, 100) >= 1:
+            rob_success = False
+        else:
+            rob_success = True
+
+        # if robber successfully achieved a rob
+        if rob_success:
+            # we passed the dodge check, so reward thief with prize and bonus prize
+            victim_money = victim.get_user_money(0)
+            victim_level = victim.get_user_level(0)
+            robber_level = robber.get_user_level(0)
+
+            # the victim will only lose the prize, not the bonus prize
+            bonus_prize = int(robber_level * 29.3)
+
+            # the prize will begin by scaling by victim's level
+            prize = int(victim_level * 9.4)
+            # if prize greater than the robber's maximum prize amount, decrease the standard prize to compensate
+            if prize > int(robber_level * 9.4):
+                prize = int(robber_level * 9.4)
+            # if prize less than the robber's maximum prize amount, increase the bonus prize to compensate
+            if prize < int(robber_level * 9.4):
+                bonus_prize += int(robber_level * 9.4 - prize)
+
+            # balancing mechanic, don't let victims lose any more money when they have less money than -50x their level
+            if not victim_money < (victim_level * -50):
+                # subtract prize from victim
+                victim.update_user_money(prize * -1)
+            # reward robber with prize and bonus prize
+            robber.update_user_money(prize + bonus_prize)
+
+            success_msg = (
+                f"**Success!** <:poggers:490322361891946496> \n"
+                f"Robbed **${prize}** (+**${bonus_prize}**) from **{target.display_name}**"
+            )
+
+            # embed the rob confirmation message, set thumbnail to 40x40 of a "ninja" gif
+            em = discord.Embed(description=success_msg, colour=0x607D4A)
+            em.set_thumbnail(url="https://cdn.discordapp.com/emojis/419506568728543263.gif?size=40")
+            await context.send(embed=em)
+
+        # else user won dice roll, so rob the money from the victim
+        else:
             robber_level = robber.get_user_level(0)
 
             bail = int(robber_level * 10.4)
             robber.update_user_money(bail * -1)
 
-            msg = (
+            fail_msg = (
                 f"<a:policesiren2:490326123549556746> :oncoming_police_car: "
                 f"<a:policesiren2:490326123549556746>\n<a:monkacop:490323719063863306>"
                 f"\u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B"
@@ -308,43 +312,10 @@ class Games(commands.Cog):
             )
 
             # embed the rob failure message, set thumbnail to 80x80 of a "police siren" gif
-            em = discord.Embed(description=msg, colour=0x607D4A)
+            em = discord.Embed(description=fail_msg, colour=0x607D4A)
             em.set_thumbnail(url="https://cdn.discordapp.com/emojis/490326123549556746.gif?size=80")
             await context.send(embed=em)
             return
-
-        # we passed the dodge check, so reward thief with prize and bonus prize
-        victim_money = victim.get_user_money(0)
-        victim_level = victim.get_user_level(0)
-        robber_level = robber.get_user_level(0)
-
-        # the victim will only lose the prize, not the bonus prize
-        bonus_prize = int(robber_level * 29.3)
-
-        # the prize will begin by scaling by victim's level
-        prize = int(victim_level * 9.4)
-        # if prize greater than the robber's maximum prize amount, decrease the standard prize to compensate
-        if prize > int(robber_level * 9.4):
-            prize = int(robber_level * 9.4)
-        # if prize less than the robber's maximum prize amount, increase the bonus prize to compensate
-        if prize < int(robber_level * 9.4):
-            bonus_prize += int(robber_level * 9.4 - prize)
-
-        # balancing mechanic, don't let victims lose any more money when they have less money than -50x their level
-        if not victim_money < (victim_level * -50):
-            # subtract prize from victim
-            victim.update_user_money(prize * -1)
-        # reward robber with prize and bonus prize
-        robber.update_user_money(prize + bonus_prize)
-        msg = (
-            f"**Success!** <:poggers:490322361891946496> \n"
-            f"Robbed **${prize}** (+**${bonus_prize}**) from **{target.display_name}**"
-        )
-
-        # embed the rob confirmation message, set thumbnail to 40x40 of a "ninja" gif
-        em = discord.Embed(description=msg, colour=0x607D4A)
-        em.set_thumbnail(url="https://cdn.discordapp.com/emojis/419506568728543263.gif?size=40")
-        await context.send(embed=em)
 
     """TOURNAMENT BATTLE FUNCTION"""
 
