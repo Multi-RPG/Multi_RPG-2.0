@@ -69,16 +69,11 @@ class Shop(commands.Cog):
 
             # have to insert encode \u200B for spaces when using discord encoding
             formatted_items.append(
-                "**Item "
-                + str(item_id)
-                + "**: "
-                + item_name
-                + " (**Lvl "
-                + str(item_lvl)
-                + "**)\n\u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B"
-                " \u200B \u200B \u200B __Type__: " + item_emoji + "\n\u200B \u200B \u200B \u200B"
-                " \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B"
-                " __Price__: **$" + str("{:,}".format(item_price)) + "**\n"
+                f"**Item {item_id}**: {item_name} (**Lvl {item_lvl}"
+                f"**)\n\u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B"
+                f" \u200B \u200B \u200B __Type__: {item_emoji}\n\u200B \u200B \u200B \u200B"
+                f" \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B"
+                f" __Price__: **${item_price:,}**\n"
             )
 
         # place the first page of items into a string
@@ -92,11 +87,11 @@ class Shop(commands.Cog):
         # embed first set of 5 items, send the message
         em = discord.Embed(title="", colour=0x607D4A)
         # get the current page/total_page and add it to the embedded page's title
-        field_name = "Shop (Page {}/{})".format(str(1), str(total_pages))
+        field_name = f"Shop (Page {1}/{total_pages})"
         em.add_field(name=field_name, value=page1_str, inline=True)
         em.set_thumbnail(url="https://cdn.discordapp.com/emojis/525164940231704577.gif?size=64")
         # send the first page of items in a message
-        intro_msg = await context.send(context.author.mention + help_msg)
+        intro_msg = await context.send(f"{context.author.mention} {help_msg}")
         msg = await context.send(embed=em)
 
         # if there is more than 5 items, we need more than 1 page.
@@ -132,7 +127,7 @@ class Shop(commands.Cog):
                         # clear the embed fields for the new page of items, add the new one, and send it
                         em.clear_fields()
                         # get the current page/total_page and add it to the embedded page's title
-                        field_name = "Shop (Page {}/{})".format(str(current_page_number), str(total_pages))
+                        field_name = f"Shop (Page {current_page_number}/{total_pages})"
                         em.add_field(name=field_name, value=page_str, inline=True)
                         msg = await context.send(embed=em)
 
@@ -153,7 +148,7 @@ class Shop(commands.Cog):
                         # clear the embed fields for the new page of items, add the new one, and send it
                         em.clear_fields()
                         # get the current page/total_page and add it to the embedded page's title
-                        field_name = "Shop (Page {}/{})".format(str(current_page_number), str(total_pages))
+                        field_name = f"Shop (Page {current_page_number}/{total_pages})"
                         em.add_field(name=field_name, value=page_str, inline=True)
                         msg = await context.send(embed=em)
 
@@ -195,7 +190,7 @@ class Shop(commands.Cog):
         try:
             item_id = int(args[0])
         except:
-            error_msg = await context.send(context.author.mention + " " + help_msg)
+            error_msg = await context.send(f"{context.author.mention} {help_msg}")
             await asyncio.sleep(7)
             await error_msg.delete()
             await context.message.delete()
@@ -227,8 +222,8 @@ class Shop(commands.Cog):
         if user.get_user_money(0) < item_price:
             difference = str(item_price - user.get_user_money(0))
             error_msg = (
-                " <:worrymag1:531214786646507540> Not enough money!"
-                " You need **$" + difference + "** more for that item! <:worrymag2:531214802266095618>"
+                f" <:worrymag1:531214786646507540> Not enough money!"
+                f" You need **${difference}** more for that item! <:worrymag2:531214802266095618>"
             )
             em = discord.Embed(description=error_msg, colour=0x607D4A)
             await context.send(context.author.mention, embed=em)
@@ -271,15 +266,11 @@ class Shop(commands.Cog):
         # draft the confirmation prompt string
         # have to insert encode \u200B for spaces when using discord encoding
         confirmation_prompt = (
-            "Type **confirm** to buy:\n\n__"
-            + item_name
-            + "__ (**Lvl "
-            + str(item_lvl)
-            + "**)\n \u200B \u200B \u200B \u200B \u200B \u200B \u200B"
-            " \u200B \u200B \u200B \u200B \u200B \u200B \u200B __Type__: "
-            + item_emoji
-            + "\n \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B\u200B"
-            " \u200B \u200B \u200B \u200B \u200B __Price__: **$" + str(item_price) + "**\n"
+            f"Type **confirm** to buy:\n\n__{item_name}__ (**Lvl {item_lvl}"
+            f"**)\n \u200B \u200B \u200B \u200B \u200B \u200B \u200B"
+            f" \u200B \u200B \u200B \u200B \u200B \u200B \u200B __Type__: {item_emoji}"
+            f"\n \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B \u200B\u200B"
+            f" \u200B \u200B \u200B \u200B \u200B __Price__: **${item_price}**\n"
         )
 
         # embed the confirmation prompt and send it
@@ -296,15 +287,15 @@ class Shop(commands.Cog):
         if response.clean_content.upper() == "CONFIRM":
             # check if they tried to exploit the code by spending all their money before confirming
             if user.get_user_money(0) < item_price:
-                await context.send(context.author.mention + " You spent money before confirming...")
+                await context.send(f"{context.author.mention} You spent money before confirming...")
                 return
             # subtract the item's price from user's bank account
             confirmation = (
-                "<:worrysign10:531221748964786188> Bought **" + item_name + "**! <:worrysign10:531221748964786188>\n"
+                f"<:worrysign10:531221748964786188> Bought **{item_name}**! <:worrysign10:531221748964786188>\n"
             )
             # update user's item level for that item type bought
             confirmation += (
-                user.update_user_battle_gear(item_type, item_lvl) + "\n" + user.update_user_money(item_price * -1)
+                f"{user.update_user_battle_gear(item_type, item_lvl)}\n{user.update_user_money(item_price * -1)}"
             )
 
             # embed the confirmation string, add the user's avatar to it, and send it
@@ -315,7 +306,7 @@ class Shop(commands.Cog):
             em.set_thumbnail(url=context.author.avatar_url)
             await context.send(embed=em)
         else:
-            await context.send(context.author.mention + " Cancelled purchase!")
+            await context.send(f"{context.author.mention} Cancelled purchase!")
 
         # clean up messages to reduce spam in channel
         await response.delete()
