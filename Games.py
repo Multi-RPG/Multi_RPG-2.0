@@ -301,7 +301,7 @@ class Games(commands.Cog):
             em.set_thumbnail(url="https://cdn.discordapp.com/emojis/419506568728543263.gif?size=40")
             await context.send(embed=em)
 
-        # else user won dice roll, so rob the money from the victim
+        # robber failed
         else:
             robber_level = robber.get_user_level(0)
 
