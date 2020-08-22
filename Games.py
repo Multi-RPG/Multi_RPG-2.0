@@ -217,7 +217,12 @@ class Games(commands.Cog):
                     )
                     return
             except:
-                pass
+                context.command.reset_cooldown(context)
+                await context.send(
+                    f'{context.author.mention}```ml\nIf targeting with rob, use =rob like so: "=rob @User"'
+                    f'\n(select an actual discord user after the @ sign, like you were to ping them)```'
+                )
+                return
 
         # if robber did not specify a target
         else:
