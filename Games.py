@@ -204,7 +204,8 @@ class Games(commands.Cog):
                 target = context.guild.get_member(victim_id)
                 # higher fail chance, 35%, if they want to specify a rob target
                 fail_chance = 35
-                # if the target doesn't have an account, change fail chance back to 30% and the target will reroll next loop
+                # if the target doesn't have an account, change fail chance back to 30%
+                # and the target will reroll next loop
                 if victim.find_user() == 0:
                     fail_chance = 30
                     await context.send(
