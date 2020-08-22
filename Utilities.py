@@ -27,7 +27,7 @@ class Utilities(commands.Cog):
                         await context.send("100 messages maximum!")
                         return
                     deleted = await context.channel.purge(limit=int(args[0]))
-                    await context.send("Deleted %s message(s)" % str(len(deleted)))
+                    await context.send(f"Deleted {len(deleted)} message(s)")
                 else:
                     await context.channel.purge(limit=1)
                     await context.send("Cleared 1 message... " "Use **=clear X** to clear a higher, specified amount.")
@@ -73,7 +73,7 @@ class Utilities(commands.Cog):
                 msg = str(msg.replace("@here", "Here!"))
             # prevent users from using links in remindme's message
             if "http" in msg:
-                error_msg = await context.send(context.author.mention + " No links permitted!")
+                error_msg = await context.send(f"{context.author.mention} No links permitted!")
                 await asyncio.sleep(6)
                 await error_msg.delete()
                 await context.message.delete()
@@ -124,7 +124,7 @@ class Utilities(commands.Cog):
         await context.send(embed=em)
 
         await asyncio.sleep(seconds)
-        await context.send(context.author.mention + " **Reminder:** " + msg)
+        await context.send(f"{context.author.mention} **Reminder:** {msg}")
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(name="id", aliases=["myid", "ID"])

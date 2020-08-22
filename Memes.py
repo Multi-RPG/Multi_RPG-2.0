@@ -16,21 +16,14 @@ import sys
 URL = "https://api.imgflip.com/caption_image"
 # set up parser to config through our .ini file with our imgflip account details
 config = configparser.ConfigParser()
-imgflip_token_path = Path(
-    "tokens/tokenimgflip.ini"
-)  # use forward slash "/" for path directories
+imgflip_token_path = Path("tokens/tokenimgflip.ini")  # use forward slash "/" for path directories
 # confirm the token is located in the above path
 if imgflip_token_path.is_file():
     config.read(imgflip_token_path)
     username = config.get("USER1", "username")
     password = config.get("USER1", "password")
 else:
-    print(
-        "\n",
-        "IMGFLIP account token not found at: ",
-        imgflip_token_path,
-        "... Please correct file path in Memes.py file.",
-    )
+    print(f"\nIMGFLIP account token not found at: {imgflip_token_path}... Please correct file path in Memes.py file.")
     sys.exit()
 
 
@@ -50,24 +43,20 @@ class Memes(commands.Cog):
         # made this check function with the help of discord API documentation
         # it will be called below when purging, to only purge messages from itself and user who called this command
         def purge_check(msg):
-            return (
-                msg.author == context.author or context.author == self.client.user
-            )
+            return msg.author == context.author or context.author == self.client.user
 
         # first, get the inputs from user. this command needs the meme text and the meme image
         await context.send(
-            "<:wthumbs:493806177894006786> First, type the text for your"
-            " custom twitter-styled meme..."
+            "<:wthumbs:493806177894006786> First, type the text for your" " custom twitter-styled meme..."
         )
 
         # helper to check if it's the author that it's responding.
         def is_author(m):
             return m.author == context.author and m.channel == context.channel
-        
+
         user_text = await self.client.wait_for("message", check=is_author, timeout=60)
         await context.send(
-            "<:wthumbs:493806177894006786> Now, send an image URL for your"
-            " custom twitter-styled meme..."
+            "<:wthumbs:493806177894006786> Now, send an image URL for your" " custom twitter-styled meme..."
         )
 
         user_image = await self.client.wait_for("message", check=is_author, timeout=60)
@@ -88,15 +77,12 @@ class Memes(commands.Cog):
         # try to start the request to get the image specified by user
         try:
             # download the image as "UserImage.png"
-            urllib.request.urlretrieve(
-                user_image.clean_content, "custom_memes\\UserImage.png"
-            )
+            urllib.request.urlretrieve(user_image.clean_content, "custom_memes\\UserImage.png")
         except:
             # the bot failed to retrieve image at that URL
             await context.send(
-                context.author.mention
-                + " The link you provided seems to be faulty..."
-                " <a:pepehands:485869482602922021>"
+                f"{context.author.mention} The link you provided seems to be faulty..."
+                f" <a:pepehands:485869482602922021>"
             )
             return
 
@@ -109,10 +95,8 @@ class Memes(commands.Cog):
 
         # PASTE USER'S PROFILE PICTURE AND USERNAME ON TOP OF BACKGROUND CANVAS
         # retrieve the URL for this user's avatar to embed above the text
-        print(context.author.avatar_url)
-        urllib.request.urlretrieve(
-            "{}".format(context.author.avatar_url), "custom_memes\\UserAvatar.webp"
-        )
+        print(f"User's avatar: {context.author.avatar_url}")
+        urllib.request.urlretrieve(f"{context.author.avatar_url}", "custom_memes\\UserAvatar.webp")
         # read the avatar image that we downloaded, convert to RGB so we can process it
         img = Image.open("custom_memes\\UserAvatar.webp", "r").convert("RGB")
         # resize avatar to to be thumbnail size
@@ -121,9 +105,7 @@ class Memes(commands.Cog):
         # paste the image onto background at the top
         background.paste(img, (10, 5))
         # draw the user's username next to their profile picture
-        draw.text(
-            (63, 1), ("@" + str(context.author)), (65, 65, 65), font=smallfont
-        )
+        draw.text((63, 1), ("@" + str(context.author)), (65, 65, 65), font=smallfont)
 
         # PASTE THE MEME TEXT IN MIDDLE OF BACKGROUND CANVAS
         # draw their specified text on the white background, with word wrapping
@@ -138,9 +120,7 @@ class Memes(commands.Cog):
             img = Image.open("custom_memes\\UserImage.png", "r").convert("RGB")
         except:
             # if we can't read the image downloaded, it's in the wrong format...
-            await context.send(
-                "PNG/JPG/WebP links only please! <a:pepehands:485869482602922021>"
-            )
+            await context.send("PNG/JPG/WebP links only please! <a:pepehands:485869482602922021>")
             return
         # resize image to fit background
         # using ANTIALIAS as good practice for using PIL library
@@ -159,14 +139,7 @@ class Memes(commands.Cog):
         name="trumporder",
         description="executive order from trump",
         brief='can use =trumporder "order"',
-        aliases=[
-            "trump",
-            "order",
-            "executiveorder" "TRUMP",
-            "EXECUTIVE",
-            "executive",
-            "ORDER",
-        ],
+        aliases=["trump", "order", "executiveorder" "TRUMP", "EXECUTIVE", "executive", "ORDER",],
     )
     async def trump_order(self, context, *args):
         # using IMGFLIP public API: https://api.imgflip.com/
@@ -184,12 +157,9 @@ class Memes(commands.Cog):
                 order = order.replace("“", "").replace("”", "")
             else:
                 order = str(args[0])
-            print("trump order meme arguments: " + order)
+            print(f"trump order meme arguments: {order}")
         except:
-            await context.send(
-                context.author.mention
-                + '```ml\nuse =trumporder like so: =trumporder "order"```'
-            )
+            await context.send(f'{context.author.mention}```ml\nuse =trumporder like so: =trumporder "order"```')
             return
 
         DATA = {
@@ -227,12 +197,11 @@ class Memes(commands.Cog):
         try:
             button1 = str(args[0])
             button2 = str(args[1])
-            print("2 buttons meme arguments: " + button1 + " " + button2)
+            print(f"2 buttons meme arguments: {button1} {button2}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =twobuttons like so: =twobuttons "option1" "option2"```'
+                f"{context.author.mention}```ml\n" f'use =twobuttons like so: =twobuttons "option1" "option2"```'
             )
             return
 
@@ -278,12 +247,11 @@ class Memes(commands.Cog):
                 reasons = reasons.replace("“", "").replace("”", "")
             else:
                 reasons = str(args[0])
-            print("reasons to live meme arguments: " + reasons)
+            print(f"reasons to live meme arguments: {reasons}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =reasonstolive like so: =reasonstolive "reasons"```'
+                f'{context.author.mention}```ml\nuse =reasonstolive like so: =reasonstolive "reasons"```'
             )
             return
 
@@ -310,16 +278,7 @@ class Memes(commands.Cog):
         name="bookfacts",
         description="book of facts meme",
         brief='can use =bookfacts "facts"',
-        aliases=[
-            "book",
-            "facts",
-            "BOOK",
-            "FACTS",
-            "bookoffacts",
-            "BOOKOFFACTS",
-            "factsbook",
-            "FACTSBOOK",
-        ],
+        aliases=["book", "facts", "BOOK", "FACTS", "bookoffacts", "BOOKOFFACTS", "factsbook", "FACTSBOOK",],
     )
     async def book_of_facts(self, context, *args):
         # using IMGFLIP public API: https://api.imgflip.com/
@@ -339,13 +298,10 @@ class Memes(commands.Cog):
                 facts = facts.replace("“", "").replace("”", "")
             else:
                 facts = str(args[0])
-            print("book of facts meme arguments: " + facts)
+            print(f"book of facts meme arguments: {facts}")
 
         except:
-            await context.send(
-                context.author.mention
-                + '```ml\nuse =bookfacts like so: =bookfacts "facts"```'
-            )
+            await context.send(f'{context.author.mention}```ml\nuse =bookfacts like so: =bookfacts "facts"```')
             return
 
         DATA = {
@@ -394,12 +350,11 @@ class Memes(commands.Cog):
                 facts = facts.replace("“", "").replace("”", "")
             else:
                 facts = str(args[0])
-            print("change my mind meme arguments: " + facts)
+            print(f"change my mind meme arguments: {facts}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =changemymind like so: =changemymind "statement"```'
+                f'{context.author.mention}```ml\nuse =changemymind like so: =changemymind "statement"```'
             )
             return
 
@@ -440,12 +395,11 @@ class Memes(commands.Cog):
         try:
             cause = str(args[0])
             reaction = str(args[1])
-            print("slap button meme arguments: " + cause + " " + reaction)
+            print(f"slap button meme arguments: {cause} {reaction}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =slapbutton like so: =slapbutton "cause" "reaction"```'
+                f'{context.author.mention}```ml\nuse =slapbutton like so: =slapbutton "cause" "reaction"```'
             )
             return
 
@@ -481,21 +435,11 @@ class Memes(commands.Cog):
             stage2 = str(args[1])
             stage3 = str(args[2])
             stage4 = str(args[3])
-            print(
-                "expanding brain meme arguments: "
-                + stage1
-                + " "
-                + stage2
-                + " "
-                + stage3
-                + " "
-                + stage4
-            )
+            print(f"expanding brain meme arguments: {stage1} {stage2} {stage3} {stage4}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =brain like so: =brain "stage1" "stage2" "stage3" "stage4"```'
+                f'{context.author.mention}```ml\nuse =brain like so: =brain "stage1" "stage2" "stage3" "stage4"```'
             )
             return
 
@@ -553,12 +497,11 @@ class Memes(commands.Cog):
             # combine into 1 string with spaces between each word
             is_this_a = " ".join(args[2 : len(args)])
 
-            print("Pigeon meme arguments: " + whom + " " + butterfly + " " + is_this_a)
+            print(f"Pigeon meme arguments: {whom} {butterfly} {is_this_a}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =pigeon like so: =pigeon "boy" "butterfly" "is this a pidgeon?"```'
+                f'{context.author.mention}```ml\nuse =pigeon like so: =pigeon "boy" "butterfly" "is this a pidgeon?"```'
             )
             return
 
@@ -608,12 +551,11 @@ class Memes(commands.Cog):
             right = str(args[1])
             car = " ".join(args[2 : len(args)])
 
-            print("Left exit meme arguments " + left + " " + right + " " + car)
+            print(f"Left exit meme arguments {left} {right} {car}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =leftexit like so: =leftexit "left" "right" "car"```'
+                f'{context.author.mention}```ml\nuse =leftexit like so: =leftexit "left" "right" "car"```'
             )
             return
 
@@ -661,19 +603,12 @@ class Memes(commands.Cog):
             distracted_boyfriend = str(args[1])
             girlfriend = " ".join(args[2 : len(args)])
 
-            print(
-                "Distracted boyfriend meme arguments "
-                + new_girl
-                + " "
-                + distracted_boyfriend
-                + " "
-                + girlfriend
-            )
+            print(f"Distracted boyfriend meme arguments {new_girl} {distracted_boyfriend} {girlfriend}")
 
         except:
             await context.send(
-                context.author.mention
-                + '```ml\nuse =boyfriend like so: "new girl" "distracted boyfriend" "girlfriend"```'
+                f"{context.author.mention}```ml\nuse =boyfriend like so: "
+                f'"new girl" "distracted boyfriend" "girlfriend"```'
             )
             return
 

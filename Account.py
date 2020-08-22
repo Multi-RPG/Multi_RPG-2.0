@@ -81,12 +81,14 @@ class Account(commands.Cog):
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
                     name=discord_member_target.display_name,
-                    value="**:moneybag: ** " + target.get_user_money(),
+                    value=f"**:moneybag: ** {target.get_user_money()}",
                     inline=True,
                 )
-                thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(
-                    discord_member_target
+                thumb_url = (
+                    f"https://cdn.discordapp.com/avatars/{discord_member_target.id}"
+                    f"/{discord_member_target.avatar}.webp?size=64"
                 )
+
                 em.set_thumbnail(url=thumb_url)
 
                 await context.send(context.author.mention, embed=em)
@@ -99,9 +101,11 @@ class Account(commands.Cog):
                 # embed the money retrieved from get_user_money(), set thumbnail to 64x64 version of user's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name, value="**:moneybag: ** " + user.get_user_money(), inline=True,
+                    name=context.author.display_name, value=f"**:moneybag: ** {user.get_user_money()}", inline=True,
                 )
-                thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(context.author)
+                thumb_url = (
+                    f"https://cdn.discordapp.com/avatars/{context.author.id}" f"/{context.author.avatar}.webp?size=64"
+                )
                 em.set_thumbnail(url=thumb_url)
 
                 await context.send(context.author.mention, embed=em)
@@ -135,10 +139,11 @@ class Account(commands.Cog):
                 # embed the level retrieved from get_user_level(), set thumbnail to 64x64 version of target's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=discord_member_target.display_name, value="**Level** " + target.get_user_level(), inline=True,
+                    name=discord_member_target.display_name, value=f"**Level** {target.get_user_level()}", inline=True,
                 )
-                thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(
-                    discord_member_target
+                thumb_url = (
+                    f"https://cdn.discordapp.com/avatars/{discord_member_target.id}"
+                    f"/{discord_member_target.avatar}.webp?size=64"
                 )
                 em.set_thumbnail(url=thumb_url)
 
@@ -152,9 +157,11 @@ class Account(commands.Cog):
                 # embed the level retrieved from get_user_level(), set thumbnail to 64x64 version of user's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name, value="**Level** " + user.get_user_level(), inline=True,
+                    name=context.author.display_name, value=f"**Level** {user.get_user_level()}", inline=True,
                 )
-                thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(context.author)
+                thumb_url = (
+                    f"https://cdn.discordapp.com/avatars/{context.author.id}/{context.author.avatar}.webp?size=64"
+                )
                 em.set_thumbnail(url=thumb_url)
 
                 await context.send(context.author.mention, embed=em)
@@ -187,15 +194,15 @@ class Account(commands.Cog):
             # check if receiver has account
             if receiver.find_user() == 0:
                 await context.send(
-                    context.author.mention + " The target doesn't have an account." "\nUse **=create** to make one."
+                    f"{context.author.mention} The target doesn't have an account." f"\nUse **=create** to make one."
                 )
                 return
             # check if donator has enough money for the donation
             # pass 0 to return integer version of money, see USERS.PY function
             if int(amnt) > donator.get_user_money(0):
                 await context.send(
-                    context.author.mention + " You don't have enough money for that donation..."
-                    " <a:pepehands:485869482602922021> "
+                    f"{context.author.mention} You don't have enough money for that donation..."
+                    f" <a:pepehands:485869482602922021> "
                 )
                 return
 
@@ -211,8 +218,8 @@ class Account(commands.Cog):
             msg = f"Not ok! {e.__class__} occurred"
             print(msg)
             await context.send(
-                context.author.mention
-                + "```ml\nuse =give like so: **=give @user X**    -- X being amnt of money to give```"
+                f"{context.author.mention}```ml\nuse =give like so: **=give @user X**"
+                f"    -- X being amnt of money to give```"
             )
 
     @has_account()
@@ -283,21 +290,15 @@ class Account(commands.Cog):
         elif user_level in range(9, 34):
             level_up_cost = int(300 * ((user_level + 1) ** 1.9) - (300 * user_level))
         elif user_level == 35:
-            await self.client.say("You are already level 35, the max level!")
+            await context.send("You are already level 35, the max level!")
             return
 
         # check if they have enough money for a level-up
         if user.get_user_money(0) < level_up_cost:
             error_msg = await context.send(
-                context.author.mention
-                + " Not enough money for level-up..."
-                + " <a:pepehands:485869482602922021>\n"
-                + "** **\nAccount balance: "
-                + user.get_user_money()
-                + "\nLevel **"
-                + str(user_level + 1)
-                + "** requires: **$"
-                + str("{:,}".format((level_up_cost)) + "**")
+                f"{context.author.mention} Not enough money for level-up... <a:pepehands:485869482602922021>\n"
+                f"** **\nAccount balance: {user.get_user_money()}\nLevel **{user_level + 1}"
+                f"** requires: **${level_up_cost:,}**"
             )
             # wait 15 seconds then delete error message and original message to reduce spam
             await asyncio.sleep(15)
@@ -308,19 +309,14 @@ class Account(commands.Cog):
         # passed conditional, so they have enough money to level up
         # confirm if they really want to level-up
         msg = (
-            "\nAccount balance: "
-            + user.get_user_money()
-            + "\nLevel **"
-            + str(user_level + 1)
-            + "** requires: **$"
-            + str("{:,}".format((level_up_cost)))
-            + "**\n** **\nDo you want to level-up?"
-            + " Type **confirm** to confirm."
+            f"\nAccount balance: {user.get_user_money()}\nLevel **{user_level + 1}"
+            f"** requires: **${level_up_cost:,}**\n****\n** **\nDo you want to level-up?"
+            f" Type **confirm** to confirm."
         )
 
         # embed the confirmation prompt, set thumbnail to user's id of max size
         em = discord.Embed(description=msg, colour=0x607D4A)
-        thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=1024".format(context.author)
+        thumb_url = f"https://cdn.discordapp.com/avatars/{context.author.id}/{context.author.avatar}.webp?size=1024"
         em.set_thumbnail(url=thumb_url)
 
         await context.send(context.author.mention, embed=em)
@@ -336,7 +332,7 @@ class Account(commands.Cog):
         if confirm.clean_content.upper() == "CONFIRM":
             # check if they tried to exploit the code by spending all their money before confirming
             if user.get_user_money(0) < level_up_cost:
-                await context.send(context.author.mention + " You spent money before confirming...")
+                await context.send(f"{context.author.mention} You spent money before confirming...")
                 return
             # deduct the level-up cost from their account
             user.update_user_money(level_up_cost * -1)
@@ -346,11 +342,11 @@ class Account(commands.Cog):
             em.add_field(
                 name=context.author.display_name, value=user.update_user_level(), inline=True,
             )
-            thumb_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.webp?size=64".format(context.author)
+            thumb_url = f"https://cdn.discordapp.com/avatars/{context.author.id}/{context.author.avatar}.webp?size=64"
             em.set_thumbnail(url=thumb_url)
             await context.send(embed=em)
         else:
-            await context.send(context.author.mention + " Cancelled level-up.")
+            await context.send(f"{context.author.mention} Cancelled level-up.")
 
     @has_account()
     @commands.cooldown(1, 86400, commands.BucketType.user)
@@ -364,10 +360,8 @@ class Account(commands.Cog):
         dailyreward = user_level * 60
 
         msg = (
-            "<a:worryswipe:525755450218643496> Daily **$"
-            + str(dailyreward)
-            + "** received! <a:worryswipe:525755450218643496>\n"
-            + user.update_user_money(dailyreward)
+            f"<a:worryswipe:525755450218643496> Daily **${dailyreward}"
+            f"** received! <a:worryswipe:525755450218643496>\n{user.update_user_money(dailyreward)}"
         )
 
         # embed the confirmation message, set thumbnail to user's id
@@ -388,16 +382,14 @@ class Account(commands.Cog):
         dailyreward = user_level * 50
 
         msg = (
-            "<a:worryswipe:525755450218643496> Daily **$"
-            + str(dailyreward)
-            + "** received! <a:worryswipe:525755450218643496>\n"
-            + user.update_user_money(dailyreward)
+            f"<a:worryswipe:525755450218643496> Daily **${dailyreward}"
+            f"** received! <a:worryswipe:525755450218643496>\n{user.update_user_money(dailyreward)}"
         )
 
         # embed the confirmation message, set thumbnail to user's id
         em = discord.Embed(title="", colour=0x607D4A)
         em.add_field(
-            name="Thanks for voting, {}!".format(context.author.display_name), value=msg, inline=True,
+            name=f"Thanks for voting, {context.author.display_name}", value=msg, inline=True,
         )
         em.set_thumbnail(url=context.author.avatar_url)
         await context.send(embed=em)
@@ -452,7 +444,7 @@ class Account(commands.Cog):
                 await context.send(embed=em)
                 return
             else:
-                await context.send(context.author.mention + " Cancelled peace toggle-on!")
+                await context.send(f"{context.author.mention} Cancelled peace toggle-on!")
                 return
 
         elif user_peace_status == 1 and user_peace_cooldown == 0:
@@ -489,7 +481,7 @@ class Account(commands.Cog):
                 await context.send(embed=em)
                 return
             else:
-                await context.send(context.author.mention + " Cancelled peace toggle-off!")
+                await context.send(f"{context.author.mention} Cancelled peace toggle-off!")
                 return
 
         elif user_peace_cooldown == 1:
@@ -533,7 +525,7 @@ class Account(commands.Cog):
                 total_winnings,
             ) = user.get_user_stats(0)
             # format money for commas
-            total_winnings = "{:,}".format(total_winnings)
+            total_winnings = f"{total_winnings:,}"
             # try to retrieve user's level, if failed, skip to next iteration
             try:
                 user_level = user.get_user_level(0)
@@ -547,15 +539,8 @@ class Account(commands.Cog):
             ranker_name = re.sub(r"\W+", "", ranker_name)
 
             # format the 2 columns for the leaderboards
-            name_field_column += (
-                str(counter)
-                + ". "
-                + ranker_name[:15]
-                + " \u200B \u200B (_lvl: "
-                + str(user_level)
-                + "_ ) \u200B \u200B \n"
-            )
-            win_loss_column += "$" + str(total_winnings) + "/" + str(battles_won) + "/" + str(battles_lost) + "\n"
+            name_field_column += f"{counter}. {ranker_name[:15]} \u200B \u200B (_lvl: {user_level}_ ) \u200B \u200B \n"
+            win_loss_column += f"${total_winnings}/{battles_won}/{battles_lost}\n"
             counter += 1
 
         # embed the ranking columns
