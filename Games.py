@@ -220,7 +220,7 @@ class Games(commands.Cog):
                 context.command.reset_cooldown(context)
                 await context.send(
                     f'{context.author.mention}```ml\nIf targeting with rob, use =rob like so: "=rob @User"'
-                    f'\n(select an actual discord user after the @ sign, like you were to ping them)```'
+                    f"\n(select an actual discord user after the @ sign, like you were to ping them)```"
                 )
                 return
 
@@ -241,9 +241,7 @@ class Games(commands.Cog):
                 # otherwise if the user was the sole player with an account in the discord server, infinite while loop
                 # this part is inefficient, but only way I can think of right now with discord's functionality
                 if counter == 70:
-                    no_targets_found_msg = (
-                        f"**No users with Multi-RPG accounts found to rob...** \nExiting now..."
-                    )
+                    no_targets_found_msg = f"**No users with Multi-RPG accounts found to rob...** \nExiting now..."
                     # embed the rob confirmation message, set thumbnail to 40x40 of a "ninja" gif
                     em = discord.Embed(description=no_targets_found_msg, colour=0x607D4A)
                     em.set_thumbnail(url="https://cdn.discordapp.com/emojis/618911376613834752.gif?size=40")
