@@ -11,7 +11,7 @@ Multi_RPG-2.0 is a new version of [Discord-Bot](https://github.com/jdkennedy45/D
 
 ## Run requirements:
 1. Needs python 3.8+, pip 20.2+, and then all requirements.txt packages installed.
-2. Optional: (Recommended) Create virtual environment, run `pip install -r requirements.txt`;
+2. Optional: (Recommended) Create virtual environment, then activate it and run `pip install -r requirements.txt`;
 3. In `scripts/setup/` folder, run `python setup.py`
 4. In new `tokens` folder, replace value in `tokenbot.ini` with your discord bot token
  
