@@ -280,20 +280,19 @@ class Account(commands.Cog):
         # get the user's current level
         # calculate the cost of their next level-up
         user_level = user.get_user_level(0)  # get int version of level, SEE USERS.PY
-        # level up cost algorithm, inspired by D&D algorithm
-        level_up_cost = int(300 * ((user_level + 1) ** 1.72) - (300 * user_level))
+        # level up cost algorithms, inspired by D&D algorithm
 
         if user_level == 1:
             level_up_cost = 399
         elif user_level in range(2, 8):
             level_up_cost = int(300 * ((user_level + 1) ** 1.8) - (300 * user_level))
-        elif user_level in range(9, 15):
+        elif user_level in range(8, 15):
             level_up_cost = int(300 * ((user_level + 1) ** 1.9) - (300 * user_level))
-        elif user_level in range(16, 25):
+        elif user_level in range(15, 25):
             level_up_cost = int(300 * ((user_level + 1) ** 2.2) - (300 * user_level))
-        elif user_level in range(26, 34):
+        elif user_level in range(25, 34):
             level_up_cost = int(300 * ((user_level + 1) ** 2.4) - (300 * user_level))
-        elif user_level in range(35, 49):
+        elif user_level in range(34, 49):
             level_up_cost = int(300 * ((user_level + 1) ** 2.6) - (300 * user_level))
         elif user_level == 50:
             await self.client.say("You are already level 50, the max level!")
