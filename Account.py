@@ -114,6 +114,9 @@ class Account(commands.Cog):
         except Exception as e:
             msg = f"Not ok! {e.__class__} occurred"
             print(msg)
+            await context.send(
+                f"{context.author.mention}```ml\nuse =money like so: **=money** or **=money @user**"
+            )
         finally:
             # delete original message to reduce spam
             await context.message.delete()
@@ -170,6 +173,9 @@ class Account(commands.Cog):
         except Exception as e:
             msg = f"Not ok! {e.__class__} occurred"
             print(msg)
+            await context.send(
+                f"{context.author.mention}```ml\nuse =level like so: **=level** or **=level @user**"
+            )
         finally:
             # delete original message to reduce spam
             await context.message.delete()
@@ -270,6 +276,9 @@ class Account(commands.Cog):
         except Exception as e:
             msg = f"Not ok! {e.__class__} occurred"
             print(msg)
+            await context.send(
+                f"{context.author.mention}```ml\nuse =profile like so: **=profile** or **=profile @user**"
+            )
 
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
