@@ -10,7 +10,7 @@ Multi_RPG-2.0 is a new version of [Discord-Bot](https://github.com/jdkennedy45/D
  - Games: Hangman, Slots, Lotto, many more.
 
 ## Run requirements:
-1. Needs python 3.5.3+ with sqlite3, pillow, requests, discord (1.3.4), numpy, dblpy (info on discordbots.org), and profanityfilter packages installed (use python3 -m pip install X)
+1. Needs python 3.8+, pip 20.2+, and then all requirements.txt packages installed.
 2. Optional: (Recommended) Create virtual environment, run `pip install -r requirements.txt`;
 3. In `scripts/setup/` folder, run `python setup.py`
 4. In new `tokens` folder, replace value in `tokenbot.ini` with your discord bot token
