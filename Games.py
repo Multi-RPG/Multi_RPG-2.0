@@ -1038,7 +1038,7 @@ class Games(commands.Cog):
         hand1 = f"Dealer's hand is: \u200B \u200B {cpu_hand}\nAnd your hand is: {user_hand}"
         instruction = (
             f"So, **{context.author.display_name}**, will your total be higher or lower than mine?"
-            f"\n(*60 seconds to answer, else your money's gone*)\n\n{hand1}\n\nEnter **low** or **high**..."
+            f"\n(*60 seconds to answer*)\n\n{hand1}\n\nEnter **low** or **high**..."
         )
         em2 = discord.Embed(description=instruction, colour=0x607D4A)
         em2.set_thumbnail(url="https://cdn.discordapp.com/emojis/618921143163682816.png?v=1")
@@ -1061,10 +1061,7 @@ class Games(commands.Cog):
                     await msg3.delete()
                     await msg4.delete()
                 msg3 = await context.send("Wrong answer!")
-                msg4 = await context.send(
-                    f"\nEnter **low** or **high**..."
-                    f" You have **{counter}** more attempts before your bet money is lost forever."
-                )
+                msg4 = await context.send(f"\nEnter **low** or **high**... You have **{counter}** more attempts.")
                 confirm = await self.client.wait_for("message", check=is_author, timeout=60)
                 counter -= 1
 
