@@ -336,7 +336,8 @@ class Games(commands.Cog):
 
         # embed the tourney registration confirmation message, set thumbnail to 40x40 of the respective server's icon
         em = discord.Embed(description=msg, colour=0x607D4A)
-        thumb_url = f"{context.guild.icon_url}size=40"
+        thumb_url = context.guild.icon_url
+        print(thumb_url)
         em.set_thumbnail(url=thumb_url)
         await context.send(embed=em)
 
