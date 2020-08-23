@@ -316,7 +316,7 @@ class Account(commands.Cog):
         # confirm if they really want to level-up
         msg = (
             f"\nAccount balance: {user.get_user_money()}\nLevel **{user_level + 1}"
-            f"** requires: **${level_up_cost:,}**\n****\n** **\nDo you want to level-up?"
+            f"** requires: **${level_up_cost:,}**\n** **\n** **\nDo you want to level-up?"
             f" Type **confirm** to confirm."
         )
 
