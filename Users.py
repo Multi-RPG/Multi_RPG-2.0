@@ -252,7 +252,7 @@ class Users:
         hm_db.update_tourney_server_id(server_id)
         return (
             f":crossed_swords: Registered for **{server_name}** daily FFA tournament! :crossed_swords:"
-            f"\nResults will be live by :alarm_clock: **7 AM PST!**"
+            f"\n** **\nResults will be live by :alarm_clock: **7 AM PST!**"
         )
 
     def update_user_records(self, battles_lost, battles_won, total_winnings):
