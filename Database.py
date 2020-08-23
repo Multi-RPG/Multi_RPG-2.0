@@ -347,6 +347,14 @@ class Database:
         self.connection.commit()
         return self.get_pet_xp()
 
+    def update_pet_name(self, pet_name):
+        cur = self.connection.cursor()
+
+        sql = "UPDATE Pets SET pet_name = ? WHERE pet_id = ?"
+        cur.execute(sql, (pet_name, self.id))
+
+        self.connection.commit()
+
     def update_pet_level(self):
         cur = self.connection.cursor()
 

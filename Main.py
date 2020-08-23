@@ -116,7 +116,8 @@ async def helper(context):
         '  =adopt          use "=adopt" to adopt your own pet to reap more rewards\n'
         '  =feed           use "=feed" to gain pet XP, to earn better chance for rewards\n'
         '  =hunt           use "=hunt" to either gain gold or a gear upgrade\n'
-        '  =pet            use "=pet" to display statistics for your pet```'
+        '  =pet            use "=pet" to display statistics for your pet'
+        '  =petname        use "=petname" to rename your pet\n```'
     )
     msg3 = (
         "```ml\n"

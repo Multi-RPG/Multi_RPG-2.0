@@ -210,6 +210,14 @@ class Users:
 
         return hm_db.update_pet_level()
 
+    def update_user_pet_name(self, pet_name):
+        hm_db = Database(self.id)
+        hm_db.connect()
+
+        hm_db.update_pet_name(pet_name)
+
+        return f"New pet name: **{pet_name}**!"
+
     # enables the peace status to "1", so users cannot =rob @target a user
     def toggle_user_peace_status(self):
         hm_db = Database(self.id)

@@ -56,7 +56,7 @@ class Pets(commands.Cog):
         intro_msg = "Welcome to the **Pet Shelter**!\n\nPlease enter your desired pet name now:"
         # embed intro message, then overwrite the variable with the actual message object
         em = discord.Embed(description=intro_msg, colour=0x607D4A)
-        em.set_thumbnail(url="https://cdn.discordapp.com/emojis/560065150489722880.png?size=128")
+        em.set_thumbnail(url="https://cdn.discordapp.com/emojis/746904102650249296.gif?size=128")
         await context.send(embed=em)
 
         # wait for user's pet name entry
@@ -311,6 +311,51 @@ class Pets(commands.Cog):
         # embed pet's details into a message
         em = discord.Embed(description=pet_details, colour=0x607D4A)
         em.set_thumbnail(url=pet_avatar)
+        await context.send(embed=em)
+
+    """PET PROFILE PAGE FUNCTION"""
+
+    @has_account()
+    @has_pet()
+    @commands.cooldown(1, 30, commands.BucketType.user)
+    @commands.command(
+        name="petname", description="change your pet name", brief="can use =petname", aliases=["petalias"],
+    )
+    async def update_pet_name(self, context):
+        # create instance of the user who wishes to change their pet name
+        pet_owner = Users(context.author.id)
+        # retrieve pet name
+        pet_name = pet_owner.get_user_pet_name()
+
+        intro_msg = f"Welcome to the **Pet Shelter**!\n\nPlease enter your new name for **{pet_name}** now:"
+        # embed intro message, then overwrite the variable with the actual message object
+        em = discord.Embed(description=intro_msg, colour=0x607D4A)
+        em.set_thumbnail(url="https://cdn.discordapp.com/emojis/560065150489722880.png?size=128")
+        await context.send(embed=em)
+
+        # wait for user's pet name entry
+        # helper to check if it's the author that it's responding.
+        def is_author(m):
+            return m.author == context.author and m.channel == context.channel
+
+        pet_name = await self.client.wait_for("message", check=is_author, timeout=60)
+        # remove everything except alphanumerics from the user's pet name entry
+        pet_name = re.sub(r"\W+", "", pet_name.clean_content)
+
+        # create an object to scan profanity
+        pf = ProfanityFilter()
+        # while the pet name entry has profanity, prompt user to re-enter a name
+        while not pf.is_clean(pet_name):
+            await context.send("Pet name has profanity! Please enter a new one now:")
+            # wait for user's new pet name entry
+            pet_name = await self.client.wait_for("message", check=is_author, timeout=60)
+            # remove everything except alphanumerics from the user's pet name entry
+            pet_name = re.sub(r"\W+", "", pet_name.clean_content)
+
+        confirmation_msg = pet_owner.update_user_pet_name(pet_name[:15])
+        # embed confirmation message
+        em = discord.Embed(description=confirmation_msg, colour=0x607D4A)
+        em.set_thumbnail(url="https://cdn.discordapp.com/emojis/746904102650249296.gif?v=1")
         await context.send(embed=em)
 
 
