@@ -301,7 +301,7 @@ class Games(commands.Cog):
             em.set_thumbnail(url="https://cdn.discordapp.com/emojis/419506568728543263.gif?size=40")
             await context.send(embed=em)
 
-        # else user won dice roll, so rob the money from the victim
+        # robber failed
         else:
             robber_level = robber.get_user_level(0)
 
@@ -1100,13 +1100,20 @@ class Games(commands.Cog):
                 em4 = discord.Embed(description=results1 + results2, colour=0x607D4A)
                 em4.set_thumbnail(url="https://cdn.discordapp.com/emojis/525200274340577290.gif?size=64")
             else:
-                results2 = (
-                    f"Aw... Sorry, but this match goes to me.\nYou lost **${bet}**. "
-                    f"{user.update_user_money(0)}"  # bet was already taken at beginning of function
-                )
-
-                em4 = discord.Embed(description=results1 + results2, colour=0x607D4A)
-                em4.set_thumbnail(url="https://cdn.discordapp.com/emojis/525209793405648896.gif?size=64")
+                # if the sums are the same, it's a draw.
+                if is_same(sum_cpu, sum_user):
+                    results2 = "Oh! It's a draw! Let's try again if you want!"
+                    em4 = discord.Embed(description=results1 + results2, colour=0x607D4A)
+                    # TODO: find an emoji for draw case.
+                    em4.set_thumbnail(url="https://cdn.discordapp.com/emojis/525209793405648896.gif?size=64")
+                # sums are not the same and user's hand isn't strong enough.
+                else:
+                    results2 = (
+                        f"Aw... Sorry, but this match goes to me.\nYou lost **${bet}**. "
+                        f"{user.update_user_money(0)}"  # bet was already taken at beginning of function
+                    )
+                    em4 = discord.Embed(description=results1 + results2, colour=0x607D4A)
+                    em4.set_thumbnail(url="https://cdn.discordapp.com/emojis/525209793405648896.gif?size=64")
 
             await context.send(embed=em4)
             await msg1.delete()
@@ -1149,6 +1156,10 @@ def win(cpu_hand, user_hand, user_guess):
     elif sum_user_hand < sum_cpu_hand and user_guess == "LOW":
         win = True
     return win, sum_cpu_hand, sum_user_hand
+
+
+def is_same(sum_user, sum_cpu):
+    return sum_user == sum_cpu
 
 
 def get_reward(sum_cpu, sum_user, bet):
