@@ -292,7 +292,7 @@ class Account(commands.Cog):
             level_up_cost = int(300 * ((user_level + 1) ** 2.2) - (300 * user_level))
         elif user_level in range(25, 34):
             level_up_cost = int(300 * ((user_level + 1) ** 2.4) - (300 * user_level))
-        elif user_level in range(34, 49):
+        elif user_level in range(34, 50):
             level_up_cost = int(300 * ((user_level + 1) ** 2.6) - (300 * user_level))
         elif user_level == 50:
             await self.client.say("You are already level 50, the max level!")
