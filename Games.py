@@ -1009,9 +1009,6 @@ class Games(commands.Cog):
             await msg.delete()
             return
 
-        # take bet money away
-        user.update_user_money(bet * -1)
-
         CARDS = {
             0: "<:card_none:662372124748546058>",
             1: "<:card_one:662081420474449930>",
@@ -1093,9 +1090,10 @@ class Games(commands.Cog):
 
             if won:
                 winnings = get_reward(sum_cpu, sum_user, bet)
+                update_user_money(user, winnings - bet, won)
                 results2 = (
                     f"Congratulations, your guess was right!\nYou won **${winnings - bet}**. "
-                    f"{user.update_user_money(winnings)}."
+                    f"Your new account balance: {user.get_user_money()}."
                 )
                 em4 = discord.Embed(description=results1 + results2, colour=0x607D4A)
                 em4.set_thumbnail(url="https://cdn.discordapp.com/emojis/525200274340577290.gif?size=64")
@@ -1108,9 +1106,10 @@ class Games(commands.Cog):
                     em4.set_thumbnail(url="https://cdn.discordapp.com/emojis/525209793405648896.gif?size=64")
                 # sums are not the same and user's hand isn't strong enough.
                 else:
+                    update_user_money(user, bet, won)
                     results2 = (
                         f"Aw... Sorry, but this match goes to me.\nYou lost **${bet}**. "
-                        f"{user.update_user_money(0)}"  # bet was already taken at beginning of function
+                        f"Your new account balance: {user.get_user_money()}"
                     )
                     em4 = discord.Embed(description=results1 + results2, colour=0x607D4A)
                     em4.set_thumbnail(url="https://cdn.discordapp.com/emojis/525209793405648896.gif?size=64")
@@ -1165,6 +1164,14 @@ def is_same(sum_user, sum_cpu):
 def get_reward(sum_cpu, sum_user, bet):
     diff = abs(sum_cpu - sum_user)
     return int(bet * 1.5) + diff
+
+
+# update user's money if win or lose.
+def update_user_money(user, amount, won):
+    if won:
+        user.update_user_money(amount)
+    else:
+        user.update_user_money(amount * -1)
 
 
 def setup(client):
