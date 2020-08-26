@@ -803,7 +803,7 @@ class Games(commands.Cog):
 
             return fish_emoji, fish_tier, fish_multiplier, fish_timeout
 
-        async def start_typing_minigame(user):
+        async def start_typing_minigame(user, ticket_cost):
             # send gif of fishing art
             waiting_image = await context.send("https://i.imgur.com/thovnKN.gif")
             # sleep randomly between 2-10 seconds to wait for fish "bite"
@@ -832,9 +832,9 @@ class Games(commands.Cog):
             bite_msg = f"Found a bite! Quickly type the prompt to catch the fish." \
                        f"\n** **\n{random_numbers_emojis}"
             timeout_msg = f"You **failed** to catch the fish in time.\n** **\n" \
-                          f"No refunds on the **${5 * user.get_user_level(0)}** entry fee."
+                          f"No refunds on the **${ticket_cost}** entry fee."
             wrong_number_msg = f"Wrong number. **Failed** to catch the fish!\n" \
-                               f"** **\nNo refunds on the **${5 * user.get_user_level(0)}** entry fee."
+                               f"** **\nNo refunds on the **${ticket_cost}** entry fee."
             right_number_msg = f"Successfully caught a **{fish_tier}-tier** fish!\n" \
                                f"You took it to the dock merchant and sold it for **${fish_reward}**!"
 
@@ -897,7 +897,7 @@ class Games(commands.Cog):
         user.update_user_money(ticket_cost * -1)
 
         # start the typing minigame
-        results = await start_typing_minigame(user)
+        results = await start_typing_minigame(user, ticket_cost)
 
         # send the results
         await context.send(embed=results)
