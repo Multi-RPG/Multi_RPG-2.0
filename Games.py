@@ -760,7 +760,7 @@ class Games(commands.Cog):
     """ Fish Minigame """
 
     @has_account()
-    @commands.cooldown(5, 15, commands.BucketType.user)
+    @commands.cooldown(5, 86400, commands.BucketType.user)
     @commands.command(
         name="fish", description="Fishing game", aliases=["FISH", "fsh"],
     )
@@ -772,7 +772,7 @@ class Games(commands.Cog):
                 Mid Tier => 30%
                 Low Tier => 60%
             """
-            fish_emoji, fish_tier, fish_reward, fish_timeout = "", "", "", ""
+            fish_emoji, fish_tier, fish_multiplier, fish_timeout = "", "", "", ""
             # Scuffed way to get real value
             # Get a random real value 0.01...100.0
             result = (random.randrange(1, 10001)) / 100
@@ -781,7 +781,7 @@ class Games(commands.Cog):
                 fish_emoji = random.choice(high_tier_fish)
                 fish_tier = "High"
                 # High Tier fish are worth x70 multiplier
-                fish_reward = 70
+                fish_multiplier = 70
                 # High Tiers timeout in 3 seconds
                 fish_timeout = 3
             elif result > 10.0 and result <= 40.0:
@@ -789,28 +789,30 @@ class Games(commands.Cog):
                 fish_emoji = random.choice(mid_tier_fish)
                 fish_tier = "Mid"
                 # Mid Tier fish are worth x30 multiplier
-                fish_reward = 30
+                fish_multiplier = 30
                 # Mid Tiers timeout in 4 seconds
                 fish_timeout = 4
             elif result > 40.0 and result <= 100.0:
                 # Select a random Low Tier fish
                 fish_emoji = random.choice(low_tier_fish)
                 fish_tier = "Low"
-                # High Tier fish are worth x15 multiplier
-                fish_reward = 15
+                # Low Tier fish are worth x18 multiplier
+                fish_multiplier = 18
                 # Low Tiers timeout in 5 seconds
                 fish_timeout = 5
 
-            return fish_emoji, fish_tier, fish_reward, fish_timeout
+            return fish_emoji, fish_tier, fish_multiplier, fish_timeout
 
-        async def start_typing_minigame():
+        async def start_typing_minigame(user):
             # send gif of fishing art
             waiting_image = await context.send("https://i.imgur.com/thovnKN.gif")
             # sleep randomly between 2-10 seconds to wait for fish "bite"
             await asyncio.sleep(random.randrange(2, 10))
 
             # pick a random fish from get_fish() and return the details about it
-            fish_emoji, fish_tier, fish_reward, fish_timeout = get_fish()
+            fish_emoji, fish_tier, fish_multiplier, fish_timeout = get_fish()
+            # apply fish reward multiplier to fish reward
+            fish_reward = fish_multiplier * user.get_user_level(0)
 
             # setup variables to store our random numbers generated
             # one will be in emoji format to send as a prompt
@@ -830,11 +832,11 @@ class Games(commands.Cog):
             bite_msg = f"Found a bite! Quickly type the prompt to catch the fish." \
                        f"\n** **\n{random_numbers_emojis}"
             timeout_msg = f"You **failed** to catch the fish in time.\n** **\n" \
-                          f"No refunds on the **$50** entry fee."
+                          f"No refunds on the **${5 * user.get_user_level(0)}** entry fee."
             wrong_number_msg = f"Wrong number. **Failed** to catch the fish!\n" \
-                f"** **\nNo refunds on the **$50** entry fee."
+                               f"** **\nNo refunds on the **${5 * user.get_user_level(0)}** entry fee."
             right_number_msg = f"Successfully caught a **{fish_tier}-tier** fish!\n" \
-                f"You took it to the dock merchant and sold it for **${fish_reward}**!"
+                               f"You took it to the dock merchant and sold it for **${fish_reward}**!"
 
             # send the fish-bite typing prompt
             typing_prompt = discord.Embed(title="", description=bite_msg, colour=0x52a7e7)
@@ -852,16 +854,15 @@ class Games(commands.Cog):
             # if it timed out because they didn't respond in time, send a fail message and return
             except asyncio.TimeoutError:
                 # inform the user they failed the catch, then return
-                em = discord.Embed(title="", description=timeout_msg, colour=0x801A06)
+                results = discord.Embed(title="", description=timeout_msg, colour=0x801A06)
                 # set embed thumbnail to a fish swimming away GIF
-                em.set_thumbnail(url="https://i.imgur.com/W4HEZLs.gif")
-                await context.send(embed=em)
-                return
+                results.set_thumbnail(url="https://i.imgur.com/W4HEZLs.gif")
+                return results
 
             # if the user typed correctly
             if user_type_attempt.content == random_numbers:
                 # give the user the reward money
-                user.update_user_money(fish_reward * user.get_user_level(0))
+                user.update_user_money(fish_reward)
 
                 # setup the congratulations message in embed format
                 results = discord.Embed(title="", description=right_number_msg, colour=0x52a7e7)
@@ -882,11 +883,11 @@ class Games(commands.Cog):
         # Create a user instance
         user = Users(context.author.id)
 
-        # Check if user has enough money. Ticket costs $50
-        ticket_cost = 50
+        # Check if user has enough money. Ticket costs 5x user level
+        ticket_cost = user.get_user_level(0) * 5
         if user.get_user_money(0) < ticket_cost:
             msg = await context.send(
-                f"{context.author.mention} You don't have enough money...\n Fishing tickets cost ${ticket_cost}!"
+                f"{context.author.mention} You don't have enough money...\nYour ticket will cost ${ticket_cost}!"
             )
             await asyncio.sleep(5)
             await msg.delete()
@@ -896,12 +897,10 @@ class Games(commands.Cog):
         user.update_user_money(ticket_cost * -1)
 
         # start the typing minigame
-        results = await start_typing_minigame(user.get_user_level(0))
+        results = await start_typing_minigame(user)
 
         # send the results
         await context.send(embed=results)
-
-
 
     """ Slot Machine """
 

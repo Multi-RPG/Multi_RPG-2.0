@@ -104,10 +104,10 @@ async def helper(context):
         '  =flip           use "=flip" or "=flip X" or "=flip X Y" \n'
         "                  -- X being heads or tails guess\n"
         "                  -- Y being amount to bet\n"
-        '  =slots          use "=slots" to spend 10 dollars to roll the slot machine to win up to 2500 dollars!\n'
+        '  =slots          use "=slots" to buy a ticket to roll the slot machine to win up to 2500 dollars!\n'
         '  =slothelp       use "=slothelp" for information on rewards calculation\n'
-        '  =fish           use "=fish" to spend 50 dollars start a mini-game at the local fishing dock\n'
-        '                  NOTE: the reward is 15-70x your level depending on fish size\n'
+        '  =fish           use "=fish" to buy a ticket to start a mini-game at the local fishing dock!\n'
+        '                  NOTE: the reward is 18-70x your level depending on fish size\n'
         '  =cards          use "=cards" to play high and low game- win 1.5x your bet!\n'
         "                  NOTE: try to guess if the sum of your cards is higher or lower than your opponent's\n"
         '  =hangman        use "=hangman" or "=hangman X", -- X being a category number \n'
