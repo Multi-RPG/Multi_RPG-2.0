@@ -809,13 +809,21 @@ class Games(commands.Cog):
             # sleep randomly between 2-10 seconds to wait for fish "bite"
             await asyncio.sleep(random.randrange(2, 10))
 
+            # pick a random fish from get_fish() and return the details about it
             fish_emoji, fish_tier, fish_reward, fish_timeout = get_fish()
-            random_numbers_emojis = ""
-            random_numbers = ""
 
+            # setup variables to store our random numbers generated
+            # one will be in emoji format to send as a prompt
+            # one will be used to compare to a discord user's typing attempt
+            random_numbers_emojis, random_numbers = "", ""
+
+            # loop 6 times to generate 6 random numbers to put together
             for x in range(1,7):
+                # random number 1-9
                 rand = random.randrange(1,9)
+                # put the numbers in english form (EX. 1 -> one) and put colons around them to convert to emojis
                 random_numbers_emojis += f":{num2words(rand)}:"
+                # concatenate each loop's number to later compare to user's typing attempt
                 random_numbers += str(rand)
 
             # create the messages to be used
