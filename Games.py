@@ -853,6 +853,7 @@ class Games(commands.Cog):
             except asyncio.TimeoutError:
                 # inform the user they failed the catch, then return
                 em = discord.Embed(title="", description=timeout_msg, colour=0x801A06)
+                # set embed thumbnail to a fish swimming away GIF
                 em.set_thumbnail(url="https://i.imgur.com/W4HEZLs.gif")
                 await context.send(embed=em)
                 return
@@ -864,12 +865,15 @@ class Games(commands.Cog):
 
                 # setup the congratulations message in embed format
                 results = discord.Embed(title="", description=right_number_msg, colour=0x52a7e7)
+                # use regex to get the only numbers from the emoji name
                 emoji_id = re.findall(r"\d+", fish_emoji)[0]
+                # set embed thumbnail to the emoji URL
                 results.set_thumbnail(url=f"https://cdn.discordapp.com/emojis/{emoji_id}.gif?v=1")
             # if they didn't type correctly
             else:
                 # setup the failure message in embed format
                 results = discord.Embed(title="", description=wrong_number_msg, colour=0x801A06)
+                # set embed thumbnail to a fish swimming away GIF
                 results.set_thumbnail(url="https://i.imgur.com/W4HEZLs.gif")
 
             # return the results in a discord-embedded message
