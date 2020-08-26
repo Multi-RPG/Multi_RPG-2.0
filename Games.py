@@ -658,7 +658,7 @@ class Games(commands.Cog):
                 )
                 # add WINNINGS to user's bank account now
                 user = Users(context.author.id)
-                prize = user.get_user_level(0) * 10
+                prize = user.get_user_level(0) * 12
                 win_msg += f"Won **${prize}**... {user.update_user_money(prize)}"
                 em = discord.Embed(description=win_msg, colour=0x607D4A)
                 await context.send(context.author.mention, embed=em)
@@ -705,7 +705,7 @@ class Games(commands.Cog):
                 )
                 # add WINNINGS to user's bank account now
                 user = Users(context.author.id)
-                prize = user.get_user_level(0) * 10
+                prize = user.get_user_level(0) * 12
                 win_msg += f"Won **${prize}**... {user.update_user_money(prize)}"
                 em = discord.Embed(description=win_msg, colour=0x607D4A)
                 await context.send(context.author.mention, embed=em)
@@ -780,24 +780,24 @@ class Games(commands.Cog):
                 # Selet a random High Tier Fish
                 fish_emoji = random.choice(high_tier_fish)
                 fish_tier = "High"
-                # High Tier fish are worth $1000
-                fish_reward = 1000
+                # High Tier fish are worth x70 multiplier
+                fish_reward = 70
                 # High Tiers timeout in 3 seconds
                 fish_timeout = 3
             elif result > 10.0 and result <= 40.0:
                 # Select a random Mid Tier fish
                 fish_emoji = random.choice(mid_tier_fish)
                 fish_tier = "Mid"
-                # Mid Tier fish are worth $350
-                fish_reward = 350
+                # Mid Tier fish are worth x30 multiplier
+                fish_reward = 30
                 # Mid Tiers timeout in 4 seconds
                 fish_timeout = 4
             elif result > 40.0 and result <= 100.0:
                 # Select a random Low Tier fish
                 fish_emoji = random.choice(low_tier_fish)
                 fish_tier = "Low"
-                # High Tier fish are worth $1000
-                fish_reward = 150
+                # High Tier fish are worth x15 multiplier
+                fish_reward = 15
                 # Low Tiers timeout in 5 seconds
                 fish_timeout = 5
 
@@ -861,7 +861,7 @@ class Games(commands.Cog):
             # if the user typed correctly
             if user_type_attempt.content == random_numbers:
                 # give the user the reward money
-                user.update_user_money(fish_reward)
+                user.update_user_money(fish_reward * user.get_user_level(0))
 
                 # setup the congratulations message in embed format
                 results = discord.Embed(title="", description=right_number_msg, colour=0x52a7e7)
@@ -896,7 +896,7 @@ class Games(commands.Cog):
         user.update_user_money(ticket_cost * -1)
 
         # start the typing minigame
-        results = await start_typing_minigame()
+        results = await start_typing_minigame(user.get_user_level(0))
 
         # send the results
         await context.send(embed=results)
