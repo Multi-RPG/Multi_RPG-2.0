@@ -138,7 +138,6 @@ def get_tier_list(file_path):
             if line == "LOW-TIER-LIST":
                 current_tier = "low"
                 continue
-
             if current_tier == "high":
                 high_tier.append(line)
             elif current_tier == "med":
@@ -833,9 +832,9 @@ class Games(commands.Cog):
                        f"\n** **\n{random_numbers_emojis}"
             timeout_msg = f"You **failed** to catch the fish in time.\n** **\n" \
                           f"No refunds on the **${ticket_cost}** entry fee."
-            wrong_number_msg = f"Wrong number. **Failed** to catch the fish!\n" \
-                               f"** **\nNo refunds on the **${ticket_cost}** entry fee."
-            right_number_msg = f"Successfully caught a **{fish_tier}-tier** fish!\n" \
+            wrong_number_msg = f"Wrong number. **Failed** to catch the fish!\n** **\n" \
+                               f"No refunds on the **${ticket_cost}** entry fee."
+            right_number_msg = f"Successfully caught a **{fish_tier}-tier** fish!\n** **\n" \
                                f"You took it to the dock merchant and sold it for **${fish_reward}**!"
 
             # send the fish-bite typing prompt
