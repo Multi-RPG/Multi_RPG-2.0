@@ -4,6 +4,7 @@ import asyncio
 import re
 import discord
 from discord.ext import commands
+from num2words import num2words
 from Users import Users
 from random import choices
 
@@ -118,8 +119,8 @@ def find_matches(guess, correct_word, underscore_sequence):
     return num_matches, underscore_sequence
 
 
-def get_slots_emoji_list():
-    with open("db_and_words\\emoji_names.txt", "r") as lines:
+def get_tier_list(file_path):
+    with open(file_path, "r") as lines:
         high_tier = []
         mid_tier = []
         low_tier = []
@@ -146,7 +147,6 @@ def get_slots_emoji_list():
                 low_tier.append(line)
         return high_tier, mid_tier, low_tier
 
-
 # short decorator function declaration, confirm that command user has an account in database
 def has_account():
     def predicate(ctx):
@@ -160,7 +160,8 @@ def has_account():
 
 
 # store data from text files into memory (emoji lists, hangman words, hangman art)
-high_tier_emotes, mid_tier_emotes, low_tier_emotes = get_slots_emoji_list()
+high_tier_emojis, mid_tier_emojis, low_tier_emojis = get_tier_list("db_and_words/emojis_slots.txt")
+high_tier_fish, mid_tier_fish, low_tier_fish = get_tier_list("db_and_words/emojis_fish.txt")
 all_words = get_hangman_words()
 hangmen = get_hangman_art()
 
@@ -756,65 +757,169 @@ class Games(commands.Cog):
             # add 1 to the main game loop's counter
             counter += 1
 
-    """ Slot Machine """
+    """ Fish Minigame """
 
     @has_account()
-    @commands.cooldown(15, 86400, commands.BucketType.user)
+    @commands.cooldown(5, 15, commands.BucketType.user)
     @commands.command(
-        name="slot", description="Slot Machine game", aliases=["machine", "pachinko", "slots", "spin", "reel"],
+        name="fish", description="Fishing game", aliases=["FISH", "fsh"],
     )
-    async def slot_machine(self, context):
+    async def fish(self, context):
+
+        # High tier should have the lowest chance possible
+        def get_fish():
+            """ High Tier => 10%
+                Mid Tier => 30%
+                Low Tier => 60%
+            """
+            fish_emoji, fish_tier, fish_reward, fish_timeout = "", "", "", ""
+            # Scuffed way to get real value
+            # Get a random real value 0.01...100.0
+            result = (random.randrange(1, 10001)) / 100
+            if result <= 10.0:
+                # Selet a random High Tier Fish
+                fish_emoji = random.choice(high_tier_fish)
+                fish_tier = "High"
+                # High Tier fish are worth $1000
+                fish_reward = 1000
+                # High Tiers timeout in 3 seconds
+                fish_timeout = 3
+            elif result > 10.0 and result <= 40.0:
+                # Select a random Mid Tier fish
+                fish_emoji = random.choice(mid_tier_fish)
+                fish_tier = "Mid"
+                # Mid Tier fish are worth $350
+                fish_reward = 350
+                # Mid Tiers timeout in 4 seconds
+                fish_timeout = 4
+            elif result > 40.0 and result <= 100.0:
+                # Select a random Low Tier fish
+                fish_emoji = random.choice(low_tier_fish)
+                fish_tier = "Low"
+                # High Tier fish are worth $1000
+                fish_reward = 150
+                # Low Tiers timeout in 5 seconds
+                fish_timeout = 5
+
+            return fish_emoji, fish_tier, fish_reward, fish_timeout
+
+        async def start_typing_minigame():
+            # send gif of fishing art
+            waiting_image = await context.send("https://i.imgur.com/thovnKN.gif")
+            # sleep randomly between 2-10 seconds to wait for fish "bite"
+            await asyncio.sleep(random.randrange(2, 10))
+
+            fish_emoji, fish_tier, fish_reward, fish_timeout = get_fish()
+            random_numbers_emojis = ""
+            random_numbers = ""
+
+            for x in range(1,7):
+                rand = random.randrange(1,9)
+                random_numbers_emojis += f":{num2words(rand)}:"
+                random_numbers += str(rand)
+
+            # create the messages to be used
+            bite_msg = f"Found a bite! Quickly type the prompt to catch the fish." \
+                       f"\n** **\n{random_numbers_emojis}"
+            timeout_msg = f"You **failed** to catch the fish in time.\n** **\n" \
+                          f"No refunds on the **$50** entry fee."
+            wrong_number_msg = f"Wrong number. **Failed** to catch the fish!\n" \
+                f"** **\nNo refunds on the **$50** entry fee."
+            right_number_msg = f"Successfully caught a **{fish_tier}-tier** fish!\n" \
+                f"You took it to the dock merchant and sold it for **${fish_reward}**!"
+
+            # send the fish-bite typing prompt
+            typing_prompt = discord.Embed(title="", description=bite_msg, colour=0x52a7e7)
+            typing_prompt.set_thumbnail(url="https://i.imgur.com/u02lzv1.gif")
+            await context.send(embed=typing_prompt)
+            await waiting_image.delete()
+
+            # helper to check if it's the author that it's responding.
+            def is_author(m):
+                return m.author == context.author and m.channel == context.channel
+
+            # get the user's attempt on typing the correct number within 3-5 seconds
+            try:
+                user_type_attempt = await self.client.wait_for("message", check=is_author, timeout=fish_timeout)
+            # if it timed out because they didn't respond in time, send a fail message and return
+            except asyncio.TimeoutError:
+                # inform the user they failed the catch, then return
+                em = discord.Embed(title="", description=timeout_msg, colour=0x801A06)
+                em.set_thumbnail(url="https://i.imgur.com/W4HEZLs.gif")
+                await context.send(embed=em)
+                return
+
+            # if the user typed correctly
+            if user_type_attempt.content == random_numbers:
+                # give the user the reward money
+                user.update_user_money(fish_reward)
+
+                # setup the congratulations message in embed format
+                results = discord.Embed(title="", description=right_number_msg, colour=0x52a7e7)
+                emoji_id = re.findall(r"\d+", fish_emoji)[0]
+                results.set_thumbnail(url=f"https://cdn.discordapp.com/emojis/{emoji_id}.gif?v=1")
+            # if they didn't type correctly
+            else:
+                # setup the failure message in embed format
+                results = discord.Embed(title="", description=wrong_number_msg, colour=0x801A06)
+                results.set_thumbnail(url="https://i.imgur.com/W4HEZLs.gif")
+
+            # return the results in a discord-embedded message
+            return results
 
         # Create a user instance
         user = Users(context.author.id)
 
-        # Check if user has enough money. Ticket costs $10
-        ticket_cost = 10
+        # Check if user has enough money. Ticket costs $50
+        ticket_cost = 50
         if user.get_user_money(0) < ticket_cost:
             msg = await context.send(
-                f"{context.author.mention} You don't have enough money...\n ticket_cost costs ${ticket_cost}!"
+                f"{context.author.mention} You don't have enough money...\n Fishing tickets cost ${ticket_cost}!"
             )
             await asyncio.sleep(5)
             await msg.delete()
             return
 
-        # Deduct ticket cost from user
+        # deduct ticket cost from user's bank account
         user.update_user_money(ticket_cost * -1)
 
+        # start the typing minigame
+        results = await start_typing_minigame()
+
+        # send the results
+        await context.send(embed=results)
+
+
+
+    """ Slot Machine """
+
+    @has_account()
+    @commands.cooldown(10, 86400, commands.BucketType.user)
+    @commands.command(
+        name="slot", description="Slot Machine game", aliases=["machine", "pachinko", "slots", "spin", "reel"],
+    )
+    async def slot_machine(self, context):
+
         # High tier should have the lowest chance possible
-        def get_tier():
-            """ High tier => 7%
+        def get_emoji_slot():
+            """ High Tier => 7%
                 Mid Tier => 28%
                 Low Tier => 65%
             """
-            tier = ""
+            emoji = ""
             # Scuffed way to get real value
             # Get a random real value 0.01...100.0
             result = (random.randrange(1, 10001)) / 100
             if result <= 7.0:
                 # High Tier
-                tier = "high"
+                emoji = random.choice(high_tier_emojis)
             elif result > 7.0 and result <= 35.0:
                 # Mid Tier
-                tier = "mid"
+                emoji = random.choice(mid_tier_emojis)
             elif result > 35.0 and result <= 100.0:
                 # Low Tier
-                tier = "low"
-            return tier
-
-        # This function and get_tier() can probably be merged
-        def get_emoji(result):
-            """Pick a emote from emote tier lists determined by the result
-               Return a random emote
-            """
-            emote = ""
-            if result == "high":
-                emote = random.choice(high_tier_emotes)
-            elif result == "mid":
-                emote = random.choice(mid_tier_emotes)
-            elif result == "low":
-                emote = random.choice(low_tier_emotes)
-            return emote
+                emoji = random.choice(low_tier_emojis)
+            return emoji
 
         def get_bonus(slot_machine):
             """Getting a jackpot gives user a reward = 500 + bonus
@@ -824,11 +929,12 @@ class Games(commands.Cog):
                Low tier = 250.0
 
                Getting 2 same emotes also gives user a reward = 120 + bonus
+               Bonuse amounts:
                High tier = 230.0
                Mid tier = 130.0
-               Low tier = 0.0
+               Low tier = 50.0
 
-               If one emoji is high tier, user is given $50.0
+               If one emoji is high tier, user is given $75.0
 
                return a list with msg type, reward, and tier
                result[0] -> 1 if jackpot, 2 if two equal elements, 0 otherwise
@@ -841,57 +947,71 @@ class Games(commands.Cog):
 
             # If all emojis are equal
             # Jackpot
+            # Utilizing set() to remove duplicates. So if there's only 1 iterms left, there was 3 duplicates
             if len(set(slot_machine)) == 1:
                 # Print Jackpot
                 result[0] = 1
-                if slot_machine[0] in high_tier_emotes:
+                if slot_machine[0] in high_tier_emojis:
                     result[1] = 500.0 + 2000.0
                     result[2] = "High"
                     return result
-                elif slot_machine[0] in mid_tier_emotes:
+                elif slot_machine[0] in mid_tier_emojis:
                     result[1] = 500.0 + 1000.0
                     result[2] = "Mid"
                     return result
-                elif slot_machine[0] in low_tier_emotes:
+                elif slot_machine[0] in low_tier_emojis:
                     result[1] = 500.0 + 250.0
                     result[2] = "Low"
                     return result
 
             # If two emojis inside slot_machine are equal
+            # Utilizing set() to remove duplicates. So if there's only 2 items left, there was 1 duplicate
             if len(set(slot_machine)) == 2:
                 result[0] = 2
                 temp = [i for i in slot_machine if slot_machine.count(i) > 1]
-                if temp[0] in high_tier_emotes:
+                if temp[0] in high_tier_emojis:
                     result[1] = 120.0 + 230.0
                     result[2] = "High"
                     return result
-                elif temp[0] in mid_tier_emotes:
+                elif temp[0] in mid_tier_emojis:
                     result[1] = 120.0 + 130.0
                     result[2] = "Mid"
+                    print("2 mid tiers")
                     return result
-                elif temp[0] in low_tier_emotes:
-                    result[1] = 120.0
+                elif temp[0] in low_tier_emojis:
+                    result[1] = 120.0 + 50.0
                     result[2] = "Low"
                     return result
 
             # If one element is a High Tier emoji
             for i in slot_machine:
-                if i in high_tier_emotes:
-                    result[1] = 50.0
+                if i in high_tier_emojis:
+                    result[1] = 75.0
                     result[2] = "High"
                     return result
 
             return result
 
-        # assign results to 3 different slots
-        result_1 = get_tier()
-        result_2 = get_tier()
-        result_3 = get_tier()
+        # Create a user instance
+        user = Users(context.author.id)
+
+        # Check if user has enough money. Ticket costs $10
+        ticket_cost = 10
+        if user.get_user_money(0) < ticket_cost:
+            msg = await context.send(
+                f"{context.author.mention} You don't have enough money...\n tickets cost ${ticket_cost}!"
+            )
+            await asyncio.sleep(5)
+            await msg.delete()
+            return
+
+        # Deduct ticket cost from user
+        user.update_user_money(ticket_cost * -1)
 
         # Get emotes from  the tier lists.
-        slot_1 = get_emoji(result_1)
-        slot_2 = get_emoji(result_2)
-        slot_3 = get_emoji(result_3)
+        slot_1 = get_emoji_slot()
+        slot_2 = get_emoji_slot()
+        slot_3 = get_emoji_slot()
 
         # Check for bonus
         slot_machine = [slot_1, slot_2, slot_3]
@@ -918,7 +1038,7 @@ class Games(commands.Cog):
                 msg = f"**Jackpot**! <a:worrycash:525200274340577290>\n {bonus[2]} Tier! You won **${bonus[1]}**!"
             elif bonus[0] == 2:
                 msg = f"You got **two** {bonus[2]} Tier! <a:worryHype:487059927731273739>\n You won **${bonus[1]}**!"
-            elif bonus[1] == 50.0:
+            elif bonus[1] == 75.0:
                 msg = f"You got **one** {bonus[2]} Tier! <a:worryHype:487059927731273739>\n You won **${bonus[1]}**!"
 
             em3 = discord.Embed(title="", description=msg, colour=0xFFD700)
@@ -933,9 +1053,9 @@ class Games(commands.Cog):
         aliases=["slothelp", "slotshelp", "slottiers", "slotstiers"],
     )
     async def slot_tiers_help(self, context):
-        msg = " ".join(high_tier_emotes)
-        msg2 = " ".join(mid_tier_emotes)
-        msg3 = " ".join(low_tier_emotes)
+        msg = " ".join(high_tier_emojis)
+        msg2 = " ".join(mid_tier_emojis)
+        msg3 = " ".join(low_tier_emojis)
         msg4 = (
             "**3** Identical High tier = **$2,500**\n"
             "**3** Identical Mid tier = **$1,500**\n"
