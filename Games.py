@@ -930,7 +930,7 @@ class Games(commands.Cog):
                 emoji = random.choice(low_tier_emojis)
             return emoji
 
-        def get_bonus(slot_machine):
+        def get_bonus(slot_machine, user_level):
             """Getting a jackpot gives user a reward = 500 + bonus
                Bonus is determined by the emote tier
                High tier = 2000.0
@@ -961,15 +961,15 @@ class Games(commands.Cog):
                 # Print Jackpot
                 result[0] = 1
                 if slot_machine[0] in high_tier_emojis:
-                    result[1] = 500.0 + 2000.0
+                    result[1] = (user_level * 30) + (user_level * 200)
                     result[2] = "High"
                     return result
                 elif slot_machine[0] in mid_tier_emojis:
-                    result[1] = 500.0 + 1000.0
+                    result[1] = (user_level * 30) + (user_level * 100)
                     result[2] = "Mid"
                     return result
                 elif slot_machine[0] in low_tier_emojis:
-                    result[1] = 500.0 + 250.0
+                    result[1] = (user_level * 30) + (user_level * 50)
                     result[2] = "Low"
                     return result
 
@@ -979,23 +979,22 @@ class Games(commands.Cog):
                 result[0] = 2
                 temp = [i for i in slot_machine if slot_machine.count(i) > 1]
                 if temp[0] in high_tier_emojis:
-                    result[1] = 120.0 + 230.0
+                    result[1] = (user_level * 10) + (user_level * 20)
                     result[2] = "High"
                     return result
                 elif temp[0] in mid_tier_emojis:
-                    result[1] = 120.0 + 130.0
+                    result[1] = (user_level * 10) + (user_level * 10)
                     result[2] = "Mid"
-                    print("2 mid tiers")
                     return result
                 elif temp[0] in low_tier_emojis:
-                    result[1] = 120.0 + 50.0
+                    result[1] = (user_level * 10) + (user_level * 5)
                     result[2] = "Low"
                     return result
 
             # If one element is a High Tier emoji
             for i in slot_machine:
                 if i in high_tier_emojis:
-                    result[1] = 75.0
+                    result[1] = (user_level * 7)
                     result[2] = "High"
                     return result
 
@@ -1004,8 +1003,13 @@ class Games(commands.Cog):
         # Create a user instance
         user = Users(context.author.id)
 
+        user.update_user_level()
+
+        # Get user level to determine rewards later on
+        user_level = user.get_user_level(0)
+
         # Check if user has enough money. Ticket costs $10
-        ticket_cost = 10
+        ticket_cost = user_level * 1
         if user.get_user_money(0) < ticket_cost:
             msg = await context.send(
                 f"{context.author.mention} You don't have enough money...\n tickets cost ${ticket_cost}!"
@@ -1024,7 +1028,7 @@ class Games(commands.Cog):
 
         # Check for bonus
         slot_machine = [slot_1, slot_2, slot_3]
-        bonus = get_bonus(slot_machine)
+        bonus = get_bonus(slot_machine, user_level)
         # Update users balance
         user.update_user_money(bonus[1])
 
@@ -1041,13 +1045,14 @@ class Games(commands.Cog):
         await context.send(embed=em2)
         # If bonus
         if bonus[1] != 0:
+            msg = ""
             # This assert only works in debug mode due to application error handling
             assert bonus[2] != ""  # Make sure there is an actual tier
             if bonus[0] == 1:
                 msg = f"**Jackpot**! <a:worrycash:525200274340577290>\n {bonus[2]} Tier! You won **${bonus[1]}**!"
             elif bonus[0] == 2:
                 msg = f"You got **two** {bonus[2]} Tier! <a:worryHype:487059927731273739>\n You won **${bonus[1]}**!"
-            elif bonus[1] == 75.0:
+            elif bonus[1] == (user_level * 7):
                 msg = f"You got **one** {bonus[2]} Tier! <a:worryHype:487059927731273739>\n You won **${bonus[1]}**!"
 
             em3 = discord.Embed(title="", description=msg, colour=0xFFD700)
