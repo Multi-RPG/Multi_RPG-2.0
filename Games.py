@@ -778,7 +778,7 @@ class Games(commands.Cog):
             if result <= 10.0:
                 # Selet a random High Tier Fish
                 fish_emoji = random.choice(high_tier_fish)
-                fish_tier = "High"
+                fish_tier = "high"
                 # High Tier fish are worth x70 multiplier
                 fish_multiplier = 70
                 # High Tiers timeout in 3 seconds
@@ -786,7 +786,7 @@ class Games(commands.Cog):
             elif result > 10.0 and result <= 40.0:
                 # Select a random Mid Tier fish
                 fish_emoji = random.choice(mid_tier_fish)
-                fish_tier = "Mid"
+                fish_tier = "mid"
                 # Mid Tier fish are worth x30 multiplier
                 fish_multiplier = 30
                 # Mid Tiers timeout in 4 seconds
@@ -794,11 +794,11 @@ class Games(commands.Cog):
             elif result > 40.0 and result <= 100.0:
                 # Select a random Low Tier fish
                 fish_emoji = random.choice(low_tier_fish)
-                fish_tier = "Low"
-                # Low Tier fish are worth x18 multiplier
-                fish_multiplier = 18
-                # Low Tiers timeout in 5 seconds
-                fish_timeout = 5
+                fish_tier = "low"
+                # Low Tier fish are worth x20 multiplier
+                fish_multiplier = 20
+                # Low Tiers timeout in 4.5
+                fish_timeout = 4.5
 
             return fish_emoji, fish_tier, fish_multiplier, fish_timeout
 
@@ -830,9 +830,9 @@ class Games(commands.Cog):
             # create the messages to be used
             bite_msg = f"Found a bite! Quickly type the prompt to catch the fish." \
                        f"\n** **\n{random_numbers_emojis}"
-            timeout_msg = f"You **failed** to catch the fish in time.\n** **\n" \
+            timeout_msg = f"You failed to catch the **{fish_tier}-tier** fish in time.\n** **\n" \
                           f"No refunds on the **${ticket_cost}** entry fee."
-            wrong_number_msg = f"Wrong number. **Failed** to catch the fish!\n** **\n" \
+            wrong_number_msg = f"Wrong number. Failed to catch the **{fish_tier}-tier** fish!\n** **\n" \
                                f"No refunds on the **${ticket_cost}** entry fee."
             right_number_msg = f"Successfully caught a **{fish_tier}-tier** fish!\n** **\n" \
                                f"You took it to the dock merchant and sold it for **${fish_reward}**!"
@@ -862,7 +862,6 @@ class Games(commands.Cog):
             if user_type_attempt.content == random_numbers:
                 # give the user the reward money
                 user.update_user_money(fish_reward)
-
                 # setup the congratulations message in embed format
                 results = discord.Embed(title="", description=right_number_msg, colour=0x52a7e7)
                 # use regex to get the only numbers from the emoji name
