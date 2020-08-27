@@ -931,19 +931,20 @@ class Games(commands.Cog):
             return emoji
 
         def get_bonus(slot_machine, user_level):
-            """Getting a jackpot gives user a reward = 500 + bonus
-               Bonus is determined by the emote tier
-               High tier = 2000.0
-               Mid tier = 1000.0
-               Low tier = 250.0
+            """Getting a jackpot gives user a reward = 30x multiplier + bonus multiplier
+               Bonus is determined by the emote tier:
+               High tier = 200x multiplier
+               Mid tier = 100x multiplier
+               Low tier = 50x multiplier
 
-               Getting 2 same emotes also gives user a reward = 120 + bonus
-               Bonuse amounts:
-               High tier = 230.0
-               Mid tier = 130.0
-               Low tier = 50.0
 
-               If one emoji is high tier, user is given $75.0
+               Getting 2 same emotes also gives user a reward = 10x multiplier + bonus multiplier
+               Bonus is determined by the emote tier:
+               High tier = 20x multiplier
+               Mid tier = 10x multiplier
+               Low tier = 5x multiplier
+
+               If one emoji is high tier, user is given 7x multiplier
 
                return a list with msg type, reward, and tier
                result[0] -> 1 if jackpot, 2 if two equal elements, 0 otherwise
@@ -1003,13 +1004,11 @@ class Games(commands.Cog):
         # Create a user instance
         user = Users(context.author.id)
 
-        user.update_user_level()
-
         # Get user level to determine rewards later on
         user_level = user.get_user_level(0)
 
         # Check if user has enough money. Ticket costs $10
-        ticket_cost = user_level * 1
+        ticket_cost = user_level
         if user.get_user_money(0) < ticket_cost:
             msg = await context.send(
                 f"{context.author.mention} You don't have enough money...\n tickets cost ${ticket_cost}!"
@@ -1071,13 +1070,14 @@ class Games(commands.Cog):
         msg2 = " ".join(mid_tier_emojis)
         msg3 = " ".join(low_tier_emojis)
         msg4 = (
-            "**3** Identical High tier = **$2,500**\n"
-            "**3** Identical Mid tier = **$1,500**\n"
-            "**3** Identical Low tier = **$750**\n\n"
-            "**2** Identical High tier = **$350**\n"
-            "**2** Identical Mid tier = **$250**\n"
-            "**2** Identical Low tier = **$120**\n\n"
-            "**1** of __any__ High tier = **$50**"
+            "The multipliers multiply your user level to determine rewards.\n** **\n"
+            "**3** Identical High tier = **230x multiplier**\n"
+            "**3** Identical Mid tier = **130x multiplier**\n"
+            "**3** Identical Low tier = **80x multiplier**\n\n"
+            "**2** Identical High tier = **30x multiplier**\n"
+            "**2** Identical Mid tier = **20x multiplier**\n"
+            "**2** Identical Low tier = **15x multiplier**\n\n"
+            "**1** of __any__ High tier = **7x multiplier**"
         )
 
         try:
