@@ -98,16 +98,16 @@ async def helper(context):
         "                  NOTE: this event takes item level & user level into calculation\n"
         "                  NOTE: this event requires AT LEAST 2 entries from your server\n"
         "                  NOTE: the reward is 170x your level for first, 100x for second\n"
-        '  =rob            use "=rob" for a 7/10 chance to mug a random player\n'
-        '  =rob            use "=rob @user" for a 7/10 chance to mug a specified player\n'
+        '  =rob            use "=rob" or "=rob @user" for a 7/10 chance to mug a random or targeted player\n'
         '  =fight          use "=fight @user X" -- X being money to bet\n'
         '  =flip           use "=flip" or "=flip X" or "=flip X Y" \n'
         "                  -- X being heads or tails guess\n"
         "                  -- Y being amount to bet\n"
-        '  =slots          use "=slots" to buy a ticket to roll the slot machine to win up to 2500 dollars!\n'
-        '  =slothelp       use "=slothelp" for information on rewards calculation\n'
+        '  =slots          use "=slots" to buy a ticket to roll the slot machine!\n'
+        '                  NOTE: ticket cost is 1x your level, reward is up to 230x your level\n'
+        '  =slotshelp      use "=slotshelp" for information on rewards calculation\n'
         '  =fish           use "=fish" to buy a ticket to start a mini-game at the local fishing dock!\n'
-        '                  NOTE: the reward is 20-70x your level depending on fish size\n'
+        '                  NOTE: ticket cost is 5x your level, reward is 20-70x your level\n'
         '  =cards          use "=cards" to play high and low game- win 1.5x your bet!\n'
         "                  NOTE: try to guess if the sum of your cards is higher or lower than your opponent's\n"
         '  =hangman        use "=hangman" or "=hangman X", -- X being a category number \n'
@@ -116,7 +116,7 @@ async def helper(context):
         "                  NOTE: the reward is 12x your level\n"
         "Pets:\n"
         '  =adopt          use "=adopt" to adopt your own pet to reap more rewards\n'
-        '  =feed           use "=feed" to gain pet XP, to earn better chance for rewards\n'
+        '  =feed           use "=feed" to gain pet xp, to earn better chance for rewards\n'
         '  =hunt           use "=hunt" to either gain gold or a gear upgrade\n'
         '  =pet            use "=pet" to display statistics for your pet'
         '  =petname        use "=petname" to rename your pet\n```'
