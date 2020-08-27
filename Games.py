@@ -781,8 +781,8 @@ class Games(commands.Cog):
                 fish_tier = "high"
                 # High Tier fish are worth x70 multiplier
                 fish_multiplier = 70
-                # High Tiers timeout in 3 seconds
-                fish_timeout = 3
+                # High Tiers timeout in 3.5 seconds
+                fish_timeout = 3.5
             elif result > 10.0 and result <= 40.0:
                 # Select a random Mid Tier fish
                 fish_emoji = random.choice(mid_tier_fish)
