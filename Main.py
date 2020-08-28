@@ -62,7 +62,10 @@ async def on_message(message):
 
 
 @client.command(
-    name="help", description="command information", brief="commands", aliases=["h", "HELP"],
+    name="help",
+    description="command information",
+    brief="commands",
+    aliases=["h", "HELP"],
 )
 async def helper(context):
     # using discord's "ml" language coloring scheme for the encoded help message
@@ -104,10 +107,10 @@ async def helper(context):
         "                  -- X being heads or tails guess\n"
         "                  -- Y being amount to bet\n"
         '  =slots          use "=slots" to buy a ticket to roll the slot machine!\n'
-        '                  NOTE: ticket cost is 1x your level, reward is up to 230x your level\n'
+        "                  NOTE: ticket cost is 1x your level, reward is up to 230x your level\n"
         '  =slotshelp      use "=slotshelp" for information on rewards calculation\n'
         '  =fish           use "=fish" to buy a ticket to start a mini-game at the local fishing dock!\n'
-        '                  NOTE: ticket cost is 5x your level, reward is 20-70x your level\n'
+        "                  NOTE: ticket cost is 5x your level, reward is 20-70x your level\n"
         '  =cards          use "=cards" to play high and low game- win 1.5x your bet!\n'
         "                  NOTE: try to guess if the sum of your cards is higher or lower than your opponent's\n"
         '  =hangman        use "=hangman" or "=hangman X", -- X being a category number \n'
@@ -239,13 +242,21 @@ if enable_error:
                     "Failed! You have not voted within the last 12 hours."
                     "\nhttps://discordbots.org/bot/486349031224639488/vote"
                 )
-                em = discord.Embed(title=context.author.display_name, description=error_msg, colour=0x607D4A,)
+                em = discord.Embed(
+                    title=context.author.display_name,
+                    description=error_msg,
+                    colour=0x607D4A,
+                )
                 em.set_thumbnail(url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=64")
                 await context.send(embed=em)
             # if the check failed for one of the 3 pet interaction functions in Pets.py
             elif any(x in str(error) for x in ["feed", "hunt", "pet"]):
                 error_msg = "Failed! You have no pet! Use **=adopt** to adopt a pet."
-                em = discord.Embed(title=context.author.display_name, description=error_msg, colour=0x607D4A,)
+                em = discord.Embed(
+                    title=context.author.display_name,
+                    description=error_msg,
+                    colour=0x607D4A,
+                )
                 em.set_thumbnail(url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=64")
                 await context.send(embed=em)
             else:
@@ -270,7 +281,9 @@ if enable_error:
             )
             await context.send(str(error))
         elif "Access" in str(error):
-            await context.send("I couldn't talk to you in there!\nI am likely missing **access** to that channel.",)
+            await context.send(
+                "I couldn't talk to you in there!\nI am likely missing **access** to that channel.",
+            )
             await context.send(str(error))
 
 

@@ -326,7 +326,8 @@ class Games(commands.Cog):
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="tournament", aliases=["TOURNAMENT", "tourney", "TOURNEY"],
+        name="tournament",
+        aliases=["TOURNAMENT", "tourney", "TOURNEY"],
     )
     async def enter_daily_tournament(self, context):
         # the bulk work of this feature is when the results are calculated from daily_maintenance.py
@@ -765,15 +766,17 @@ class Games(commands.Cog):
     @has_account()
     @commands.cooldown(5, 86400, commands.BucketType.user)
     @commands.command(
-        name="fish", description="Fishing game", aliases=["FISH", "fsh"],
+        name="fish",
+        description="Fishing game",
+        aliases=["FISH", "fsh"],
     )
     async def fish(self, context):
 
         # High tier should have the lowest chance possible
         def get_fish():
-            """ High Tier => 10%
-                Mid Tier => 30%
-                Low Tier => 60%
+            """High Tier => 10%
+            Mid Tier => 30%
+            Low Tier => 60%
             """
             fish_emoji, fish_tier, fish_multiplier, fish_timeout = "", "", "", ""
             # Scuffed way to get real value
@@ -832,17 +835,22 @@ class Games(commands.Cog):
                 random_numbers += str(rand)
 
             # create the messages to be used
-            bite_msg = f"Found a bite! Quickly type the prompt to catch the fish." \
-                       f"\n** **\n{random_numbers_emojis}"
-            timeout_msg = f"You failed to catch the **{fish_tier}-tier** fish in time.\n** **\n" \
-                          f"No refunds on the **${ticket_cost}** entry fee."
-            wrong_number_msg = f"Wrong number. Failed to catch the **{fish_tier}-tier** fish!\n** **\n" \
-                               f"No refunds on the **${ticket_cost}** entry fee."
-            right_number_msg = f"Successfully caught a **{fish_tier}-tier** fish!\n** **\n" \
-                               f"You took it to the dock merchant and sold it for **${fish_reward}**!"
+            bite_msg = f"Found a bite! Quickly type the prompt to catch the fish." f"\n** **\n{random_numbers_emojis}"
+            timeout_msg = (
+                f"You failed to catch the **{fish_tier}-tier** fish in time.\n** **\n"
+                f"No refunds on the **${ticket_cost}** entry fee."
+            )
+            wrong_number_msg = (
+                f"Wrong number. Failed to catch the **{fish_tier}-tier** fish!\n** **\n"
+                f"No refunds on the **${ticket_cost}** entry fee."
+            )
+            right_number_msg = (
+                f"Successfully caught a **{fish_tier}-tier** fish!\n** **\n"
+                f"You took it to the dock merchant and sold it for **${fish_reward}**!"
+            )
 
             # send the fish-bite typing prompt
-            typing_prompt = discord.Embed(title="", description=bite_msg, colour=0x52a7e7)
+            typing_prompt = discord.Embed(title="", description=bite_msg, colour=0x52A7E7)
             typing_prompt.set_thumbnail(url="https://i.imgur.com/u02lzv1.gif")
             await context.send(embed=typing_prompt)
             await waiting_image.delete()
@@ -867,7 +875,7 @@ class Games(commands.Cog):
                 # give the user the reward money
                 user.update_user_money(fish_reward)
                 # setup the congratulations message in embed format
-                results = discord.Embed(title="", description=right_number_msg, colour=0x52a7e7)
+                results = discord.Embed(title="", description=right_number_msg, colour=0x52A7E7)
                 # use regex to get the only numbers from the emoji name
                 emoji_id = re.findall(r"\d+", fish_emoji)[0]
                 # set embed thumbnail to the emoji URL
@@ -909,15 +917,17 @@ class Games(commands.Cog):
     @has_account()
     @commands.cooldown(10, 86400, commands.BucketType.user)
     @commands.command(
-        name="slot", description="Slot Machine game", aliases=["machine", "pachinko", "slots", "spin", "reel"],
+        name="slot",
+        description="Slot Machine game",
+        aliases=["machine", "pachinko", "slots", "spin", "reel"],
     )
     async def slot_machine(self, context):
 
         # High tier should have the lowest chance possible
         def get_emoji_slot():
-            """ High Tier => 7%
-                Mid Tier => 28%
-                Low Tier => 65%
+            """High Tier => 7%
+            Mid Tier => 28%
+            Low Tier => 65%
             """
             emoji = ""
             # Scuffed way to get real value
@@ -936,24 +946,24 @@ class Games(commands.Cog):
 
         def get_bonus(slot_machine, user_level):
             """Getting a jackpot gives user a reward = 30x multiplier + bonus multiplier
-               Bonus is determined by the emote tier:
-               High tier = 200x multiplier
-               Mid tier = 100x multiplier
-               Low tier = 50x multiplier
+            Bonus is determined by the emote tier:
+            High tier = 200x multiplier
+            Mid tier = 100x multiplier
+            Low tier = 50x multiplier
 
 
-               Getting 2 same emotes also gives user a reward = 10x multiplier + bonus multiplier
-               Bonus is determined by the emote tier:
-               High tier = 20x multiplier
-               Mid tier = 10x multiplier
-               Low tier = 5x multiplier
+            Getting 2 same emotes also gives user a reward = 10x multiplier + bonus multiplier
+            Bonus is determined by the emote tier:
+            High tier = 20x multiplier
+            Mid tier = 10x multiplier
+            Low tier = 5x multiplier
 
-               If one emoji is high tier, user is given 7x multiplier
+            If one emoji is high tier, user is given 7x multiplier
 
-               return a list with msg type, reward, and tier
-               result[0] -> 1 if jackpot, 2 if two equal elements, 0 otherwise
-               result[1] -> reward
-               result[2] -> tier
+            return a list with msg type, reward, and tier
+            result[0] -> 1 if jackpot, 2 if two equal elements, 0 otherwise
+            result[1] -> reward
+            result[2] -> tier
             """
             # result list
             # default values incase of no bonus
@@ -999,7 +1009,7 @@ class Games(commands.Cog):
             # If one element is a High Tier emoji
             for i in slot_machine:
                 if i in high_tier_emojis:
-                    result[1] = (user_level * 7)
+                    result[1] = user_level * 7
                     result[2] = "High"
                     return result
 

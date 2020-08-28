@@ -139,7 +139,14 @@ class Memes(commands.Cog):
         name="trumporder",
         description="executive order from trump",
         brief='can use =trumporder "order"',
-        aliases=["trump", "order", "executiveorder" "TRUMP", "EXECUTIVE", "executive", "ORDER", ],
+        aliases=[
+            "trump",
+            "order",
+            "executiveorder" "TRUMP",
+            "EXECUTIVE",
+            "executive",
+            "ORDER",
+        ],
     )
     async def trump_order(self, context, *args):
         # using IMGFLIP public API: https://api.imgflip.com/
@@ -278,7 +285,16 @@ class Memes(commands.Cog):
         name="bookfacts",
         description="book of facts meme",
         brief='can use =bookfacts "facts"',
-        aliases=["book", "facts", "BOOK", "FACTS", "bookoffacts", "BOOKOFFACTS", "factsbook", "FACTSBOOK", ],
+        aliases=[
+            "book",
+            "facts",
+            "BOOK",
+            "FACTS",
+            "bookoffacts",
+            "BOOKOFFACTS",
+            "factsbook",
+            "FACTSBOOK",
+        ],
     )
     async def book_of_facts(self, context, *args):
         # using IMGFLIP public API: https://api.imgflip.com/
