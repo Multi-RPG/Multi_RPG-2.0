@@ -9,7 +9,7 @@ class Database:
 
     def connect(self):
         try:
-            self.connection = sqlite3.connect("db_and_words\hangman.db")
+            self.connection = sqlite3.connect(r"db_and_words\hangman.db")
             # Next part required to enable foreign keys on sqlite. It must execute every connection.
             self.connection.execute("PRAGMA foreign_keys = ON")
             return self.connection
@@ -247,7 +247,8 @@ class Database:
     # pass in the winning_number as a parameter from the daily script: daily_maintenance.py
     def get_lottery_winners(self, winning_number):
         cur = self.connection.cursor()
-        # find ticket id's with the winning number as their ticket guess, and their active_ticket is 1, which defines a basic ticket
+        # find ticket id's with the winning number as their ticket guess,
+        # and their active_ticket is 1, which defines a basic ticket
         sql = "SELECT ticket_id FROM Lottery WHERE ticket_guess = ? AND ticket_active = ?"
         cur.execute(sql, (winning_number, 1))
         rows = cur.fetchall()
@@ -255,7 +256,8 @@ class Database:
         for row in rows:
             std_winners.append(row[0])
 
-        # find ticket id's with the winning number as their ticket guess, and their active_ticket is 2, which defined a premium ticket
+        # find ticket id's with the winning number as their ticket guess,
+        # and their active_ticket is 2, which defined a premium ticket
         sql = "SELECT ticket_id FROM Lottery WHERE ticket_guess = ? AND ticket_active = ?"
         cur.execute(sql, (winning_number, 2))
         rows = cur.fetchall()

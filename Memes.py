@@ -87,11 +87,11 @@ class Memes(commands.Cog):
             return
 
         # SETUP WHITE BACKGROUND CANVAS
-        background = Image.open("custom_memes\memebackground.png")
+        background = Image.open(r"custom_memes\memebackground.png")
         draw = ImageDraw.Draw(background)
         # set custom true type font from our directory, helvetica neue
-        font = ImageFont.truetype("custom_memes\helv.ttf", 25)
-        smallfont = ImageFont.truetype("custom_memes\helv.ttf", 21)
+        font = ImageFont.truetype(r"custom_memes\helv.ttf", 25)
+        smallfont = ImageFont.truetype(r"custom_memes\helv.ttf", 21)
 
         # PASTE USER'S PROFILE PICTURE AND USERNAME ON TOP OF BACKGROUND CANVAS
         # retrieve the URL for this user's avatar to embed above the text
@@ -131,15 +131,15 @@ class Memes(commands.Cog):
         offset = ((bg_w - img_w) // 2, 191)
         # paste the image onto background now at the position specified
         background.paste(img, offset)
-        background.save("custom_memes\memegenresult.png")
+        background.save(r"custom_memes\memegenresult.png")
 
-        await context.send(file=discord.File("custom_memes\memegenresult.png"))
+        await context.send(file=discord.File(r"custom_memes\memegenresult.png"))
 
     @commands.command(
         name="trumporder",
         description="executive order from trump",
         brief='can use =trumporder "order"',
-        aliases=["trump", "order", "executiveorder" "TRUMP", "EXECUTIVE", "executive", "ORDER",],
+        aliases=["trump", "order", "executiveorder" "TRUMP", "EXECUTIVE", "executive", "ORDER", ],
     )
     async def trump_order(self, context, *args):
         # using IMGFLIP public API: https://api.imgflip.com/
@@ -278,7 +278,7 @@ class Memes(commands.Cog):
         name="bookfacts",
         description="book of facts meme",
         brief='can use =bookfacts "facts"',
-        aliases=["book", "facts", "BOOK", "FACTS", "bookoffacts", "BOOKOFFACTS", "factsbook", "FACTSBOOK",],
+        aliases=["book", "facts", "BOOK", "FACTS", "bookoffacts", "BOOKOFFACTS", "factsbook", "FACTSBOOK", ],
     )
     async def book_of_facts(self, context, *args):
         # using IMGFLIP public API: https://api.imgflip.com/
@@ -391,7 +391,8 @@ class Memes(commands.Cog):
         template_id = 119139145
         font = "arial"
 
-        # try-catch block, because of *args array. if no argument given in discord after "=pidgeon", it will go to the exception
+        # try-catch block, because of *args array.
+        # if no argument given in discord after "=pidgeon", it will go to the exception
         try:
             cause = str(args[0])
             reaction = str(args[1])

@@ -12,7 +12,7 @@ from random import choices
 def get_hangman_art():
     # prepare array of hangman art
     art_array = []
-    with open("db_and_words\hangmen.txt") as my_file:
+    with open(r"db_and_words\hangmen.txt") as my_file:
         for line in my_file:
             art_array.append(line)
 
@@ -30,7 +30,7 @@ def get_hangman_art():
 
 def get_hangman_words():
     # only read words file once so we won't have to re-open the file every game call
-    words_file = open("db_and_words\words.txt", "r")
+    words_file = open(r"db_and_words\words.txt", "r")
     words = words_file.readlines()
     words_file.close()
     return words
@@ -146,6 +146,7 @@ def get_tier_list(file_path):
                 low_tier.append(line)
         return high_tier, mid_tier, low_tier
 
+
 # short decorator function declaration, confirm that command user has an account in database
 def has_account():
     def predicate(ctx):
@@ -241,7 +242,7 @@ class Games(commands.Cog):
                 # otherwise if the user was the sole player with an account in the discord server, infinite while loop
                 # this part is inefficient, but only way I can think of right now with discord's functionality
                 if counter == 70:
-                    no_targets_found_msg = f"**No users with Multi-RPG accounts found to rob...** \nExiting now..."
+                    no_targets_found_msg = "**No users with Multi-RPG accounts found to rob...** \nExiting now..."
                     # embed the rob confirmation message, set thumbnail to 40x40 of a "ninja" gif
                     em = discord.Embed(description=no_targets_found_msg, colour=0x607D4A)
                     em.set_thumbnail(url="https://cdn.discordapp.com/emojis/618911376613834752.gif?size=40")
@@ -644,7 +645,8 @@ class Games(commands.Cog):
                 await art_msg.delete()
                 await guess_prompt_msg.delete()
                 await guess_msg.delete()
-                # pick_result_msg, underscore_seq_msg, guessed_list_msg will only exist if the game has gone at least 1 loop
+                # pick_result_msg, underscore_seq_msg,
+                # guessed_list_msg will only exist if the game has gone at least 1 loop
                 if counter > 0:
                     await pick_result_msg.delete()
                     await underscore_seq_msg.delete()
@@ -668,7 +670,8 @@ class Games(commands.Cog):
                 await art_msg.delete()
                 await guess_prompt_msg.delete()
                 await guess_msg.delete()
-                # pick_result_msg, underscore_seq_msg, guessed_list_msg will only exist if the game has gone at least 1 loop
+                # pick_result_msg, underscore_seq_msg,
+                # guessed_list_msg will only exist if the game has gone at least 1 loop
                 if counter > 0:
                     await pick_result_msg.delete()
                     await underscore_seq_msg.delete()
@@ -691,7 +694,8 @@ class Games(commands.Cog):
                 await art_msg.delete()
                 await guess_prompt_msg.delete()
                 await guess_msg.delete()
-                # pick_result_msg, underscore_seq_msg, guessed_list_msg will only exist if the game has gone at least 1 loop
+                # pick_result_msg, underscore_seq_msg,
+                # guessed_list_msg will only exist if the game has gone at least 1 loop
                 if counter > 0:
                     await pick_result_msg.delete()
                     await underscore_seq_msg.delete()
@@ -819,9 +823,9 @@ class Games(commands.Cog):
             random_numbers_emojis, random_numbers = "", ""
 
             # loop 6 times to generate 6 random numbers to put together
-            for x in range(1,7):
+            for x in range(1, 7):
                 # random number 1-9
-                rand = random.randrange(1,9)
+                rand = random.randrange(1, 9)
                 # put the numbers in english form (EX. 1 -> one) and put colons around them to convert to emojis
                 random_numbers_emojis += f":{num2words(rand)}:"
                 # concatenate each loop's number to later compare to user's typing attempt
@@ -1095,9 +1099,9 @@ class Games(commands.Cog):
         except discord.Forbidden as error:
             print(f"{type(error).__name__} {error.text}")
             error_msg = (
-                f"I was unable to DM you the help message. "
-                f"It is possible that you do not allow DM from server members. "
-                f"Please check your privacy settings."
+                "I was unable to DM you the help message. "
+                "It is possible that you do not allow DM from server members. "
+                "Please check your privacy settings."
             )
             await context.send(error_msg)
 
@@ -1136,7 +1140,7 @@ class Games(commands.Cog):
 
         # confirm the user has enough money for the bet
         if user.get_user_money(0) < bet:
-            msg = f", you don't have enough money for that bet...\n"
+            msg = ", you don't have enough money for that bet...\n"
             msg = await context.send(f"{context.author.mention}{msg}")
             await asyncio.sleep(7)
             await msg.delete()

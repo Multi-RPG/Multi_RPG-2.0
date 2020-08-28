@@ -157,9 +157,9 @@ async def helper(context):
     except discord.Forbidden as error:
         print(f"{type(error).__name__} {error.text}")
         error_msg = (
-            f"I was unable to DM you the help message. "
-            f"It is possible that you do not allow DM from server members. "
-            f"Please check your privacy settings."
+            "I was unable to DM you the help message. "
+            "It is possible that you do not allow DM from server members. "
+            "Please check your privacy settings."
         )
         await context.send(error_msg)
 
