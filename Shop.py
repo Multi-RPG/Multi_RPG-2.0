@@ -38,7 +38,10 @@ class Shop(commands.Cog):
     @has_account()
     @commands.cooldown(1, 30, commands.BucketType.user)
     @commands.command(
-        name="shop", description="view daily shop", brief="view the daily shop", aliases=["SHOP"],
+        name="shop",
+        description="view daily shop",
+        brief="view the daily shop",
+        aliases=["SHOP"],
     )
     async def shop(self, context):
         # connect to database file
@@ -182,7 +185,10 @@ class Shop(commands.Cog):
     @has_account()
     @commands.cooldown(1, 15, commands.BucketType.user)
     @commands.command(
-        name="buy", description="buy an item from the daily shop", brief="buy an item from the shop", aliases=["BUY"],
+        name="buy",
+        description="buy an item from the daily shop",
+        brief="buy an item from the shop",
+        aliases=["BUY"],
     )
     async def buy(self, context, *args):
         # connect to database file
@@ -304,7 +310,9 @@ class Shop(commands.Cog):
             # embed the confirmation string, add the user's avatar to it, and send it
             em = discord.Embed(title="", colour=0x607D4A)
             em.add_field(
-                name=context.author.display_name, value=confirmation, inline=True,
+                name=context.author.display_name,
+                value=confirmation,
+                inline=True,
             )
             em.set_thumbnail(url=context.author.avatar_url)
             await context.send(embed=em)

@@ -44,7 +44,10 @@ class Account(commands.Cog):
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="create", description="make a user", brief="start a user account", aliases=["register"],
+        name="create",
+        description="make a user",
+        brief="start a user account",
+        aliases=["register"],
     )
     async def register(self, context):
         # create new user instance with their discord ID to store in database
@@ -56,7 +59,9 @@ class Account(commands.Cog):
 
         em = discord.Embed(title="", colour=0x607D4A)
         em.add_field(
-            name=context.author.display_name, value=new_user.add_user(), inline=True,
+            name=context.author.display_name,
+            value=new_user.add_user(),
+            inline=True,
         )
         em.set_thumbnail(url=context.author.avatar_url)
         await context.send(embed=em)
@@ -104,7 +109,9 @@ class Account(commands.Cog):
                 # embed the money retrieved from get_user_money(), set thumbnail to 64x64 version of user's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name, value=f"**:moneybag: ** {user.get_user_money()}", inline=True,
+                    name=context.author.display_name,
+                    value=f"**:moneybag: ** {user.get_user_money()}",
+                    inline=True,
                 )
                 thumb_url = (
                     f"https://cdn.discordapp.com/avatars/{context.author.id}" f"/{context.author.avatar}.webp?size=64"
@@ -143,7 +150,9 @@ class Account(commands.Cog):
                 # embed the level retrieved from get_user_level(), set thumbnail to 64x64 version of target's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=discord_member_target.display_name, value=f"**Level** {target.get_user_level()}", inline=True,
+                    name=discord_member_target.display_name,
+                    value=f"**Level** {target.get_user_level()}",
+                    inline=True,
                 )
                 thumb_url = (
                     f"https://cdn.discordapp.com/avatars/{discord_member_target.id}"
@@ -161,7 +170,9 @@ class Account(commands.Cog):
                 # embed the level retrieved from get_user_level(), set thumbnail to 64x64 version of user's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name, value=f"**Level** {user.get_user_level()}", inline=True,
+                    name=context.author.display_name,
+                    value=f"**Level** {user.get_user_level()}",
+                    inline=True,
                 )
                 thumb_url = (
                     f"https://cdn.discordapp.com/avatars/{context.author.id}/{context.author.avatar}.webp?size=64"
@@ -230,7 +241,8 @@ class Account(commands.Cog):
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="stats", aliases=["battles", "BRECORDS", "STATS", "profile", "PROFILE", "gear", "GEAR"],
+        name="stats",
+        aliases=["battles", "BRECORDS", "STATS", "profile", "PROFILE", "gear", "GEAR"],
     )
     async def profile_stats(self, context, *args):
         try:
@@ -252,7 +264,9 @@ class Account(commands.Cog):
                 # embed the statistics retrieved from get_user_stats(), set thumbnail to target's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=discord_member_target.display_name, value=target.get_user_stats(), inline=True,
+                    name=discord_member_target.display_name,
+                    value=target.get_user_stats(),
+                    inline=True,
                 )
                 em.set_thumbnail(url=target_avatar_url)
 
@@ -266,7 +280,9 @@ class Account(commands.Cog):
                 # embed the statistics retrieved from get_user_stats(), set thumbnail to user's id
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name, value=user.get_user_stats(), inline=True,
+                    name=context.author.display_name,
+                    value=user.get_user_stats(),
+                    inline=True,
                 )
                 em.set_thumbnail(url=context.author.avatar_url)
 
@@ -353,7 +369,9 @@ class Account(commands.Cog):
             # increase level by 1 and print new level
             em = discord.Embed(title="", colour=0x607D4A)
             em.add_field(
-                name=context.author.display_name, value=user.update_user_level(), inline=True,
+                name=context.author.display_name,
+                value=user.update_user_level(),
+                inline=True,
             )
             thumb_url = f"https://cdn.discordapp.com/avatars/{context.author.id}/{context.author.avatar}.webp?size=64"
             em.set_thumbnail(url=thumb_url)
@@ -402,7 +420,9 @@ class Account(commands.Cog):
         # embed the confirmation message, set thumbnail to user's id
         em = discord.Embed(title="", colour=0x607D4A)
         em.add_field(
-            name=f"Thanks for voting, {context.author.display_name}", value=msg, inline=True,
+            name=f"Thanks for voting, {context.author.display_name}",
+            value=msg,
+            inline=True,
         )
         em.set_thumbnail(url=context.author.avatar_url)
         await context.send(embed=em)
@@ -410,7 +430,8 @@ class Account(commands.Cog):
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="toggle", aliases=["togglepeace", "TOGGLEPEACE", "peace", "PEACE"],
+        name="toggle",
+        aliases=["togglepeace", "TOGGLEPEACE", "peace", "PEACE"],
     )
     async def toggle_peace(self, context):
         # create instance of user who wants to get their daily money
@@ -451,7 +472,9 @@ class Account(commands.Cog):
                 # embed the confirmation string, add the user's avatar to it, and send it
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name, value=confirmation, inline=True,
+                    name=context.author.display_name,
+                    value=confirmation,
+                    inline=True,
                 )
                 em.set_thumbnail(url=context.author.avatar_url)
                 await context.send(embed=em)
@@ -488,7 +511,9 @@ class Account(commands.Cog):
                 # embed the confirmation string, add the user's avatar to it, and send it
                 em = discord.Embed(title="", colour=0x607D4A)
                 em.add_field(
-                    name=context.author.display_name, value=confirmation, inline=True,
+                    name=context.author.display_name,
+                    value=confirmation,
+                    inline=True,
                 )
                 em.set_thumbnail(url=context.author.avatar_url)
                 await context.send(embed=em)
