@@ -3,10 +3,14 @@ import random
 import asyncio
 import re
 import discord
+import logging
+
 from discord.ext import commands
 from num2words import num2words
 from Users import Users
 from random import choices
+
+log = logging.getLogger("MULTI_RPG")
 
 
 def get_hangman_art():
@@ -39,7 +43,7 @@ def get_hangman_words():
 def battle_decider(fighter1, fighter2, fighter1_weight, fighter2_weight):
     # choices function maps a selection to a probability, and selects one choice based off probability
     winner = choices([fighter1, fighter2], [fighter1_weight, fighter2_weight])
-    print(winner)
+    log.info(f"winner is {winner}.")
     # choices function returning [1] or [2] so use regex to pull the integers out
     return int(re.findall(r"\d+", str(winner))[0])
 
@@ -339,7 +343,7 @@ class Games(commands.Cog):
         # embed the tourney registration confirmation message, set thumbnail to 40x40 of the respective server's icon
         em = discord.Embed(description=msg, colour=0x607D4A)
         thumb_url = context.guild.icon_url
-        print(thumb_url)
+        log.info(f"thumb_url {thumb_url}")
         em.set_thumbnail(url=thumb_url)
         await context.send(embed=em)
 
@@ -640,7 +644,7 @@ class Games(commands.Cog):
 
             """RUN WIN CHECKS AND CANCEL CHECKS NOW"""
             # run conditionals to check if they guessed entire word or they used a cancel keyword
-            print(f"{guess_msg.clean_content.upper()} and correct word: {correct_word}")  # console print
+            log.info(f"{guess_msg.clean_content.upper()} and correct word: {correct_word}")
             if guess_msg.clean_content.upper() == correct_word:
                 await cat_msg.delete()
                 await art_msg.delete()
@@ -922,7 +926,6 @@ class Games(commands.Cog):
         aliases=["machine", "pachinko", "slots", "spin", "reel"],
     )
     async def slot_machine(self, context):
-
         # High tier should have the lowest chance possible
         def get_emoji_slot():
             """High Tier => 7%
@@ -1107,7 +1110,7 @@ class Games(commands.Cog):
             em.set_thumbnail(url="https://i.imgur.com/a9pARrC.gif")
             await context.author.dm_channel.send(embed=em)
         except discord.Forbidden as error:
-            print(f"{type(error).__name__} {error.text}")
+            log.debug(f"{type(error).__name__} {error.text}")
             error_msg = (
                 "I was unable to DM you the help message. "
                 "It is possible that you do not allow DM from server members. "

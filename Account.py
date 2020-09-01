@@ -2,10 +2,13 @@
 import re
 import discord
 import asyncio
+import logging
 
 from discord.ext import commands
 from DiscordBotsOrgApi import DiscordBotsOrgAPI
 from Users import Users
+
+log = logging.getLogger("MULTI_RPG")
 
 
 # short decorator function declaration, confirm that command user has an account in database
@@ -113,10 +116,8 @@ class Account(commands.Cog):
         # Added this exception for debugging purposes.
         except Exception as e:
             msg = f"Not ok! {e.__class__} occurred"
-            print(msg)
-            await context.send(
-                f"{context.author.mention}```ml\nuse =money like so: **=money** or **=money @user**"
-            )
+            log.debug(msg)
+            await context.send(f"{context.author.mention}```ml\nuse =money like so: **=money** or **=money @user**")
         finally:
             # delete original message to reduce spam
             await context.message.delete()
@@ -172,10 +173,8 @@ class Account(commands.Cog):
         # Added this exception for debugging purposes.
         except Exception as e:
             msg = f"Not ok! {e.__class__} occurred"
-            print(msg)
-            await context.send(
-                f"{context.author.mention}```ml\nuse =level like so: **=level** or **=level @user**"
-            )
+            log.debug(msg)
+            await context.send(f"{context.author.mention}```ml\nuse =level like so: **=level** or **=level @user**")
         finally:
             # delete original message to reduce spam
             await context.message.delete()
@@ -222,7 +221,7 @@ class Account(commands.Cog):
             await context.message.delete()
         except Exception as e:
             msg = f"Not ok! {e.__class__} occurred"
-            print(msg)
+            log.debug(msg)
             await context.send(
                 f"{context.author.mention}```ml\nuse =give like so: **=give @user X**"
                 f"    -- X being amnt of money to give```"
@@ -275,7 +274,7 @@ class Account(commands.Cog):
 
         except Exception as e:
             msg = f"Not ok! {e.__class__} occurred"
-            print(msg)
+            log.debug(msg)
             await context.send(
                 f"{context.author.mention}```ml\nuse =profile like so: **=profile** or **=profile @user**"
             )

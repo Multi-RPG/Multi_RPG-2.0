@@ -3,10 +3,13 @@ import asyncio
 import discord
 import math
 import collections
+import logging
 
 from discord.ext import commands
 from Users import Users
 from Database import Database
+
+log = logging.getLogger("MULTI_RPG")
 
 
 # short decorator function declaration, confirm that command user has an account in database
@@ -168,7 +171,7 @@ class Shop(commands.Cog):
                     reaction, user = await self.client.wait_for("reaction_add", check=is_author, timeout=30)
 
             except asyncio.TimeoutError:
-                print("Timeout")
+                log.debug("Timeout")
 
             # This is called regardless.
             finally:

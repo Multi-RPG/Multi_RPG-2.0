@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 import sqlite3
+import logging
+
 from sqlite3 import Error
+
+log = logging.getLogger("MULTI_RPG")
 
 
 class Database:
@@ -14,7 +18,7 @@ class Database:
             self.connection.execute("PRAGMA foreign_keys = ON")
             return self.connection
         except Error as e:
-            print(e)
+            log.error(e)
 
     def insert_acct(self):
         cur = self.connection.cursor()
@@ -33,9 +37,9 @@ class Database:
         # print users table to console after inserts
         cur.execute("select * from Users")
         rows = cur.fetchall()
-        print("\nUsers after insert: \n")
+        log.debug("Users after insert:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_money()
@@ -52,9 +56,9 @@ class Database:
         # print pets table to console after inserts
         cur.execute("select * from Pets")
         rows = cur.fetchall()
-        print("\nPets after insert: \n")
+        log.debug("Pets after insert:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
 
@@ -68,9 +72,9 @@ class Database:
         # print servers table after insert
         cur.execute("select * from Servers")
         rows = cur.fetchall()
-        print("\nServers after insert: \n")
+        log.debug("Servers after insert:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
 
@@ -83,9 +87,9 @@ class Database:
         # print users table to console after inserts
         cur.execute("select * from Shop")
         rows = cur.fetchall()
-        print("\nShop after insert: \n")
+        log.debug("Shop after insert:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
 
@@ -212,7 +216,7 @@ class Database:
         cur.execute(sql)
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
         return rows
 
     def get_item_score(self):
@@ -283,7 +287,7 @@ class Database:
         sql = "SELECT * FROM SHOP WHERE item_id = ?"
         cur.execute(sql, (item_id,))
         row = cur.fetchone()
-        print(row)
+        log.debug(row)
         return row
         # see if a row exists in the fetch results, if not, they don't have an account
 
@@ -313,9 +317,9 @@ class Database:
         cur.execute(sql, (amount, self.id))
         cur.execute("select * from Users")
         rows = cur.fetchall()
-        print("\nUsers table after cash update: \n")
+        log.debug("Users table after cash update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_money()
@@ -327,9 +331,9 @@ class Database:
         cur.execute(sql, (self.id,))
         cur.execute("select * from Users")
         rows = cur.fetchall()
-        print("\nUsers table after level update: \n")
+        log.debug("Users table after level update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_level()
@@ -342,9 +346,9 @@ class Database:
         cur.execute(sql, (self.id,))
         cur.execute("select * from Pets")
         rows = cur.fetchall()
-        print("\nPets table after XP update: \n")
+        log.debug("Pets table after XP update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_pet_xp()
@@ -368,9 +372,9 @@ class Database:
         cur.execute(sql, (self.id,))
         cur.execute("select * from Pets")
         rows = cur.fetchall()
-        print("\nPets table after level update: \n")
+        log.debug("Pets table after level update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_pet_level()
@@ -383,9 +387,9 @@ class Database:
         cur.execute(sql, (self.id,))
         cur.execute("select * from Users")
         rows = cur.fetchall()
-        print("\nUsers table after peace update: \n")
+        log.debug("Users table after peace update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_peace_status()
@@ -398,9 +402,9 @@ class Database:
         cur.execute(sql, (self.id,))
         cur.execute("select * from Users")
         rows = cur.fetchall()
-        print("\nUsers table after peace update: \n")
+        log.debug("Users table after peace update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_peace_status()
@@ -412,9 +416,9 @@ class Database:
         cur.execute(sql, (weapon_level, self.id))
         cur.execute("SELECT * from Battles")
         rows = cur.fetchall()
-        print("\nBattles table after battle gear update: \n")
+        log.debug("Battles table after battle gear update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_item_score()
@@ -426,9 +430,9 @@ class Database:
         cur.execute(sql, (helmet_level, self.id))
         cur.execute("SELECT * from Battles")
         rows = cur.fetchall()
-        print("\nBattles table after battle gear update: \n")
+        log.debug("Battles table after battle gear update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_item_score()
@@ -440,9 +444,9 @@ class Database:
         cur.execute(sql, (chest_level, self.id))
         cur.execute("SELECT * from Battles")
         rows = cur.fetchall()
-        print("\nBattles table after battle gear update: \n")
+        log.debug("Battles table after battle gear update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_item_score()
@@ -454,9 +458,9 @@ class Database:
         cur.execute(sql, (boots_level, self.id))
         cur.execute("SELECT * from Battles")
         rows = cur.fetchall()
-        print("\nBattles table after battle gear update: \n")
+        log.debug("Battles table after battle gear update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_item_score()
@@ -467,9 +471,9 @@ class Database:
         cur.execute(sql, (server_id, self.id))
         cur.execute("SELECT * from Battles")
         rows = cur.fetchall()
-        print("\nBattles table after battle gear update: \n")
+        log.debug("Battles table after battle gear update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
 
@@ -483,9 +487,9 @@ class Database:
         cur.execute(sql, (battles_lost, battles_won, total_winnings, self.id))
         cur.execute("select * from Battles")
         rows = cur.fetchall()
-        print("\nBattles table after battle records update: \n")
+        log.debug("Battles table after battle records update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
         return self.get_battle_stats()
@@ -500,9 +504,9 @@ class Database:
         cur.execute("SELECT * from Lottery")
 
         rows = cur.fetchall()
-        print("\nLottery table after lottery update: \n")
+        log.debug("Lottery table after lottery update:")
         for row in rows:
-            print(row)
+            log.debug(f"{row}")
 
         self.connection.commit()
 

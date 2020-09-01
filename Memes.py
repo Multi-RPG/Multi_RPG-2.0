@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 import requests
 import discord
+import logging
+import urllib.request
+import textwrap
+import configparser
+import sys
+
 from discord.ext import commands
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
 from pathlib import Path
-import urllib.request
-import textwrap
-import configparser
-import sys
+
+log = logging.getLogger("MULTI_RPG")
 
 # prepare data for IMGFLIP public API: https://api.imgflip.com/
 # set URL that we will direct our non-custom memes requests to
@@ -23,7 +27,9 @@ if imgflip_token_path.is_file():
     username = config.get("USER1", "username")
     password = config.get("USER1", "password")
 else:
-    print(f"\nIMGFLIP account token not found at: {imgflip_token_path}... Please correct file path in Memes.py file.")
+    log.error(
+        f"\nIMGFLIP account token not found at: {imgflip_token_path}... Please correct file path in Memes.py file."
+    )
     sys.exit()
 
 
@@ -95,7 +101,7 @@ class Memes(commands.Cog):
 
         # PASTE USER'S PROFILE PICTURE AND USERNAME ON TOP OF BACKGROUND CANVAS
         # retrieve the URL for this user's avatar to embed above the text
-        print(f"User's avatar: {context.author.avatar_url}")
+        log.info(f"User's avatar: {context.author.avatar_url}")
         urllib.request.urlretrieve(f"{context.author.avatar_url}", "custom_memes\\UserAvatar.webp")
         # read the avatar image that we downloaded, convert to RGB so we can process it
         img = Image.open("custom_memes\\UserAvatar.webp", "r").convert("RGB")
@@ -164,7 +170,7 @@ class Memes(commands.Cog):
                 order = order.replace("“", "").replace("”", "")
             else:
                 order = str(args[0])
-            print(f"trump order meme arguments: {order}")
+            log.info(f"trump order meme arguments: {order}")
         except:
             await context.send(f'{context.author.mention}```ml\nuse =trumporder like so: =trumporder "order"```')
             return
@@ -204,7 +210,7 @@ class Memes(commands.Cog):
         try:
             button1 = str(args[0])
             button2 = str(args[1])
-            print(f"2 buttons meme arguments: {button1} {button2}")
+            log.info(f"2 buttons meme arguments: {button1} {button2}")
 
         except:
             await context.send(
@@ -254,7 +260,7 @@ class Memes(commands.Cog):
                 reasons = reasons.replace("“", "").replace("”", "")
             else:
                 reasons = str(args[0])
-            print(f"reasons to live meme arguments: {reasons}")
+            log.info(f"reasons to live meme arguments: {reasons}")
 
         except:
             await context.send(
@@ -314,7 +320,7 @@ class Memes(commands.Cog):
                 facts = facts.replace("“", "").replace("”", "")
             else:
                 facts = str(args[0])
-            print(f"book of facts meme arguments: {facts}")
+            log.info(f"book of facts meme arguments: {facts}")
 
         except:
             await context.send(f'{context.author.mention}```ml\nuse =bookfacts like so: =bookfacts "facts"```')
@@ -366,7 +372,7 @@ class Memes(commands.Cog):
                 facts = facts.replace("“", "").replace("”", "")
             else:
                 facts = str(args[0])
-            print(f"change my mind meme arguments: {facts}")
+            log.info(f"change my mind meme arguments: {facts}")
 
         except:
             await context.send(
@@ -412,7 +418,7 @@ class Memes(commands.Cog):
         try:
             cause = str(args[0])
             reaction = str(args[1])
-            print(f"slap button meme arguments: {cause} {reaction}")
+            log.info(f"slap button meme arguments: {cause} {reaction}")
 
         except:
             await context.send(
@@ -452,7 +458,7 @@ class Memes(commands.Cog):
             stage2 = str(args[1])
             stage3 = str(args[2])
             stage4 = str(args[3])
-            print(f"expanding brain meme arguments: {stage1} {stage2} {stage3} {stage4}")
+            log.info(f"expanding brain meme arguments: {stage1} {stage2} {stage3} {stage4}")
 
         except:
             await context.send(
@@ -514,7 +520,7 @@ class Memes(commands.Cog):
             # combine into 1 string with spaces between each word
             is_this_a = " ".join(args[2 : len(args)])
 
-            print(f"Pigeon meme arguments: {whom} {butterfly} {is_this_a}")
+            log.info(f"Pigeon meme arguments: {whom} {butterfly} {is_this_a}")
 
         except:
             await context.send(
@@ -568,7 +574,7 @@ class Memes(commands.Cog):
             right = str(args[1])
             car = " ".join(args[2 : len(args)])
 
-            print(f"Left exit meme arguments {left} {right} {car}")
+            log.info(f"Left exit meme arguments {left} {right} {car}")
 
         except:
             await context.send(
@@ -620,7 +626,7 @@ class Memes(commands.Cog):
             distracted_boyfriend = str(args[1])
             girlfriend = " ".join(args[2 : len(args)])
 
-            print(f"Distracted boyfriend meme arguments {new_girl} {distracted_boyfriend} {girlfriend}")
+            log.info(f"Distracted boyfriend meme arguments {new_girl} {distracted_boyfriend} {girlfriend}")
 
         except:
             await context.send(

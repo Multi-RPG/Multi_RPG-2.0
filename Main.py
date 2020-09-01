@@ -4,12 +4,15 @@ import asyncio
 import configparser
 import sys
 import datetime
-import logging
 
+from init_logging import init_logging
 from discord.ext import commands
 from pathlib import Path
 from Database import Database
 from parse_args import parse_args
+
+# initialize logging
+log = init_logging("MULTI_RPG")
 
 # Bot's prefix is defaulted to '='.
 bot_prefix = "="
@@ -23,31 +26,22 @@ args = parse_args()
 if args.dev:
     bot_prefix = "."
     enable_error = False
-    print(f"Running dev mode. enable_error = {enable_error}")
+    log.info(f"Running dev mode. enable_error = {enable_error}")
 
 # Check if a prefix was passed, so we override the prefix set by args.dev
 if args.prefix:
     bot_prefix = args.prefix
 
 client = commands.Bot(command_prefix=[bot_prefix])
-print(f"Prefix set to [{bot_prefix}]")
+log.info(f"Prefix set to [{bot_prefix}]")
 
 # remove the default help command
 client.remove_command("help")
 
-# set up logging for command errors
-formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
-handler = logging.FileHandler("logs/commands_errors.txt")
-handler.setFormatter(formatter)
-
-commands_logger = logging.getLogger("commands_logger")
-commands_logger.setLevel(logging.INFO)
-commands_logger.addHandler(handler)
-
 
 @client.event
 async def on_ready():
-    print(f"Logged in as {client.user.name}\n{client.user.id}\n---------")
+    log.info(f"Logged in as {client.user.name}, id: {client.user.id}\n---------")
     await client.change_presence(activity=discord.Game(name="=help for commands"))
 
 
@@ -158,7 +152,7 @@ async def helper(context):
         await author.dm_channel.send(msg3)
         await author.dm_channel.send(msg4)
     except discord.Forbidden as error:
-        print(f"{type(error).__name__} {error.text}")
+        log.debug(f"{type(error).__name__} {error.text}")
         error_msg = (
             "I was unable to DM you the help message. "
             "It is possible that you do not allow DM from server members. "
@@ -228,10 +222,10 @@ if enable_error:
 
         elif isinstance(error, commands.CommandNotFound):
             error_msg = await context.send("Command not found...")
+            log.warning(f"{str(error)}\nInitiated by: {context.author.name}, ID: {context.author.id}")
             await asyncio.sleep(10)
             await context.message.delete()
             await error_msg.delete()
-            commands_logger.info(f"{str(error)}\nInitiated by: {context.author.name}, ID: {context.author.id}")
 
         # we use command checks when checking if user voted within 12 hours,
         # or if a user has a pet/account in the database
@@ -269,7 +263,7 @@ if enable_error:
                 f"User tried: {str(context.message.clean_content)}\n"
                 f"Initiated by: {context.author.name} ID: {context.author.id}."
             )
-            commands_logger.info(error_message)
+            log.warning(error_message)
 
         # special cases
         # if permissions/access error is indicated from discord's response string, private message the user
@@ -302,7 +296,7 @@ if __name__ == "__main__":
             client.load_extension(extension)
         except Exception as e:
             exc = f"{type(e).__name__}: {e}"
-            print(f"Failed to load extension {extension}\n{exc}")
+            log.error(f"Failed to load extension {extension}\n{exc}")
 
 # set up parser to config through our .ini file with our bot's token
 config = configparser.ConfigParser()
@@ -313,7 +307,7 @@ if bot_token_path.is_file():
     # we now have the bot's token
     TOKEN = config.get("BOT1", "token")
 else:
-    print(f"\nDiscord bot token not found at: {bot_token_path}... Please correct file path in Main.py file.")
+    log.error(f"\nDiscord bot token not found at: {bot_token_path}... Please correct file path in Main.py file.")
     sys.exit()
 
 client.run(TOKEN)

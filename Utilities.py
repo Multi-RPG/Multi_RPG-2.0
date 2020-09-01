@@ -2,7 +2,11 @@
 import discord
 import asyncio
 import re
+import logging
+
 from discord.ext import commands
+
+log = logging.getLogger("MULTI_RPG")
 
 
 class Utilities(commands.Cog):
@@ -33,7 +37,7 @@ class Utilities(commands.Cog):
                     await context.send("Cleared 1 message... " "Use **=clear X** to clear a higher, specified amount.")
             except Exception as e:
                 msg = f"Not ok! {e.__class__} occurred"
-                print(msg)
+                log.debug(msg)
         # else inform the user they lack sufficient privileges
         else:
             await context.send("You need to be a local server administrator to do that!")
