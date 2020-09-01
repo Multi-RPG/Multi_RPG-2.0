@@ -7,10 +7,10 @@ FORMATTER = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s: %(message
 LOG_FILE = "logs/multirpg_log.txt"
 
 
-def get_console_handler():
+def get_console_handler(level):
     """set up console handler"""
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.DEBUG)
+    console_handler.setLevel(level)
     console_handler.setFormatter(FORMATTER)
     return console_handler
 
@@ -27,14 +27,14 @@ def get_file_handler():
     return file_handler
 
 
-def init_logging(logger_name):
+def init_logging(logger_name, level):
     """Set up logging for bot"""
 
     # set up logging for bot
     log = logging.getLogger(logger_name)
-    log.setLevel(logging.DEBUG)
+    log.setLevel(level)
 
-    log.addHandler(get_console_handler())
+    log.addHandler(get_console_handler(level))
     log.addHandler(get_file_handler())
 
     # Silence irrelevant loggers

@@ -4,6 +4,7 @@ import asyncio
 import configparser
 import sys
 import datetime
+import logging
 
 from init_logging import init_logging
 from discord.ext import commands
@@ -11,8 +12,13 @@ from pathlib import Path
 from Database import Database
 from parse_args import parse_args
 
+# Parse command-line for custom settings, such as changing the default prefix and enabling the dev mode to enable
+# error messages.
+args = parse_args()
+
 # initialize logging
-log = init_logging("MULTI_RPG")
+level = logging.DEBUG if args.dev else logging.INFO
+log = init_logging("MULTI_RPG", level)
 
 # Bot's prefix is defaulted to '='.
 bot_prefix = "="
@@ -20,9 +26,7 @@ bot_prefix = "="
 # Command error handling
 enable_error = True
 
-# Parse command-line for custom settings, such as changing the default prefix and enabling the dev mode to enable
-# error messages.
-args = parse_args()
+# if --dev mode, enable error
 if args.dev:
     bot_prefix = "."
     enable_error = False
