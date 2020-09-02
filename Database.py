@@ -39,7 +39,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Users after insert:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_money()
@@ -58,7 +58,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Pets after insert:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
 
@@ -74,7 +74,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Servers after insert:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
 
@@ -89,7 +89,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Shop after insert:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
 
@@ -216,7 +216,7 @@ class Database:
         cur.execute(sql)
         rows = cur.fetchall()
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
         return rows
 
     def get_item_score(self):
@@ -319,7 +319,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Users table after cash update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_money()
@@ -333,7 +333,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Users table after level update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_level()
@@ -348,7 +348,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Pets table after XP update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_pet_xp()
@@ -374,7 +374,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Pets table after level update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_pet_level()
@@ -389,7 +389,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Users table after peace update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_peace_status()
@@ -404,7 +404,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Users table after peace update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_peace_status()
@@ -418,7 +418,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Battles table after battle gear update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_item_score()
@@ -432,7 +432,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Battles table after battle gear update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_item_score()
@@ -446,7 +446,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Battles table after battle gear update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_item_score()
@@ -460,7 +460,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Battles table after battle gear update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_item_score()
@@ -473,7 +473,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Battles table after battle gear update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
 
@@ -489,7 +489,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Battles table after battle records update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
         return self.get_battle_stats()
@@ -506,7 +506,7 @@ class Database:
         rows = cur.fetchall()
         log.debug("Lottery table after lottery update:")
         for row in rows:
-            log.debug(f"{row}")
+            log.debug(row)
 
         self.connection.commit()
 
