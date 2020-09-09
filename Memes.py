@@ -84,7 +84,8 @@ class Memes(commands.Cog):
         try:
             # download the image as "UserImage.png"
             urllib.request.urlretrieve(user_image.clean_content, "custom_memes\\UserImage.png")
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in custom memes command.")
             # the bot failed to retrieve image at that URL
             await context.send(
                 f"{context.author.mention} The link you provided seems to be faulty..."
@@ -101,7 +102,7 @@ class Memes(commands.Cog):
 
         # PASTE USER'S PROFILE PICTURE AND USERNAME ON TOP OF BACKGROUND CANVAS
         # retrieve the URL for this user's avatar to embed above the text
-        log.info(f"User's avatar: {context.author.avatar_url}")
+        log.debug(f"User's avatar: {context.author.avatar_url}")
         urllib.request.urlretrieve(f"{context.author.avatar_url}", "custom_memes\\UserAvatar.webp")
         # read the avatar image that we downloaded, convert to RGB so we can process it
         img = Image.open("custom_memes\\UserAvatar.webp", "r").convert("RGB")
@@ -124,7 +125,10 @@ class Memes(commands.Cog):
         # read the image that we downloaded earlier
         try:
             img = Image.open("custom_memes\\UserImage.png", "r").convert("RGB")
-        except:
+        except Exception as e:
+            # Image.open actually raises 3 exceptions:
+            # https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.open
+            log.debug(f"[{type(e).__name__} {e}]")
             # if we can't read the image downloaded, it's in the wrong format...
             await context.send("PNG/JPG/WebP links only please! <a:pepehands:485869482602922021>")
             return
@@ -170,8 +174,9 @@ class Memes(commands.Cog):
                 order = order.replace("“", "").replace("”", "")
             else:
                 order = str(args[0])
-            log.info(f"trump order meme arguments: {order}")
-        except:
+            log.debug(f"trump order meme arguments: {order}")
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in trump command.")
             await context.send(f'{context.author.mention}```ml\nuse =trumporder like so: =trumporder "order"```')
             return
 
@@ -210,9 +215,10 @@ class Memes(commands.Cog):
         try:
             button1 = str(args[0])
             button2 = str(args[1])
-            log.info(f"2 buttons meme arguments: {button1} {button2}")
+            log.debug(f"2 buttons meme arguments: {button1} {button2}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in two buttons command.")
             await context.send(
                 f"{context.author.mention}```ml\n" f'use =twobuttons like so: =twobuttons "option1" "option2"```'
             )
@@ -260,9 +266,10 @@ class Memes(commands.Cog):
                 reasons = reasons.replace("“", "").replace("”", "")
             else:
                 reasons = str(args[0])
-            log.info(f"reasons to live meme arguments: {reasons}")
+            log.debug(f"reasons to live meme arguments: {reasons}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in reasons-to-live command.")
             await context.send(
                 f'{context.author.mention}```ml\nuse =reasonstolive like so: =reasonstolive "reasons"```'
             )
@@ -320,9 +327,10 @@ class Memes(commands.Cog):
                 facts = facts.replace("“", "").replace("”", "")
             else:
                 facts = str(args[0])
-            log.info(f"book of facts meme arguments: {facts}")
+            log.debug(f"book of facts meme arguments: {facts}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in book-of-facts command.")
             await context.send(f'{context.author.mention}```ml\nuse =bookfacts like so: =bookfacts "facts"```')
             return
 
@@ -372,9 +380,10 @@ class Memes(commands.Cog):
                 facts = facts.replace("“", "").replace("”", "")
             else:
                 facts = str(args[0])
-            log.info(f"change my mind meme arguments: {facts}")
+            log.debug(f"change my mind meme arguments: {facts}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in change-my-mind command.")
             await context.send(
                 f'{context.author.mention}```ml\nuse =changemymind like so: =changemymind "statement"```'
             )
@@ -418,9 +427,10 @@ class Memes(commands.Cog):
         try:
             cause = str(args[0])
             reaction = str(args[1])
-            log.info(f"slap button meme arguments: {cause} {reaction}")
+            log.debug(f"slap button meme arguments: {cause} {reaction}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in slap-button command.")
             await context.send(
                 f'{context.author.mention}```ml\nuse =slapbutton like so: =slapbutton "cause" "reaction"```'
             )
@@ -458,9 +468,10 @@ class Memes(commands.Cog):
             stage2 = str(args[1])
             stage3 = str(args[2])
             stage4 = str(args[3])
-            log.info(f"expanding brain meme arguments: {stage1} {stage2} {stage3} {stage4}")
+            log.debug(f"expanding brain meme arguments: {stage1} {stage2} {stage3} {stage4}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in expanding-brain command.")
             await context.send(
                 f'{context.author.mention}```ml\nuse =brain like so: =brain "stage1" "stage2" "stage3" "stage4"```'
             )
@@ -520,9 +531,10 @@ class Memes(commands.Cog):
             # combine into 1 string with spaces between each word
             is_this_a = " ".join(args[2 : len(args)])
 
-            log.info(f"Pigeon meme arguments: {whom} {butterfly} {is_this_a}")
+            log.debug(f"Pigeon meme arguments: {whom} {butterfly} {is_this_a}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in pigeon command.")
             await context.send(
                 f'{context.author.mention}```ml\nuse =pigeon like so: =pigeon "boy" "butterfly" "is this a pidgeon?"```'
             )
@@ -574,9 +586,10 @@ class Memes(commands.Cog):
             right = str(args[1])
             car = " ".join(args[2 : len(args)])
 
-            log.info(f"Left exit meme arguments {left} {right} {car}")
+            log.debug(f"Left exit meme arguments {left} {right} {car}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in left-exit command.")
             await context.send(
                 f'{context.author.mention}```ml\nuse =leftexit like so: =leftexit "left" "right" "car"```'
             )
@@ -626,9 +639,10 @@ class Memes(commands.Cog):
             distracted_boyfriend = str(args[1])
             girlfriend = " ".join(args[2 : len(args)])
 
-            log.info(f"Distracted boyfriend meme arguments {new_girl} {distracted_boyfriend} {girlfriend}")
+            log.debug(f"Distracted boyfriend meme arguments {new_girl} {distracted_boyfriend} {girlfriend}")
 
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in boyfriend command.")
             await context.send(
                 f"{context.author.mention}```ml\nuse =boyfriend like so: "
                 f'"new girl" "distracted boyfriend" "girlfriend"```'

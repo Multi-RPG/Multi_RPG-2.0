@@ -567,7 +567,8 @@ class Account(commands.Cog):
             # try to retrieve user's level, if failed, skip to next iteration
             try:
                 user_level = user.get_user_level(0)
-            except:
+            except Exception as e:
+                log.debug(f"[{type(e).__name__} {e}] - User not found.")
                 continue
 
             # get the "member" discord object in order to retrieve the user's current discord name

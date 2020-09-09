@@ -198,7 +198,8 @@ class Shop(commands.Cog):
         # try to retrieve the item number the user should have provided as a parameter
         try:
             item_id = int(args[0])
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in buy command.")
             error_msg = await context.send(f"{context.author.mention} {help_msg}")
             await asyncio.sleep(7)
             await error_msg.delete()

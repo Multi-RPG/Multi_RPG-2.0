@@ -113,7 +113,8 @@ class Utilities(commands.Cog):
                 await context.message.delete()
                 return
         # if arguments weren't passed in correctly
-        except:
+        except Exception as e:
+            log.debug(f"[{type(e).__name__} {e}] - Error occured in remind me command.")
             error_msg = await context.send(error_str)
             await asyncio.sleep(15)
             await error_msg.delete()

@@ -106,7 +106,11 @@ class Database:
                 pass
             # the above if statement didn't throw error, so the account exists. return 1
             return 1
-        except:
+        except TypeError as error:
+            log.debug(f"[{type(error).__name__} {error}] - User not found.")
+            return 0
+        except Exception as error:
+            log.debug(f"[{type(error).__name__} {error}] - Unhandled exception.")
             return 0
 
     def find_pet(self):
@@ -122,7 +126,11 @@ class Database:
                 pass
             # the above if statement didn't throw error, so the account exists. return 1
             return 1
-        except:
+        except TypeError as error:
+            log.debug(f"[{type(error).__name__} {error}] - Pet not found.")
+            return 0
+        except Exception as error:
+            log.debug(f"[{type(error).__name__} {error}] - Unhandled exception.")
             return 0
 
     def find_server(self, server_id):
@@ -137,7 +145,11 @@ class Database:
                 pass
             # the above if statement didn't throw error, so the server is registered
             return 1
-        except:
+        except TypeError as error:
+            log.debug(f"[{type(error).__name__} {error}] - Server not found.")
+            return 0
+        except Exception as error:
+            log.debug(f"[{type(error).__name__} {error}] - Unhandled exception.")
             return 0
 
     def get_money(self):
