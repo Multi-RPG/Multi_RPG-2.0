@@ -2,7 +2,11 @@
 import discord
 import asyncio
 import re
+import logging
+
 from discord.ext import commands
+
+log = logging.getLogger("MULTI_RPG")
 
 
 class Utilities(commands.Cog):
@@ -33,7 +37,7 @@ class Utilities(commands.Cog):
                     await context.send("Cleared 1 message... " "Use **=clear X** to clear a higher, specified amount.")
             except Exception as e:
                 msg = f"Not ok! {e.__class__} occurred"
-                print(msg)
+                log.debug(msg)
         # else inform the user they lack sufficient privileges
         else:
             await context.send("You need to be a local server administrator to do that!")
@@ -118,7 +122,9 @@ class Utilities(commands.Cog):
 
         # embed the link, set thumbnail, send reminder confirmation, then wait X seconds
         em = discord.Embed(
-            title="Remindme registered", description="Will remind you in {} {}".format(time, unit), colour=0x607D4A,
+            title="Remindme registered",
+            description="Will remind you in {} {}".format(time, unit),
+            colour=0x607D4A,
         )
         em.set_thumbnail(url="https://i.imgur.com/1HdQNaz.gif")
         await context.send(embed=em)
@@ -133,12 +139,17 @@ class Utilities(commands.Cog):
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command(
-        name="code", description="Give link to code", brief='can use "=code', aliases=["CODE"],
+        name="code",
+        description="Give link to code",
+        brief='can use "=code',
+        aliases=["CODE"],
     )
     async def source_code_link(self, context):
         # embed the link, set thumbnail and send
         em = discord.Embed(
-            title="Source code link", description="https://github.com/Multi-RPG/Multi_RPG-2.0", colour=0x607D4A,
+            title="Source code link",
+            description="https://github.com/Multi-RPG/Multi_RPG-2.0",
+            colour=0x607D4A,
         )
         em.set_thumbnail(url="https://i.imgur.com/nbTu5lX.png")
         await context.send(embed=em)
@@ -170,7 +181,9 @@ class Utilities(commands.Cog):
     async def vote_link(self, context):
         # embed the link, set thumbnail and send
         em = discord.Embed(
-            title="Vote link", description="https://discordbots.org/bot/486349031224639488/vote", colour=0x607D4A,
+            title="Vote link",
+            description="https://discordbots.org/bot/486349031224639488/vote",
+            colour=0x607D4A,
         )
         em.set_thumbnail(url="https://cdn.discordapp.com/emojis/440598342767083521.png?size=40")
         await context.send(embed=em)

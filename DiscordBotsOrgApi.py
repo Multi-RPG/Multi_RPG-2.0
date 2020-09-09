@@ -27,11 +27,11 @@ class DiscordBotsOrgAPI(commands.Cog):
                 self.dblpy = dbl.DBLClient(self.client, self.token, autopost=True)
         # if the file doesn't exist with the api token, do not attempt to use discordbots.org API
         else:
-            print("\nWarning: discordbots.org token not found at: ", api_token_path)
-            print("client will continue to run without DiscordBotsOrgApi support.")
+            logger.info("\nWarning: discordbots.org token not found at: ", api_token_path)
+            logger.info("client will continue to run without DiscordBotsOrgApi support.")
 
     async def on_guild_post():
-        print("Server count posted successfully")
+        logger.info("Server count posted successfully")
 
     def check_upvote(self, voter_id):
         headers = {"Authorization": self.token}
@@ -50,5 +50,5 @@ def setup(client):
         level=logging.INFO,
     )
     logging.info("Running Multi-RPG")
-    logger = logging.getLogger("client")
+    logger = logging.getLogger("DiscordBotOrgAPI")
     client.add_cog(DiscordBotsOrgAPI(client))
