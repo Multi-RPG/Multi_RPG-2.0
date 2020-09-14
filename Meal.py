@@ -9,18 +9,32 @@ from requests.exceptions import HTTPError
 log = logging.getLogger("MULTI_RPG")
 
 
-STR_INGREDIENT = "strIngredient"
-STR_MEASURE = "strMeasure"
+class MealValue:
+    """Constants to access items in the payload sent by the API"""
 
-QUERY = {
-    "SEARCH_NAME": "https://www.themealdb.com/api/json/v1/1/search.php?s=",
-    "LIST_MEAL_BY_LETTER": "https://www.themealdb.com/api/json/v1/1/search.php?f=",
-    "LOOKUP_BY_ID": "https://www.themealdb.com/api/json/v1/1/lookup.php?i=",
-    "GET_RANDOM": "https://www.themealdb.com/api/json/v1/1/random.php",
-}
+    meal_id = "idMeal"
+    title = "strMeal"
+    ingredient = "strIngredient"
+    measure = "strMeasure"
+    instructions = "strInstructions"
+    image = "strMealThumb"
+    source = "strSource"
+
+
+class Query:
+    """Available queries"""
+
+    search_by_name = "https://www.themealdb.com/api/json/v1/1/search.php?s="
+    search_by_letter = "https://www.themealdb.com/api/json/v1/1/search.php?f="
+    search_by_id = "https://www.themealdb.com/api/json/v1/1/lookup.php?i="
+    search_by_category = "https://www.themealdb.com/api/json/v1/1/filter.php?c="
+
+    get_random = "https://www.themealdb.com/api/json/v1/1/random.php"
 
 
 class Meal:
+    meal = "meals"
+
     def __init__(self, ID, title, ingredients, instruction, image, source):
         self._id = ID
         self._title = title
@@ -97,8 +111,8 @@ def _parse_ingredients_measure(payload):
     ingredients = list()
     measure = list()
     for index in range(1, 21):
-        ingredient_key = f"{STR_INGREDIENT}{index}"
-        measure_key = f"{STR_MEASURE}{index}"
+        ingredient_key = f"{MealValue.ingredient}{index}"
+        measure_key = f"{MealValue.measure}{index}"
         ingredients.append(payload["meals"][0][ingredient_key])
         measure.append(payload["meals"][0][measure_key])
 
@@ -115,20 +129,20 @@ def _parse_ingredients_measure(payload):
 
 def _get_meal():
     try:
-        # response = requests.get(f"{QUERY['SEARCH_NAME']}{content}")
-        response = requests.get(QUERY["GET_RANDOM"])
+        # response = requests.get(f"{Query.search_by_name}{name}")
+        response = requests.get(Query.get_random)
         response.raise_for_status()
 
         payload = response.json()
-        # print(f"{payload['meals']}")
-        # print(f"{payload['meals'][0]}")
+        # print(f"{payload[Meal.meal]}")
+        # print(f"{payload[Meal.meal][0]}")
 
-        ID = payload["meals"][0]["idMeal"]
-        title = payload["meals"][0]["strMeal"]
+        ID = payload[Meal.meal][0][MealValue.meal_id]
+        title = payload[Meal.meal][0][MealValue.title]
         ingredients = _parse_ingredients_measure(payload)
-        instruction = payload["meals"][0]["strInstructions"]
-        image = payload["meals"][0]["strMealThumb"]
-        source = payload["meals"][0]["strSource"]
+        instruction = payload[Meal.meal][0][MealValue.instructions]
+        image = payload[Meal.meal][0][MealValue.image]
+        source = payload[Meal.meal][0][MealValue.source]
         return Meal(ID, title, ingredients, instruction, image, source)
 
     except HTTPError as http_err:
