@@ -5,6 +5,7 @@ import re
 import logging
 
 from discord.ext import commands
+from Meal import get_meal
 
 log = logging.getLogger("MULTI_RPG")
 
@@ -235,6 +236,36 @@ class Utilities(commands.Cog):
 
         await context.send(embed=embed)
         await context.message.delete()
+
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.command(
+        name="get_meal",
+        description="Get a random meal recipe.",
+        brief="random meal recipe.",
+        aliases=["recipe", "food", "meal"],
+    )
+    async def meal(self, context):
+        """
+        Get meal command
+        Returns a random meal
+        """
+        meal = get_meal()
+        ingredients = meal.ingredients
+        # instruction = meal.instruction
+        title = meal.title
+
+        embed = discord.Embed(title=title, url=meal.source, colour=discord.Colour(0x28D1F7))
+        embed.set_thumbnail(url=meal.image)
+        embed.set_footer(text=meal.source)
+
+        for ingredients, measure in ingredients.items():
+            embed.add_field(name=ingredients, value=measure, inline=True)
+        await context.send(embed=embed)
+        # if instruction:
+        #     for item in instruction:
+        #         await context.send(f"```Instructions:\n{item}```")
+        # else:
+        #     embed.set_footer(text=meal.source)
 
 
 def setup(client):
