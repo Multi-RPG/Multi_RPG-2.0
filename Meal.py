@@ -24,16 +24,17 @@ class MealValue:
 class Query:
     """Available queries"""
 
+    get_random = "https://www.themealdb.com/api/json/v1/1/random.php"
+
     search_by_name = "https://www.themealdb.com/api/json/v1/1/search.php?s="
     search_by_letter = "https://www.themealdb.com/api/json/v1/1/search.php?f="
     search_by_id = "https://www.themealdb.com/api/json/v1/1/lookup.php?i="
     search_by_category = "https://www.themealdb.com/api/json/v1/1/filter.php?c="
 
-    get_random = "https://www.themealdb.com/api/json/v1/1/random.php"
-
 
 class Meal:
     meal = "meals"
+    queries = ["random", "name", "letter", "id", "category"]
 
     def __init__(self, ID, title, ingredients, instruction, image, source):
         self._id = ID
@@ -106,6 +107,10 @@ class Meal:
     def get_formatted_ingredients(self):
         return self._concatenate()
 
+    @staticmethod
+    def get_queries():
+        return ", ".join(Meal.queries)
+
 
 def _parse_ingredients_measure(payload):
     ingredients = list()
@@ -127,15 +132,32 @@ def _parse_ingredients_measure(payload):
     return ingredients
 
 
-def _get_meal():
+def get_query_string(query_type):
+    query_type = query_type.lower()
+    if query_type == "random":
+        return Query.get_random
+    elif query_type == "name":
+        return Query.search_by_name
+    elif query_type == "letter":
+        return Query.search_by_letter
+    elif query_type == "id":
+        return Query.search_by_id
+    elif query_type == "category":
+        return Query.search_by_category
+    else:
+        raise ValueError(f"This query: {query_type} doesn't exist.")
+
+
+def _get_meal(query_type, arg=None):
     try:
-        # response = requests.get(f"{Query.search_by_name}{name}")
-        response = requests.get(Query.get_random)
+        query_string = get_query_string(query_type)
+        if arg:
+            # if optional argument, append it to the query string
+            query_string += arg
+        response = requests.get(query_string)
         response.raise_for_status()
 
         payload = response.json()
-        # print(f"{payload[Meal.meal]}")
-        # print(f"{payload[Meal.meal][0]}")
 
         ID = payload[Meal.meal][0][MealValue.meal_id]
         title = payload[Meal.meal][0][MealValue.title]
@@ -153,13 +175,13 @@ def _get_meal():
         log.debug("\nWe got a response: Success")
 
 
-def get_meal():
+def get_meal(query_type):
     """
     If an exception is thrown, it retuns None,
     so, keeps asking until _get_meal doesn't return None.
     """
     while True:
-        meal = _get_meal()
+        meal = _get_meal(query_type)
         if meal is None:
             continue
         return meal

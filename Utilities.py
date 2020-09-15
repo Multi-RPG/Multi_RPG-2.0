@@ -5,7 +5,7 @@ import re
 import logging
 
 from discord.ext import commands
-from Meal import get_meal
+from Meal import get_meal, Meal
 
 log = logging.getLogger("MULTI_RPG")
 
@@ -244,12 +244,48 @@ class Utilities(commands.Cog):
         brief="random meal recipe.",
         aliases=["recipe", "food", "meal"],
     )
-    async def meal(self, context):
+    async def meal(self, context, *args):
         """
         Get meal command
         Returns a random meal
         """
-        meal = get_meal()
+
+        # Checks for arguments...
+        if not args:
+            # We assume user wants a random meal.
+            meal = get_meal("random")
+            log.debug(f"aidu args length {len(args)}")
+        elif len(args) == 1 and args[0].lower() == "help":
+            await context.send(
+                f"```Optional arguments for =meal "
+                f"({Meal.get_queries()})\nExample: =meal query_type [value]\nfor more "
+                f"example, use =help```"
+            )
+            return
+        elif len(args) == 1 and args[0].lower() in Meal.queries:
+            # Extra arguments for meal command are:
+            # ["random", "name", "letter", "id", "category"]
+            log.debug(f"aidu {args[0].lower()} args length {len(args)}")
+            # TODO: Check if we actually got a meal using the others arguments.
+            # If no meal, we tell the user no meal was found with that name, letter, id or category
+            meal = get_meal(args[0].lower())
+        elif len(args) > 1:
+            # TODO: For arguments name, letter, id and category, more than one argument is necessary
+            # User entered more than one argument.
+            log.debug(f"aidu too many arguments for this command. args length {len(args)}")
+            await context.send("Too many arguments. Do =help for instructions.")
+            return
+        else:
+            # User entered a wrong argument.
+            log.debug(
+                f"aidu the thing you entered is not a valid argument for meal command."
+                f"args length {len(args)} {args}"
+            )
+            await context.send("Wrong argument. Do =help for instructions.")
+            return
+
+        # If got a meal, print it to user.
+        # Set up the message.
         ingredients = meal.ingredients
         # instruction = meal.instruction
         title = meal.title
@@ -261,6 +297,7 @@ class Utilities(commands.Cog):
         for ingredients, measure in ingredients.items():
             embed.add_field(name=ingredients, value=measure, inline=True)
         await context.send(embed=embed)
+        # Not implemented:
         # if instruction:
         #     for item in instruction:
         #         await context.send(f"```Instructions:\n{item}```")
