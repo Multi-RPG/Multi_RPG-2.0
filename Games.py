@@ -5,150 +5,14 @@ import re
 import discord
 import logging
 
+
 from discord.ext import commands
 from num2words import num2words
 from Users import Users
+from GamesMemLoader import GamesMemLoader
 from random import choices
 
 log = logging.getLogger("MULTI_RPG")
-
-
-def get_hangman_art():
-    # prepare array of hangman art
-    art_array = []
-    with open(r"db_and_words\hangmen.txt") as my_file:
-        for line in my_file:
-            art_array.append(line)
-
-    # convert respective list index-ranges to string with ''.join
-    # the resulting art_array[0-6] will represent each stage of hangman
-    art_array[0] = "".join(art_array[0:6])
-    art_array[1] = "".join(art_array[7:13])
-    art_array[2] = "".join(art_array[14:20])
-    art_array[3] = "".join(art_array[21:27])
-    art_array[4] = "".join(art_array[28:34])
-    art_array[5] = "".join(art_array[35:41])
-    art_array[6] = "".join(art_array[42:49])
-    return art_array
-
-
-def get_hangman_words():
-    # only read words file once so we won't have to re-open the file every game call
-    words_file = open(r"db_and_words\words.txt", "r")
-    words = words_file.readlines()
-    words_file.close()
-    return words
-
-
-def battle_decider(fighter1, fighter2, fighter1_weight, fighter2_weight):
-    # choices function maps a selection to a probability, and selects one choice based off probability
-    winner = choices([fighter1, fighter2], [fighter1_weight, fighter2_weight])
-    log.info(f"winner is {winner}.")
-    # choices function returning [1] or [2] so use regex to pull the integers out
-    return int(re.findall(r"\d+", str(winner))[0])
-
-
-def pick_word(cat):
-    if cat == 1:
-        random_word = random.choice(all_words[0:180])
-        category = "Country name"
-    elif cat == 2:
-        random_word = random.choice(all_words[181:319])
-        category = "Farm"
-    elif cat == 3:
-        random_word = random.choice(all_words[320:389])
-        category = "Camping"
-    elif cat == 4:
-        random_word = random.choice(all_words[390:490])
-        category = "Household items/devices"
-    elif cat == 5:
-        random_word = random.choice(all_words[491:603])
-        category = "Beach"
-    elif cat == 6:
-        random_word = random.choice(all_words[604:648])
-        category = "Holidays"
-    elif cat == 7:
-        random_word = random.choice(all_words[649:699])
-        category = "US States"
-    elif cat == 8:
-        random_word = random.choice(all_words[700:998])
-        category = "Sports & Hobbies"
-    else:
-        random_word = random.choice(all_words[649:699])
-        category = "US States"
-
-    # quick band-aid fix to truncate CR in text file, COMING BACK LATER TO FIX
-    length = len(random_word) - 1  # to remove carriage return, I'm not using unix format to make the list
-    random_word = random_word[:length]  # truncate word with [:length] cause of carriage return in text file...
-
-    underscore_sequence = list("")  # this will be our list of underscores
-    # it will be consistently replaced by guesses
-
-    # fill the underscore_sequence list with underscore underscore_sequencelate of the correct word
-    for x in random_word:
-        if x == " ":
-            underscore_sequence += "      "  # in the case of 2-word phrases, need to move everything over
-        elif x == "'":
-            underscore_sequence += " '"
-        else:
-            underscore_sequence += " \u2581"  # if not a space, add: \u2581, a special underscore character.
-            # using to replace by correctly guessed letters
-
-    return random_word.upper(), category, underscore_sequence
-
-
-def add_guess_to_list(guess, guessed):  # accepts guess and list of all guesses
-    if len(guess.clean_content) > 1:  # don't want to add whole word to guess list
-        all_guessed = "".join(map(str, guessed))
-        return guessed, all_guessed
-    guessed.extend(guess.clean_content.upper())  # add last guess to the list of guessed words
-    guessed.extend(" ")  # add space to guessed list
-    all_guessed = "".join(map(str, guessed))  # messy syntax, convert the list into a string so bot can print it
-    return guessed, all_guessed
-
-
-def find_matches(guess, correct_word, underscore_sequence):
-    index = 0
-    num_matches = 0
-    for x in correct_word:
-        index += 1
-        if x == " ":
-            index += 2
-        # if any matches, we need to replace underscore(s) in the sequence
-        # and increase the number of matches for the loop
-        if guess.clean_content.upper() == x:
-            # convulted index scheme due to underscore_sequence format
-            underscore_sequence[index * 2 - 1] = guess.clean_content.upper()
-            num_matches += 1
-    return num_matches, underscore_sequence
-
-
-def get_tier_list(file_path):
-    with open(file_path, "r") as lines:
-        high_tier = []
-        mid_tier = []
-        low_tier = []
-
-        current_tier = ""
-
-        for line in lines:
-            line = line.rstrip("\n")
-            if line == "HIGH-TIER-LIST":
-                current_tier = "high"
-                continue
-            if line == "MEDIUM-TIER-LIST":
-                current_tier = "med"
-                continue
-            if line == "LOW-TIER-LIST":
-                current_tier = "low"
-                continue
-            if current_tier == "high":
-                high_tier.append(line)
-            elif current_tier == "med":
-                mid_tier.append(line)
-            elif current_tier == "low":
-                low_tier.append(line)
-        return high_tier, mid_tier, low_tier
 
 
 # short decorator function declaration, confirm that command user has an account in database
@@ -163,11 +27,14 @@ def has_account():
     return commands.check(predicate)
 
 
+# load the mem loader class
+memLoader = GamesMemLoader()
 # store data from text files into memory (emoji lists, hangman words, hangman art)
-high_tier_emojis, mid_tier_emojis, low_tier_emojis = get_tier_list("db_and_words/emojis_slots.txt")
-high_tier_fish, mid_tier_fish, low_tier_fish = get_tier_list("db_and_words/emojis_fish.txt")
-all_words = get_hangman_words()
-hangmen = get_hangman_art()
+# put the data in global variables. now this data is available for the rest of runtime
+high_tier_emojis, mid_tier_emojis, low_tier_emojis = memLoader.get_tier_list("db_and_words/emojis_slots.txt")
+high_tier_fish, mid_tier_fish, low_tier_fish = memLoader.get_tier_list("db_and_words/emojis_fish.txt")
+all_words = memLoader.get_hangman_words()
+hangmen = memLoader.get_hangman_art()
 
 
 class Games(commands.Cog):
@@ -175,7 +42,6 @@ class Games(commands.Cog):
         self.client = client
 
     """ROB FUNCTION"""
-
     @has_account()
     @commands.cooldown(1, 3600, commands.BucketType.user)
     @commands.command(
@@ -358,6 +224,13 @@ class Games(commands.Cog):
         aliases=["battle", "BATTLE", "FIGHT", "duel", "DUEL"],
     )
     async def battle_user(self, context, *args):
+        def battle_decider(fighter1, fighter2, fighter1_weight, fighter2_weight):
+            # choices function maps a selection to a probability, and selects one choice based off probability
+            winner = choices([fighter1, fighter2], [fighter1_weight, fighter2_weight])
+            log.info(f"winner is {winner}.")
+            # choices function returning [1] or [2] so use regex to pull the integers out
+            return int(re.findall(r"\d+", str(winner))[0])
+
         # try/except block to check argument syntax
         try:
             if not args:
@@ -592,6 +465,80 @@ class Games(commands.Cog):
             "```fix\n1. Country name\n2. Farm\n3. Camping\n4. Household items/devices\n"
             "5. Beach\n6. Holidays\n7. US States\n8. Sports & Hobbies```"
         )
+
+        def pick_word(cat):
+            if cat == 1:
+                random_word = random.choice(all_words[0:180])
+                category = "Country name"
+            elif cat == 2:
+                random_word = random.choice(all_words[181:319])
+                category = "Farm"
+            elif cat == 3:
+                random_word = random.choice(all_words[320:389])
+                category = "Camping"
+            elif cat == 4:
+                random_word = random.choice(all_words[390:490])
+                category = "Household items/devices"
+            elif cat == 5:
+                random_word = random.choice(all_words[491:603])
+                category = "Beach"
+            elif cat == 6:
+                random_word = random.choice(all_words[604:648])
+                category = "Holidays"
+            elif cat == 7:
+                random_word = random.choice(all_words[649:699])
+                category = "US States"
+            elif cat == 8:
+                random_word = random.choice(all_words[700:998])
+                category = "Sports & Hobbies"
+            else:
+                random_word = random.choice(all_words[649:699])
+                category = "US States"
+
+            # quick band-aid fix to truncate CR in text file, COMING BACK LATER TO FIX
+            length = len(random_word) - 1  # to remove carriage return, I'm not using unix format to make the list
+            random_word = random_word[:length]  # truncate word with [:length] cause of carriage return in text file...
+
+            underscore_sequence = list("")  # this will be our list of underscores
+            # it will be consistently replaced by guesses
+
+            # fill the underscore_sequence list with underscore underscore_sequencelate of the correct word
+            for x in random_word:
+                if x == " ":
+                    underscore_sequence += "      "  # in the case of 2-word phrases, need to move everything over
+                elif x == "'":
+                    underscore_sequence += " '"
+                else:
+                    underscore_sequence += " \u2581"  # if not a space, add: \u2581, a special underscore character.
+                    # using to replace by correctly guessed letters
+
+            return random_word.upper(), category, underscore_sequence
+
+        def add_guess_to_list(guess, guessed):  # accepts guess and list of all guesses
+            if len(guess.clean_content) > 1:  # don't want to add whole word to guess list
+                all_guessed = "".join(map(str, guessed))
+                return guessed, all_guessed
+            guessed.extend(guess.clean_content.upper())  # add last guess to the list of guessed words
+            guessed.extend(" ")  # add space to guessed list
+            all_guessed = "".join(map(str, guessed))  # messy syntax, convert the list into a string so bot can print it
+            return guessed, all_guessed
+
+        def find_matches(guess, correct_word, underscore_sequence):
+            index = 0
+            num_matches = 0
+            for x in correct_word:
+                index += 1
+                if x == " ":
+                    index += 2
+                # if any matches, we need to replace underscore(s) in the sequence
+                # and increase the number of matches for the loop
+                if guess.clean_content.upper() == x:
+                    # convulted index scheme due to underscore_sequence format
+                    underscore_sequence[index * 2 - 1] = guess.clean_content.upper()
+                    num_matches += 1
+            return num_matches, underscore_sequence
+
+
         wrong_guesses = 0  # global running count of incorrect guesses
         guessed_letters = [""]  # string of letters
 
