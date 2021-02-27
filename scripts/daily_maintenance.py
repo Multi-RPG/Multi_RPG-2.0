@@ -26,7 +26,7 @@ client = commands.Bot(command_prefix=["=", "%"])
 
 # set up parser to config through our .ini file with our bot's token
 config = configparser.ConfigParser()
-bot_token_path = Path("tokens/tokenbot.ini")  # use forward slash "/" for path directories
+bot_token_path = Path("../tokens/tokenbot.ini")  # use forward slash "/" for path directories
 # confirm the token is located in the above path
 if bot_token_path.is_file():
     config.read(bot_token_path)
@@ -55,7 +55,7 @@ async def on_ready():
 
     # make sure to change this path to the full file path if you plan to use crontab, or else it will not work
     config = configparser.ConfigParser()
-    items_path = Path("db_and_words/all_items.ini")  # use forward slash "/" for path directories
+    items_path = Path("../db_and_words/all_items.ini")  # use forward slash "/" for path directories
     if items_path.is_file():
         config.read(items_path)
     else:
