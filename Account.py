@@ -73,10 +73,9 @@ class Account(commands.Cog):
         try:
             # using money on a target.
             if len(args) > 0:
-                # use regex to extract only numbers to get their discord ID,
-                # ex: <@348195501025394688> to 348195501025394688
-                # create user instance with their target's discord ID, check database for their money field
-                target_id = re.findall(r"\d+", args[0])[0]
+                # retrieve the target ID from the whoever the user mentioned
+                target_id = context.message.mentions[0].id
+
                 target = Users(target_id)
                 if target.find_user() == 0:
                     await context.send("Target does not have account.")
@@ -136,10 +135,9 @@ class Account(commands.Cog):
         try:
             # using level on a target.
             if len(args) > 0:
-                # use regex to extract only numbers to get their discord ID,
-                # ex: <@348195501025394688> to 348195501025394688
-                # create user instance with their target's discord ID, check database for their level field
-                target_id = re.findall(r"\d+", args[0])[0]
+                # retrieve the target ID from the whoever the user mentioned
+                target_id = context.message.mentions[0].id
+
                 target = Users(target_id)
                 if target.find_user() == 0:
                     await context.send("Target does not have account.")
@@ -203,9 +201,9 @@ class Account(commands.Cog):
                 return
             # create user instance with their discord ID, check database for their level field
             donator = Users(context.author.id)
-            # use regex to extract only numbers from "receiver_string" to get their discord ID,
-            # ex: <@348195501025394688> to 348195501025394688
-            receiver = Users(re.findall(r"\d+", receiver_string)[0])
+
+            # set the receiver ID to whoever the donator mentioned
+            receiver = Users(context.message.mentions[0].id)
 
             # check if receiver has account
             if receiver.find_user() == 0:
@@ -248,10 +246,9 @@ class Account(commands.Cog):
         try:
             # using stats on a target.
             if len(args) > 0:
-                # use regex to extract only numbers to get their discord ID,
-                # ex: <@348195501025394688> to 348195501025394688
-                # create user instance with their target's discord ID, check database for their money field
-                target_id = re.findall(r"\d+", args[0])[0]
+                # retrieve the target ID from the whoever the user mentioned
+                target_id = context.message.mentions[0].id
+
                 target = Users(target_id)
                 if target.find_user() == 0:
                     await context.send("Target does not have account.")
