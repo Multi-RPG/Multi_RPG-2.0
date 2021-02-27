@@ -193,8 +193,8 @@ class Games(commands.Cog):
         # if they specified a rob target, attempt to rob that target
         if args:
             try:
-                # use regex to extract only the user-id from the user targeted
-                victim_id = re.findall(r"\d+", args[0])[0]
+                # retrieve the target ID from the whoever the user mentioned
+                victim_id = context.message.mentions[0].id
                 victim = Users(victim_id)
 
                 # get_member() returns the "member" object that matches an id provided
@@ -390,8 +390,8 @@ class Games(commands.Cog):
 
         # retrieve battle target
         target = args[0]
-        # use regex to extract only the user-id from the user targeted
-        fighter2_id = int(re.findall(r"\d+", target)[0])
+        # retrieve the target ID from the whoever the user mentioned
+        fighter2_id = context.message.mentions[0].id
         fighter2 = Users(fighter2_id)
 
         # check if targeted user has account
