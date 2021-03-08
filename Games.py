@@ -406,8 +406,7 @@ class Games(commands.Cog):
         await asyncio.sleep(3)
         await gif.delete()
 
-        # check if they specified a guess of heads or tails
-        # process if they won or not
+        # process if their guess was correct or not
         if guess in ["heads", "HEADS"]:
             if result == 1:
                 msg = "<:heads:486705167643967508> Result is **Heads**! You win! <a:worryHype:487059927731273739>"
