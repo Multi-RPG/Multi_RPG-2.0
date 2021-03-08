@@ -1093,7 +1093,10 @@ class Games(commands.Cog):
             else:
                 await context.send(f"{context.author.mention}, no bet specified, defaulting to **$10** ** **")
                 bet = 10
-        except:
+        except Exception as e:
+            msg = f"Not ok! {e.__class__} occurred"
+            log.debug(msg)
+
             await context.send(
                 f'{context.author.mention}```ml\nuse =cards like so: "=cards X"  -- X being integer amount to bet```'
             )
