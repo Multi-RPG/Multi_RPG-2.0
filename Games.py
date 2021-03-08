@@ -5,7 +5,6 @@ import re
 import discord
 import logging
 
-
 from discord.ext import commands
 from num2words import num2words
 from Users import Users
@@ -42,6 +41,7 @@ class Games(commands.Cog):
         self.client = client
 
     """ROB FUNCTION"""
+
     @has_account()
     @commands.cooldown(1, 3600, commands.BucketType.user)
     @commands.command(
@@ -87,7 +87,9 @@ class Games(commands.Cog):
                         f"{context.author.mention} That target is in :dove: **peace mode** :dove:. Try another target."
                     )
                     return
-            except:
+            except Exception as e:
+                msg = f"Not ok! {e.__class__} occurred"
+                log.debug(msg)
                 context.command.reset_cooldown(context)
                 await context.send(
                     f'{context.author.mention}```ml\nIf targeting with rob, use =rob like so: "=rob @User"'
@@ -252,7 +254,9 @@ class Games(commands.Cog):
                 await context.send("No bet specified, defaulting to **$10**\n ** **")
                 bet = 10
         # if the user still used syntax incorrectly
-        except:
+        except Exception as e:
+            msg = f"Not ok! {e.__class__} occurred"
+            log.debug(msg)
             await context.send(
                 f"{context.author.mention}```ml\nuse =fight like so: "
                 f'"=fight @user X"  -- X being integer amount to bet```'
@@ -351,7 +355,7 @@ class Games(commands.Cog):
                 await context.send(f"You rejected the battle! {target}")
 
         # if the target never responded
-        except:
+        except TimeoutError:
             await context.send("**Battle request ignored...** <a:pepehands:485869482602922021>")
 
     """FLIP COIN FUNCTION"""
@@ -365,32 +369,37 @@ class Games(commands.Cog):
     )
     async def flip_coin(self, context, *args):
         result = random.randint(0, 1)  # flipping in "binary"
+        guess = ""
+        bet = 0
         win = 0
+        error_msg = "To use a bet as X being your bet, try **=flip heads X** or **=flip tails X**"
 
-        # first, check if they specified a bet and they have enough money for it
-        # this try/catch block will simply pass if they did not specify a bet
-        try:
-            user = Users(context.author.id)
-
-            # Convenient way to flip all
-            if type(args[1]) == str and args[1] == "all":
-                bet = user.get_user_money(0)
-            else:
+        user = Users(context.author.id)
+        if args:
+            if len(args) > 0:
+                guess = args[0]
+            if len(args) > 1:
                 bet = int(args[1])
-
-            # pass 0 to return integer version of money, see USERS.PY function
-            if bet > user.get_user_money(0) or bet < 1:
-                error_msg = await context.send(
-                    f"You don't have enough money for that bet..."
-                    f" <a:pepehands:485869482602922021> {context.author.mention}"
-                )
-                await asyncio.sleep(6)
-                await error_msg.delete()
-
+                # Convenient way to flip all
+                if type(args[1]) == str and args[1] == "all":
+                    bet = user.get_user_money(0)
+            if len(args) > 2:
+                await context.send(error_msg)
                 return
-        except:
-            pass
 
+        # check if user has enough money for their bet, or if they tried a negative bet
+        # pass 0 to return integer version of money, see USERS.PY function
+        if bet > user.get_user_money(0) or bet < 0:
+            error_msg = await context.send(
+                f"You don't have enough money for that bet..."
+                f" <a:pepehands:485869482602922021> {context.author.mention}"
+            )
+            await asyncio.sleep(6)
+            await error_msg.delete()
+
+            return
+
+        # send gif of coin flipping
         gif = await context.send(
             "https://media1.tenor.com/images/938e1fc4fcf2e136855fd0e83b1e8a5f/tenor.gif?itemid=5017733"
         )
@@ -399,53 +408,50 @@ class Games(commands.Cog):
 
         # check if they specified a guess of heads or tails
         # process if they won or not
-        try:
-            if args[0] in ["heads", "HEADS"]:
-                if result == 1:
-                    msg = "<:heads:486705167643967508> Result is **Heads**! You win! <a:worryHype:487059927731273739>"
-                    win = 1
-                else:
-                    msg = "<:heads:486705184370589718> Result is **Tails**! You lost. <a:pepehands:485869482602922021>"
-            elif args[0] in ["tails", "TAILS"]:
-                if result == 1:
-                    msg = "<:heads:486705167643967508> Result is **Heads**! You lost. <a:pepehands:485869482602922021>"
-                else:
-                    msg = "<:heads:486705184370589718> Result is **Tails**! You win! <a:worryHype:487059927731273739>"
-                    win = 1
+        if guess in ["heads", "HEADS"]:
+            if result == 1:
+                msg = "<:heads:486705167643967508> Result is **Heads**! You win! <a:worryHype:487059927731273739>"
+                win = 1
             else:
-                error_msg = await context.send("Did you mean heads or tails? Try **=flip heads** or **=flip tails**.")
-                await asyncio.sleep(6)
-                await error_msg.delete()
-                return
-        except:
+                msg = "<:heads:486705184370589718> Result is **Tails**! You lost. <a:pepehands:485869482602922021>"
+        elif guess in ["tails", "TAILS"]:
+            if result == 1:
+                msg = "<:heads:486705167643967508> Result is **Heads**! You lost. <a:pepehands:485869482602922021>"
+            else:
+                msg = "<:heads:486705184370589718> Result is **Tails**! You win! <a:worryHype:487059927731273739>"
+                win = 1
+        else:
             # no arguments provided at all. so just give a result
             if result == 1:
                 msg = "<:heads:486705167643967508> Result is **Heads**!"
             else:
                 msg = "<:heads:486705184370589718> Result is **Tails**!"
 
-        # if they specified a "guess" and "bet" that was valid, check if they won
-        # note this will only pass through if "bet" was assigned through the earlier try/catch
-        try:
-            if win == 1:
-                # triple user's bet if they win, add to account
-                msg2 = f"\n{user.update_user_money(bet)}"
-            else:
-                # remove user's bet from their account if they lose
-                msg2 = f"\n{user.update_user_money(bet * -1)}"
-                # if they have $0 after that flip, give a donation dollar to discourage account re-creation
-                # pass in 0 for get_user_money to return the money as integer, SEE USERS.PY
-                if user.get_user_money(0) == 0:
-                    msg2 += "\n** **\n_Mission failed. We'll get 'em next time. Take this **$1**._"
-                    msg2 += f"\n{user.update_user_money(1)}"
-        except:
-            pass
+        # if they made a bet, check if they won
+        if bet > 0:
+            msg2 = ""
+            try:
+                if win == 1:
+                    # triple user's bet if they win, add to account
+                    msg2 = f"\n{user.update_user_money(bet)}"
+                else:
+                    # remove user's bet from their account if they lose
+                    msg2 = f"\n{user.update_user_money(bet * -1)}"
+                    # if they have $0 after that flip, give a donation dollar to discourage account re-creation
+                    # pass in 0 for get_user_money to return the money as integer, SEE USERS.PY
+                    if user.get_user_money(0) == 0:
+                        msg2 += "\n** **\n_Mission failed. We'll get 'em next time. Take this **$1**._"
+                        msg2 += f"\n{user.update_user_money(1)}"
 
-        try:
+            except Exception as e:
+                msg = f"Not ok! {e.__class__} occurred"
+                log.debug(msg)
+
             # embed the flip results message with money won and send
             em = discord.Embed(description=msg + msg2, colour=0x607D4A)
             await context.send(context.author.mention, embed=em)
-        except:
+
+        else:
             # embed the flip results message and send
             em = discord.Embed(description=msg, colour=0x607D4A)
             await context.send(context.author.mention, embed=em)
@@ -537,7 +543,6 @@ class Games(commands.Cog):
                     underscore_sequence[index * 2 - 1] = guess.clean_content.upper()
                     num_matches += 1
             return num_matches, underscore_sequence
-
 
         wrong_guesses = 0  # global running count of incorrect guesses
         guessed_letters = [""]  # string of letters
