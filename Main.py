@@ -36,8 +36,8 @@ if args.dev:
 if args.prefix:
     bot_prefix = args.prefix
 
-client = commands.Bot(command_prefix=[bot_prefix])
-log.info(f"Prefix set to [{bot_prefix}]")
+client = commands.Bot(command_prefix=commands.when_mentioned_or(bot_prefix))
+log.info(f"Prefix set to {bot_prefix}")
 
 # remove the default help command
 client.remove_command("help")
