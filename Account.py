@@ -4,8 +4,9 @@ import discord
 import asyncio
 import logging
 
+from discord import option
 from discord.ext import commands
-from DiscordBotsOrgApi import DiscordBotsOrgAPI
+# from DiscordBotsOrgApi import DiscordBotsOrgAPI
 from Users import Users
 
 log = logging.getLogger("MULTI_RPG")
@@ -42,11 +43,9 @@ class Account(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(
+    @commands.slash_command(
         name="create",
-        description="make a user",
-        brief="start a user account",
+        description="Create an account.",
         aliases=["register"],
     )
     async def register(self, context):
@@ -54,7 +53,7 @@ class Account(commands.Cog):
         new_user = Users(context.author.id)
 
         if new_user.find_user() == 1:
-            await context.send("<:worrymag1:531214786646507540> You **already** have an account registered!")
+            await context.respond("<:worrymag1:531214786646507540> You **already** have an account registered!")
             return
 
         em = discord.Embed(title="", colour=0x607D4A)
@@ -64,69 +63,48 @@ class Account(commands.Cog):
             inline=True,
         )
         em.set_thumbnail(url=context.author.avatar_url)
-        await context.send(embed=em)
+        await context.respond(embed=em)
 
-    @has_account()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(name="money", aliases=["m", "MONEY"])
-    async def money(self, context, *args):
-        try:
-            # using money on a target.
-            if len(args) > 0:
-                # retrieve the target ID from the whoever the user mentioned
-                target_id = context.message.mentions[0].id
+    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.slash_command(
+        name="money",
+        description="Get money balance.",
+        aliases=["m", "MONEY"],
+    )
+    @option("user", type=discord.User, required=False)
+    async def money(self, context, user: discord.User):
+        if user is None:
+            # create user instance with their discord ID,
+            # check database for their money field
+            discord_user = context.author
+            user = Users(discord_user.id)
 
-                target = Users(target_id)
-                if target.find_user() == 0:
-                    await context.send("Target does not have account.")
-                    return
+            # embed the money retrieved from get_user_money(),
+            # set thumbnail to 64x64 version of user's id
+            em = discord.Embed(title="", colour=0x607D4A)
+            em.add_field(
+                name=context.author.display_name,
+                value=f"**:moneybag: ** {user.get_user_money()}",
+                inline=True,
+            )
+            em.set_thumbnail(url=discord_user.display_avatar)
+            await context.respond(embed=em)
+        else:
+            target = Users(user.id)
+            if target.find_user() == 0:
+                await context.respond("Target does not have account.")
+                return
 
-                # fetch_user returns a User object that matches an id provided
-                discord_member_target = await self.client.fetch_user(target_id)
-
-                # embed the money retrieved from get_user_money(), set thumbnail to 64x64 version of target's id
-                em = discord.Embed(title="", colour=0x607D4A)
-                em.add_field(
-                    name=discord_member_target.display_name,
-                    value=f"**:moneybag: ** {target.get_user_money()}",
-                    inline=True,
-                )
-                thumb_url = (
-                    f"https://cdn.discordapp.com/avatars/{discord_member_target.id}"
-                    f"/{discord_member_target.avatar}.webp?size=64"
-                )
-
-                em.set_thumbnail(url=thumb_url)
-
-                await context.send(context.author.mention, embed=em)
-
-            # if they passed no parameter, get their own money
-            else:
-                # create user instance with their discord ID, check database for their money field
-                user = Users(context.author.id)
-
-                # embed the money retrieved from get_user_money(), set thumbnail to 64x64 version of user's id
-                em = discord.Embed(title="", colour=0x607D4A)
-                em.add_field(
-                    name=context.author.display_name,
-                    value=f"**:moneybag: ** {user.get_user_money()}",
-                    inline=True,
-                )
-                thumb_url = (
-                    f"https://cdn.discordapp.com/avatars/{context.author.id}" f"/{context.author.avatar}.webp?size=64"
-                )
-                em.set_thumbnail(url=thumb_url)
-
-                await context.send(context.author.mention, embed=em)
-
-        # Added this exception for debugging purposes.
-        except Exception as e:
-            msg = f"Not ok! {e.__class__} occurred"
-            log.debug(msg)
-            await context.send(f"{context.author.mention}```ml\nuse =money like so: **=money** or **=money @user**")
-        finally:
-            # delete original message to reduce spam
-            await context.message.delete()
+            # embed the money retrieved from get_user_money(),
+            # set thumbnail to 64x64 version of target's id
+            em = discord.Embed(title="", colour=0x607D4A)
+            em.add_field(
+                name=user.display_name,
+                value=f"**:moneybag: ** {target.get_user_money()}",
+                inline=True,
+            )
+            em.set_thumbnail(url=user.display_avatar)
+            await context.respond(embed=em)
 
     @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
