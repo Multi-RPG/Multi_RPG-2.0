@@ -4,8 +4,10 @@ import discord
 import asyncio
 import logging
 
-from discord import option
 from discord.ext import commands
+from discord import option
+from typing import Union
+
 # from DiscordBotsOrgApi import DiscordBotsOrgAPI
 from Users import Users
 
@@ -56,223 +58,163 @@ class Account(commands.Cog):
             await context.respond("<:worrymag1:531214786646507540> You **already** have an account registered!")
             return
 
-        em = discord.Embed(title="", colour=0x607D4A)
-        em.add_field(
-            name=context.author.display_name,
-            value=new_user.add_user(),
-            inline=True,
+        await context.respond(
+            embed=self._basic_message_embed(
+                name=context.author.display_name, value=new_user.add_user(), url=context.author.display_avatar
+            )
         )
-        em.set_thumbnail(url=context.author.avatar_url)
-        await context.respond(embed=em)
 
     # @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.slash_command(
         name="money",
-        description="Get money balance.",
+        description="Display money balance.",
         aliases=["m", "MONEY"],
     )
-    @option("user", type=discord.User, required=False)
-    async def money(self, context, user: discord.User):
+    @option(name="user", type=discord.User, required=False)
+    async def money(self, context, user):
         if user is None:
-            # create user instance with their discord ID,
-            # check database for their money field
             discord_user = context.author
             user = Users(discord_user.id)
+            if user.find_user() == 0:
+                await context.respond("Target does not have account.")
+                return
 
-            # embed the money retrieved from get_user_money(),
-            # set thumbnail to 64x64 version of user's id
-            em = discord.Embed(title="", colour=0x607D4A)
-            em.add_field(
-                name=context.author.display_name,
-                value=f"**:moneybag: ** {user.get_user_money()}",
-                inline=True,
+            await context.respond(
+                embed=self._basic_message_embed(
+                    name=discord_user.display_name,
+                    value=f"**:moneybag: ** {user.get_user_money()}",
+                    url=discord_user.display_avatar,
+                )
             )
-            em.set_thumbnail(url=discord_user.display_avatar)
-            await context.respond(embed=em)
         else:
             target = Users(user.id)
             if target.find_user() == 0:
                 await context.respond("Target does not have account.")
                 return
 
-            # embed the money retrieved from get_user_money(),
-            # set thumbnail to 64x64 version of target's id
-            em = discord.Embed(title="", colour=0x607D4A)
-            em.add_field(
-                name=user.display_name,
-                value=f"**:moneybag: ** {target.get_user_money()}",
-                inline=True,
+            await context.respond(
+                embed=self._basic_message_embed(
+                    name=user.display_name, value=f"**:moneybag: ** {target.get_user_money()}", url=user.display_avatar
+                )
             )
-            em.set_thumbnail(url=user.display_avatar)
-            await context.respond(embed=em)
 
-    @has_account()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(name="level", aliases=["LEVEL", "lvl", "LVL"])
-    async def level(self, context, *args):
-        try:
-            # using level on a target.
-            if len(args) > 0:
-                # retrieve the target ID from the whoever the user mentioned
-                target_id = context.message.mentions[0].id
+    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.slash_command(
+        name="level",
+        description="Display level.",
+        aliases=["LEVEL", "lvl", "LVL"],
+    )
+    @option(name="user", type=discord.User, required=False)
+    async def level(self, context, user):
+        if user is None:
+            discord_user = context.author
+            user = Users(discord_user.id)
+            if user.find_user() == 0:
+                await context.respond("Target does not have account.")
+                return
 
-                target = Users(target_id)
-                if target.find_user() == 0:
-                    await context.send("Target does not have account.")
-                    return
-
-                # fetch_user returns a User object that matches an id provided
-                discord_member_target = await self.client.fetch_user(target_id)
-                # embed the level retrieved from get_user_level(), set thumbnail to 64x64 version of target's id
-                em = discord.Embed(title="", colour=0x607D4A)
-                em.add_field(
-                    name=discord_member_target.display_name,
-                    value=f"**Level** {target.get_user_level()}",
-                    inline=True,
-                )
-                thumb_url = (
-                    f"https://cdn.discordapp.com/avatars/{discord_member_target.id}"
-                    f"/{discord_member_target.avatar}.webp?size=64"
-                )
-                em.set_thumbnail(url=thumb_url)
-
-                await context.send(context.author.mention, embed=em)
-
-            # if they passed no parameter, get their own level
-            else:
-                # create user instance with their discord ID, check database for their level field
-                user = Users(context.author.id)
-
-                # embed the level retrieved from get_user_level(), set thumbnail to 64x64 version of user's id
-                em = discord.Embed(title="", colour=0x607D4A)
-                em.add_field(
-                    name=context.author.display_name,
+            await context.respond(
+                embed=self._basic_message_embed(
+                    name=discord_user.display_name,
                     value=f"**Level** {user.get_user_level()}",
-                    inline=True,
+                    url=discord_user.display_avatar,
                 )
-                thumb_url = (
-                    f"https://cdn.discordapp.com/avatars/{context.author.id}/{context.author.avatar}.webp?size=64"
-                )
-                em.set_thumbnail(url=thumb_url)
-
-                await context.send(context.author.mention, embed=em)
-
-        # Added this exception for debugging purposes.
-        except Exception as e:
-            msg = f"Not ok! {e.__class__} occurred"
-            log.debug(msg)
-            await context.send(f"{context.author.mention}```ml\nuse =level like so: **=level** or **=level @user**")
-        finally:
-            # delete original message to reduce spam
-            await context.message.delete()
-
-    @has_account()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(name="give", aliases=["DONATE", "GIVE", "pay", "donate", "PAY", "gift", "GIFT"])
-    async def give(self, context, *args):
-        # will automatically go to exception if all arguments weren't supplied correctly
-        try:
-            receiver_string = args[0]
-            amnt = int(args[1])
-            if amnt < 1:
-                await context.send("Can’t GIFT DEBT!")
-                return
-            # create user instance with their discord ID, check database for their level field
-            donator = Users(context.author.id)
-
-            # set the receiver ID to whoever the donator mentioned
-            receiver = Users(context.message.mentions[0].id)
-
-            # check if receiver has account
-            if receiver.find_user() == 0:
-                await context.send(
-                    f"{context.author.mention} The target doesn't have an account." f"\nUse **=create** to make one."
-                )
-                return
-            # check if donator has enough money for the donation
-            # pass 0 to return integer version of money, see USERS.PY function
-            if int(amnt) > donator.get_user_money(0):
-                await context.send(
-                    f"{context.author.mention} You don't have enough money for that donation..."
-                    f" <a:pepehands:485869482602922021> "
-                )
+            )
+        else:
+            target = Users(user.id)
+            if target.find_user() == 0:
+                await context.respond("Target does not have account.")
                 return
 
-            # pass the donation amount, pass the receiver user object, and pass the receiver's string name
-            msg = context.author.mention + " " + donator.donate_money(int(amnt), receiver, receiver_string)
-            # embed the donation message, put a heartwarming emoji size 64x64 as the thumbnail
-            em = discord.Embed(title="", colour=0x607D4A)
-            em.add_field(name="DONATION ALERT", value=msg, inline=True)
-            em.set_thumbnail(url="https://cdn.discordapp.com/emojis/526815183553822721.webp?size=64")
-            await context.send(embed=em)
-            await context.message.delete()
-        except Exception as e:
-            msg = f"Not ok! {e.__class__} occurred"
-            log.debug(msg)
-            await context.send(
-                f"{context.author.mention}```ml\nuse =give like so: **=give @user X**"
-                f"    -- X being amnt of money to give```"
+            await context.respond(
+                embed=self._basic_message_embed(
+                    name=user.display_name,
+                    value=f"**Level** {target.get_user_level()}",
+                    url=user.display_avatar,
+                )
             )
 
-    @has_account()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(
+    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.slash_command(
+        name="give",
+        description="Give own money to other user.",
+        aliases=["DONATE", "GIVE", "pay", "donate", "PAY", "gift", "GIFT"],
+    )
+    @option(name="user", type=discord.User, required=True)
+    @option(name="amount", type=int, required=True)
+    async def give(self, context, user, amount):
+        receiver = Users(user.id)
+        # check if receiver has account
+        if receiver.find_user() == 0:
+            await context.respond(f"The target doesn't have an account." f"\nUse **/create** to make one.")
+            return
+
+        # check if donator has account
+        donator = Users(context.author.id)
+        if donator.find_user() == 0:
+            await context.respond(f"You don't have an account." f"\nUse **/create** to make one.")
+            return
+
+        if amount < 1:
+            await context.respond("Can’t GIFT DEBT!")
+            return
+
+        if amount > donator.get_user_money(0):
+            await context.respond(f"You don't have enough money for that donation... <a:pepehands:485869482602922021>")
+            return
+
+        msg = f"{donator.donate_money(amount, receiver, user.display_name)}"
+        await context.respond(
+            embed=self._basic_message_embed(
+                name="DONATION ALERT",
+                value=msg,
+                url="https://cdn.discordapp.com/emojis/526815183553822721.webp?size=64",
+            )
+        )
+
+    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.slash_command(
         name="stats",
+        description="Display profile stats.",
         aliases=["battles", "BRECORDS", "STATS", "profile", "PROFILE", "gear", "GEAR"],
     )
-    async def profile_stats(self, context, *args):
-        try:
-            # using stats on a target.
-            if len(args) > 0:
-                # retrieve the target ID from the whoever the user mentioned
-                target_id = context.message.mentions[0].id
+    @option(name="user", type=discord.User, required=False)
+    async def profile_stats(self, context, user):
+        if user is None:
+            discord_user = context.author
+            user = Users(discord_user.id)
+            if user.find_user() == 0:
+                await context.respond("Target does not have account.")
+                return
 
-                target = Users(target_id)
-                if target.find_user() == 0:
-                    await context.send("Target does not have account.")
-                    return
-
-                # fetch_user returns a User object that matches an id provided
-                discord_member_target = await self.client.fetch_user(target_id)
-                target_avatar_url = discord_member_target.avatar_url
-
-                # embed the statistics retrieved from get_user_stats(), set thumbnail to target's id
-                em = discord.Embed(title="", colour=0x607D4A)
-                em.add_field(
-                    name=discord_member_target.display_name,
-                    value=target.get_user_stats(),
-                    inline=True,
-                )
-                em.set_thumbnail(url=target_avatar_url)
-
-                await context.send(context.author.mention, embed=em)
-
-            # if they passed no parameter, or user was not found, get their own records
-            else:
-                # create user instance with their discord ID, check database for their level field
-                user = Users(context.author.id)
-
-                # embed the statistics retrieved from get_user_stats(), set thumbnail to user's id
-                em = discord.Embed(title="", colour=0x607D4A)
-                em.add_field(
-                    name=context.author.display_name,
+            await context.respond(
+                embed=self._basic_message_embed(
+                    name=discord_user.display_name,
                     value=user.get_user_stats(),
-                    inline=True,
+                    url=discord_user.display_avatar,
                 )
-                em.set_thumbnail(url=context.author.avatar_url)
-
-                await context.send(context.author.mention, embed=em)
-
-        except Exception as e:
-            msg = f"Not ok! {e.__class__} occurred"
-            log.debug(msg)
-            await context.send(
-                f"{context.author.mention}```ml\nuse =profile like so: **=profile** or **=profile @user**"
             )
 
-    @has_account()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(name="levelup", aliases=["lup", "LEVELUP"])
+        else:
+            target = Users(user.id)
+            if target.find_user() == 0:
+                await context.respond("Target does not have account.")
+                return
+
+            await context.respond(
+                embed=self._basic_message_embed(
+                    name=user.display_name,
+                    value=target.get_user_stats(),
+                    url=user.display_avatar,
+                )
+            )
+
+    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.slash_command(
+        name="levelup",
+        description="Level the account up.",
+        aliases=["lup", "LEVELUP"],
+    )
     async def levelup(self, context):
         # create instance of user who wants to level-up
         user = Users(context.author.id)
@@ -564,6 +506,24 @@ class Account(commands.Cog):
         # set embedded thumbnail to an upwards trend chart
         em.set_thumbnail(url="https://cdn.shopify.com/s/files/1/0185/5092/products/objects-0104_800x.png?v=1369543363")
         await context.send(embed=em)
+
+    def _basic_message_embed(
+        self,
+        name: str,
+        value: str,
+        url: str,
+        title: str = "",
+        colour: Union[discord.Colour, int] = 0x607D4A,
+        inline: bool = True,
+    ):
+        em = discord.Embed(title=title, colour=colour)
+        em.add_field(
+            name=name,
+            value=value,
+            inline=inline,
+        )
+        em.set_thumbnail(url=url)
+        return em
 
 
 def setup(client):
