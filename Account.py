@@ -53,7 +53,6 @@ class Account(commands.Cog):
     async def register(self, context):
         # create new user instance with their discord ID to store in database
         new_user = Users(context.author.id)
-
         if new_user.find_user() == 1:
             await context.respond("<:worrymag1:531214786646507540> You **already** have an account registered!")
             return
@@ -64,7 +63,7 @@ class Account(commands.Cog):
             )
         )
 
-    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.slash_command(
         name="money",
         description="Display money balance.",
@@ -76,7 +75,7 @@ class Account(commands.Cog):
             discord_user = context.author
             user = Users(discord_user.id)
             if user.find_user() == 0:
-                await context.respond("Target does not have account.")
+                await context.respond("You do not have an account.")
                 return
 
             await context.respond(
@@ -89,7 +88,7 @@ class Account(commands.Cog):
         else:
             target = Users(user.id)
             if target.find_user() == 0:
-                await context.respond("Target does not have account.")
+                await context.respond("Target does not have an account.")
                 return
 
             await context.respond(
@@ -98,7 +97,7 @@ class Account(commands.Cog):
                 )
             )
 
-    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.slash_command(
         name="level",
         description="Display level.",
@@ -110,7 +109,7 @@ class Account(commands.Cog):
             discord_user = context.author
             user = Users(discord_user.id)
             if user.find_user() == 0:
-                await context.respond("Target does not have account.")
+                await context.respond("you do not have an account.")
                 return
 
             await context.respond(
@@ -123,7 +122,7 @@ class Account(commands.Cog):
         else:
             target = Users(user.id)
             if target.find_user() == 0:
-                await context.respond("Target does not have account.")
+                await context.respond("Target does not have an account.")
                 return
 
             await context.respond(
@@ -134,7 +133,7 @@ class Account(commands.Cog):
                 )
             )
 
-    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.slash_command(
         name="give",
         description="Give own money to other user.",
@@ -172,7 +171,7 @@ class Account(commands.Cog):
             )
         )
 
-    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.slash_command(
         name="stats",
         description="Display profile stats.",
@@ -184,7 +183,7 @@ class Account(commands.Cog):
             discord_user = context.author
             user = Users(discord_user.id)
             if user.find_user() == 0:
-                await context.respond("Target does not have account.")
+                await context.respond("You do not have an account.")
                 return
 
             await context.respond(
@@ -198,7 +197,7 @@ class Account(commands.Cog):
         else:
             target = Users(user.id)
             if target.find_user() == 0:
-                await context.respond("Target does not have account.")
+                await context.respond("Target does not have an account.")
                 return
 
             await context.respond(
@@ -209,7 +208,7 @@ class Account(commands.Cog):
                 )
             )
 
-    # @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.slash_command(
         name="levelup",
         description="Level the account up.",
@@ -236,20 +235,19 @@ class Account(commands.Cog):
         elif user_level in range(34, 50):
             level_up_cost = int(300 * ((user_level + 1) ** 2.6) - (300 * user_level))
         elif user_level == 50:
-            await self.client.say("You are already level 50, the max level!")
+            await self.respond("You are already level 50, the max level!")
             return
 
         # check if they have enough money for a level-up
         if user.get_user_money(0) < level_up_cost:
-            error_msg = await context.send(
+            error_msg = await context.respond(
                 f"{context.author.mention} Not enough money for level-up... <a:pepehands:485869482602922021>\n"
                 f"** **\nAccount balance: {user.get_user_money()}\nLevel **{user_level + 1}"
                 f"** requires: **${level_up_cost:,}**"
             )
             # wait 15 seconds then delete error message and original message to reduce spam
             await asyncio.sleep(15)
-            await error_msg.delete()
-            await context.message.delete()
+            await context.delete()
             return
 
         # passed conditional, so they have enough money to level up
@@ -264,8 +262,7 @@ class Account(commands.Cog):
         em = discord.Embed(description=msg, colour=0x607D4A)
         thumb_url = f"https://cdn.discordapp.com/avatars/{context.author.id}/{context.author.avatar}.webp?size=1024"
         em.set_thumbnail(url=thumb_url)
-
-        await context.send(context.author.mention, embed=em)
+        await context.respond(context.author.mention, embed=em)
 
         # wait for user's input
         # message is the event name we're waiting for.
@@ -274,34 +271,38 @@ class Account(commands.Cog):
         def is_author(m):
             return m.author == context.author and m.channel == context.channel
 
-        confirm = await self.client.wait_for("message", check=is_author, timeout=60)
-        if confirm.clean_content.upper() == "CONFIRM":
-            # check if they tried to exploit the code by spending all their money before confirming
-            if user.get_user_money(0) < level_up_cost:
-                await context.send(f"{context.author.mention} You spent money before confirming...")
-                return
-            # deduct the level-up cost from their account
-            user.update_user_money(level_up_cost * -1)
-            # embed the confirmation message, set thumbnail to user's id of size 64x64
-            # increase level by 1 and print new level
-            em = discord.Embed(title="", colour=0x607D4A)
-            em.add_field(
-                name=context.author.display_name,
-                value=user.update_user_level(),
-                inline=True,
-            )
-            thumb_url = f"https://cdn.discordapp.com/avatars/{context.author.id}/{context.author.avatar}.webp?size=64"
-            em.set_thumbnail(url=thumb_url)
-            await context.send(embed=em)
-        else:
-            await context.send(f"{context.author.mention} Cancelled level-up.")
+        try:
+            confirm = await self.client.wait_for("message", check=is_author, timeout=30)
+            if confirm.clean_content.upper() == "CONFIRM":
+                # check if they tried to exploit the code by spending all their money before confirming
+                if user.get_user_money(0) < level_up_cost:
+                    await context.respond("You spent money before confirming...")
+                    return
+                # deduct the level-up cost from their account
+                user.update_user_money(level_up_cost * -1)
+                # embed the confirmation message, set thumbnail to user's id of size 64x64
+                # increase level by 1 and print new level
+                await context.send(
+                    embed=self._basic_message_embed(
+                        name=context.author.display_name,
+                        value=user.update_user_level(),
+                        url=context.author.display_avatar,
+                    )
+                )
+            else:
+                await context.respond("I didn't get your answer. Please try again.")
+        except asyncio.TimeoutError:
+            await context.respond("Cancelled level-up.")
 
-    @has_account()
     @commands.cooldown(1, 86400, commands.BucketType.user)
-    @commands.command(name="daily", aliases=["DAILY", "dailygamble"])
+    @commands.slash_command(name="daily", description="Get daily money.", aliases=["DAILY", "dailygamble"])
     async def daily(self, context):
         # create instance of user who wants to get their daily money
         user = Users(context.author.id)
+        if user.find_user() == 0:
+            await context.respond("You do not have an account.")
+            return
+
         # get the user's current level
         # calculate the cost of their next level-up
         user_level = user.get_user_level(0)  # get int version of level, SEE USERS.PY
@@ -311,20 +312,22 @@ class Account(commands.Cog):
             f"<a:worryswipe:525755450218643496> Daily **${dailyreward}"
             f"** received! <a:worryswipe:525755450218643496>\n{user.update_user_money(dailyreward)}"
         )
-
-        # embed the confirmation message, set thumbnail to user's id
-        em = discord.Embed(title="", colour=0x607D4A)
-        em.add_field(name=context.author.display_name, value=msg, inline=True)
-        em.set_thumbnail(url=context.author.avatar_url)
-        await context.send(embed=em)
+        await context.respond(
+            embed=self._basic_message_embed(
+                name=context.author.display_name, value=msg, url=context.author.display_avatar
+            )
+        )
 
     @has_voted()
-    @has_account()
     @commands.cooldown(1, 43200, commands.BucketType.user)
-    @commands.command(name="daily2", aliases=["DAILY2", "bonus", "votebonus"])
+    @commands.slash_command(name="daily2", description="Get daily money.", aliases=["DAILY2", "bonus", "votebonus"])
     async def daily2(self, context):
         # create instance of user who earned their vote bonus
         user = Users(context.author.id)
+        if user.find_user() == 0:
+            await context.respond("You do not have an account.")
+            return
+
         # get the user's current level
         user_level = user.get_user_level(0)  # get int version of level, SEE USERS.PY
         dailyreward = user_level * 50
@@ -333,72 +336,66 @@ class Account(commands.Cog):
             f"<a:worryswipe:525755450218643496> Daily **${dailyreward}"
             f"** received! <a:worryswipe:525755450218643496>\n{user.update_user_money(dailyreward)}"
         )
-
-        # embed the confirmation message, set thumbnail to user's id
-        em = discord.Embed(title="", colour=0x607D4A)
-        em.add_field(
-            name=f"Thanks for voting, {context.author.display_name}",
-            value=msg,
-            inline=True,
+        await context.respond(
+            embed=self._basic_message_embed(
+                name=f"Thanks for voting, {context.author.display_name}", value=msg, url=context.author.display_avatar
+            )
         )
-        em.set_thumbnail(url=context.author.avatar_url)
-        await context.send(embed=em)
 
-    @has_account()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(
+    @commands.slash_command(
         name="toggle",
+        description="Toggle peace on and off.",
         aliases=["togglepeace", "TOGGLEPEACE", "peace", "PEACE"],
     )
     async def toggle_peace(self, context):
         # create instance of user who wants to get their daily money
         user = Users(context.author.id)
+        if user.find_user() == 0:
+            await context.respond("You do not have an account.")
+            return
+
         user_peace_status = user.get_user_peace_status()
         user_peace_cooldown = user.get_user_peace_cooldown()
         if user_peace_status == 0 and user_peace_cooldown == 0:
             msg = (
                 ":dove: Would you like to enable peace status? :dove:\n\nType **confirm** to enter peace mode\n"
-                "Type **cancel** to cancel\n\n"
+                "Type anything else to cancel\n\n"
                 "_Note: \u200B \u200B \u200B This makes you exempt from users who use =rob @user "
                 "\nNote2: \u200B In exchange, you will not be able to =rob @user"
                 "\nNote3: You can still use =rob or be robbed randomly from =rob"
                 "\nNote4: If enabled, cannot exit peace mode until Monday at 7am_"
             )
-            # embed the confirmation message, set thumbnail to user's id
-            em = discord.Embed(title="", colour=0x607D4A)
-            em.add_field(name=context.author.display_name, value=msg, inline=True)
-            em.set_thumbnail(url=context.author.avatar_url)
-            await context.send(embed=em)
-
-            # wait for a "confirm" response from the user to process the peace toggle
-            # if it is not "confirm", cancel toggle
+            await context.respond(
+                embed=self._basic_message_embed(
+                    name=context.author.display_name, value=msg, url=context.author.display_avatar
+                )
+            )
 
             # helper to check if it's the author that it's responding.
             def is_author(m):
                 return m.author == context.author and m.channel == context.channel
 
-            response = await self.client.wait_for("message", check=is_author, timeout=20)
-            if response.clean_content.upper() == "CONFIRM":
-                user.toggle_user_peace_status()
-                user.update_user_peace_cooldown()
-                confirmation = (
-                    ":dove: You are now **in peace** status :dove:"
-                    "\n\nYou are **unable** to turn it off until Monday at 7 AM PST!"
-                )
-
-                # embed the confirmation string, add the user's avatar to it, and send it
-                em = discord.Embed(title="", colour=0x607D4A)
-                em.add_field(
-                    name=context.author.display_name,
-                    value=confirmation,
-                    inline=True,
-                )
-                em.set_thumbnail(url=context.author.avatar_url)
-                await context.send(embed=em)
-                return
-            else:
-                await context.send(f"{context.author.mention} Cancelled peace toggle-on!")
-                return
+            try:
+                # wait for a "confirm" response from the user to process the peace toggle
+                # if it is not "confirm", cancel toggle
+                response = await self.client.wait_for("message", check=is_author, timeout=20)
+                if response.clean_content.upper() == "CONFIRM":
+                    user.toggle_user_peace_status()
+                    user.update_user_peace_cooldown()
+                    confirmation = (
+                        ":dove: You are now **in peace** status :dove:"
+                        "\n\nYou are **unable** to turn it off until Monday at 7 AM PST!"
+                    )
+                    await context.send(
+                        embed=self._basic_message_embed(
+                            name=context.author.display_name, value=confirmation, url=context.author.display_avatar
+                        )
+                    )
+                else:
+                    await context.respond("Cancelled peace toggle-on.")
+            except asyncio.TimeoutError:
+                await context.respond("Cancelled peace toggle-on!")
 
         elif user_peace_status == 1 and user_peace_cooldown == 0:
             msg = (
@@ -409,35 +406,31 @@ class Account(commands.Cog):
             # embed the confirmation message, set thumbnail to user's id
             em = discord.Embed(description=msg, colour=0x607D4A)
             em.set_thumbnail(url=context.author.avatar_url)
-            await context.send(embed=em)
-
-            # wait for a "confirm" response from the user to process the peace toggle
-            # if it is not "confirm", cancel toggle
+            await context.response(embed=em)
 
             # helper to check if it's the author that it's responding.
             def is_author(m):
                 return m.author == context.author and m.channel == context.channel
 
-            response = await self.client.wait_for("message", check=is_author, timeout=20)
-            if response.clean_content.upper() == "CONFIRM":
-                user.toggle_user_peace_status()
-                confirmation = (
-                    ":dove: You are now **out of peace** status :dove:\n\n_Note: =rob @user is now available_"
-                )
+            try:
+                # wait for a "confirm" response from the user to process the peace toggle
+                # if it is not "confirm", cancel toggle
+                response = await self.client.wait_for("message", check=is_author, timeout=20)
+                if response.clean_content.upper() == "CONFIRM":
+                    user.toggle_user_peace_status()
+                    confirmation = (
+                        ":dove: You are now **out of peace** status :dove:\n\n_Note: =rob @user is now available_"
+                    )
+                    await context.send(
+                        embed=self._basic_message_embed(
+                            name=context.author.display_name, value=confirmation, url=context.author.display_avatar
+                        )
+                    )
+                else:
+                    await context.respond("Cancelled peace toogle-on.")
 
-                # embed the confirmation string, add the user's avatar to it, and send it
-                em = discord.Embed(title="", colour=0x607D4A)
-                em.add_field(
-                    name=context.author.display_name,
-                    value=confirmation,
-                    inline=True,
-                )
-                em.set_thumbnail(url=context.author.avatar_url)
-                await context.send(embed=em)
-                return
-            else:
-                await context.send(f"{context.author.mention} Cancelled peace toggle-off!")
-                return
+            except asyncio.TimeoutError:
+                await context.respond("Cancelled peace toggle-on!")
 
         elif user_peace_cooldown == 1:
             msg = (
@@ -447,15 +440,17 @@ class Account(commands.Cog):
             # embed the confirmation message, set thumbnail to user's id
             em = discord.Embed(description=msg, colour=0x607D4A)
             em.set_thumbnail(url="https://cdn.discordapp.com/emojis/440598341877891083.png?size=40")
-            await context.send(embed=em)
-            return
+            await context.response(embed=em)
 
-    @has_account()
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name="rankings", aliases=["ranks", "leaderboards", "lb"])
+    @commands.slash_command(name="rankings", description="Display ranking.", aliases=["ranks", "leaderboards", "lb"])
     async def ranks(self, context):
         # create instance of user who wants to view rankings
         user = Users(context.author.id)
+        if user.find_user() == 0:
+            await context.respond("You do not have an account.")
+            return
+
         # retrieve top 15 ranked players
         rankings = user.get_user_ranks()
         # declare variables we will use as columns for the leaderboards
@@ -482,6 +477,7 @@ class Account(commands.Cog):
             # format money for commas
             total_winnings = f"{total_winnings:,}"
             # try to retrieve user's level, if failed, skip to next iteration
+            # FIXME: refactor this.
             try:
                 user_level = user.get_user_level(0)
             except Exception as e:
@@ -505,7 +501,7 @@ class Account(commands.Cog):
         em.add_field(name="Winnings/W/L", value=win_loss_column, inline=True)
         # set embedded thumbnail to an upwards trend chart
         em.set_thumbnail(url="https://cdn.shopify.com/s/files/1/0185/5092/products/objects-0104_800x.png?v=1369543363")
-        await context.send(embed=em)
+        await context.respond(embed=em)
 
     def _basic_message_embed(
         self,
